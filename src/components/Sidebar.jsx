@@ -1,0 +1,201 @@
+import { useState } from "react";
+import * as api from "../lib/api";
+import Modal from "./Modal.jsx";
+
+export default function Sidebar({
+  user,
+  clients,
+  programs,
+  selectedClient,
+  selectedProgram,
+  view,
+  onSelectClient,
+  onSelectProgram,
+  onSetView,
+  onClientsChanged,
+  onProgramsChanged,
+  onSignOut,
+}) {
+  const [clientModal, setClientModal] = useState(false);
+  const [programModal, setProgramModal] = useState(false);
+
+  return (
+    <aside className="sidebar">
+      <div className="brand">
+        <span className="brand-mark">◆</span>
+        <span className="brand-name">ProgramLab</span>
+      </div>
+
+      <nav className="nav">
+        <button
+          className={"nav-btn" + (view === "calendar" ? " active" : "")}
+          onClick={() => onSetView("calendar")}
+        >
+          <span className="nav-icon">📅</span> Calendar
+        </button>
+        <button
+          className={"nav-btn" + (view === "programs" ? " active" : "")}
+          onClick={() => onSetView("programs")}
+        >
+          <span className="nav-icon">📋</span> Programs
+        </button>
+      </nav>
+
+      {/* Clients */}
+      <div className="panel">
+        <div className="panel-head">
+          <h2>Clients</h2>
+          <button className="icon-btn" onClick={() => setClientModal(true)} title="Add client">+</button>
+        </div>
+        <ul className="list">
+          {clients.length === 0 && <li className="list-empty">No clients yet</li>}
+          {clients.map((c) => (
+            <li
+              key={c.id}
+              className={"list-item" + (selectedClient?.id === c.id ? " active" : "")}
+              onClick={() => onSelectClient(c)}
+            >
+              <span>{c.name}</span>
+              <span className="meta">{c.goal || ""}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Programs */}
+      <div className="panel">
+        <div className="panel-head">
+          <h2>Programs</h2>
+          <button
+            className="icon-btn"
+            onClick={() => selectedClient && setProgramModal(true)}
+            title={selectedClient ? "Add program" : "Select a client first"}
+            disabled={!selectedClient}
+          >+</button>
+        </div>
+        <ul className="list">
+          {!selectedClient && <li className="list-empty">Select a client</li>}
+          {selectedClient && programs.length === 0 && (
+            <li className="list-empty">No programs yet</li>
+          )}
+          {programs.map((p) => (
+            <li
+              key={p.id}
+              className={"list-item" + (selectedProgram?.id === p.id ? " active" : "")}
+              onClick={() => onSelectProgram(p)}
+            >
+              <span>{p.name}</span>
+              <span className="meta">{p.weeks}w</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Account footer */}
+      <div className="sidebar-foot">
+        <span className="user-email" title={user.email}>{user.email}</span>
+        <button className="linklike" onClick={onSignOut}>Sign out</button>
+      </div>
+
+      {clientModal && (
+        <ClientForm
+          onClose={() => setClientModal(false)}
+          onSaved={async (created) => {
+            setClientModal(false);
+            const list = await onClientsChanged();
+            const fresh = (list || []).find((c) => c.id === created.id);
+            if (fresh) onSelectClient(fresh);
+          }}
+        />
+      )}
+
+      {programModal && selectedClient && (
+        <ProgramForm
+          clientId={selectedClient.id}
+          onClose={() => setProgramModal(false)}
+          onSaved={async (created) => {
+            setProgramModal(false);
+            await onProgramsChanged();
+            onSelectProgram(created);
+          }}
+        />
+      )}
+    </aside>
+  );
+}
+
+function ClientForm({ onClose, onSaved }) {
+  const [name, setName] = useState("");
+  const [goal, setGoal] = useState("");
+  const [busy, setBusy] = useState(false);
+
+  async function submit(e) {
+    e.preventDefault();
+    if (!name.trim()) return;
+    setBusy(true);
+    try {
+      const created = await api.createClient(name.trim(), goal.trim());
+      onSaved(created);
+    } catch (err) {
+      alert(err.message);
+      setBusy(false);
+    }
+  }
+
+  return (
+    <Modal title="New client" onClose={onClose}>
+      <form onSubmit={submit} className="form">
+        <label className="field">
+          <span>Name</span>
+          <input value={name} onChange={(e) => setName(e.target.value)} autoFocus required />
+        </label>
+        <label className="field">
+          <span>Primary goal</span>
+          <input value={goal} onChange={(e) => setGoal(e.target.value)} placeholder="e.g. Strength" />
+        </label>
+        <div className="form-actions">
+          <button type="button" className="btn secondary" onClick={onClose}>Cancel</button>
+          <button type="submit" className="btn" disabled={busy}>Add client</button>
+        </div>
+      </form>
+    </Modal>
+  );
+}
+
+function ProgramForm({ clientId, onClose, onSaved }) {
+  const [name, setName] = useState("");
+  const [weeks, setWeeks] = useState(4);
+  const [busy, setBusy] = useState(false);
+
+  async function submit(e) {
+    e.preventDefault();
+    if (!name.trim()) return;
+    setBusy(true);
+    try {
+      const created = await api.createProgram(clientId, name.trim(), Number(weeks) || 4);
+      onSaved(created);
+    } catch (err) {
+      alert(err.message);
+      setBusy(false);
+    }
+  }
+
+  return (
+    <Modal title="New program" onClose={onClose}>
+      <form onSubmit={submit} className="form">
+        <label className="field">
+          <span>Program name</span>
+          <input value={name} onChange={(e) => setName(e.target.value)} autoFocus required />
+        </label>
+        <label className="field">
+          <span>Length (weeks)</span>
+          <input type="number" min="1" max="52" value={weeks} onChange={(e) => setWeeks(e.target.value)} />
+        </label>
+        <div className="form-actions">
+          <button type="button" className="btn secondary" onClick={onClose}>Cancel</button>
+          <button type="submit" className="btn" disabled={busy}>Add program</button>
+        </div>
+      </form>
+    </Modal>
+  );
+}

@@ -1,0 +1,16 @@
+# Netlify build configuration for ProgramLab (Vite + React SPA)
+[build]
+  command = "npm run build"
+  publish = "dist"
+
+# Single-page app: route all paths back to index.html
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Remember to set these in Netlify:
+#   Site settings → Environment variables
+#     VITE_SUPABASE_URL
+#     VITE_SUPABASE_ANON_KEY
+# (The anon key is a public client key and is safe to expose.)

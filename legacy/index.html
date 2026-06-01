@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ProgramLab — Exercise Programming</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <div class="app">
+    <!-- LEFT COLUMN (20%) -->
+    <aside class="sidebar">
+      <div class="brand">
+        <span class="brand-mark">◆</span>
+        <span class="brand-name">ProgramLab</span>
+      </div>
+
+      <!-- Navigation / calendar access -->
+      <nav class="nav">
+        <button class="nav-btn" data-view="calendar">
+          <span class="nav-icon">📅</span> Calendar
+        </button>
+        <button class="nav-btn" data-view="programs">
+          <span class="nav-icon">📋</span> Programs
+        </button>
+      </nav>
+
+      <!-- Clients -->
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Clients</h2>
+          <button class="icon-btn" id="add-client" title="Add client">+</button>
+        </div>
+        <ul class="list" id="client-list"></ul>
+      </div>
+
+      <!-- Programs for selected client -->
+      <div class="panel">
+        <div class="panel-head">
+          <h2>Programs</h2>
+          <button class="icon-btn" id="add-program" title="Add program">+</button>
+        </div>
+        <ul class="list" id="program-list"></ul>
+      </div>
+    </aside>
+
+    <!-- RIGHT COLUMN (80%) -->
+    <main class="content" id="content"></main>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
