@@ -1,16 +1,16 @@
 -- ============================================================
--- ProgramLab schema + row-level security
--- Run this in the Supabase dashboard → SQL Editor → New query.
--- Safe to re-run (uses IF NOT EXISTS / DROP POLICY IF EXISTS).
+-- ProgramLab schema — NO-LOGIN / shared workspace
+-- One shared dataset, accessed with the public (anon) key.
+-- Run in Supabase dashboard → SQL Editor → New query.
+-- Safe to re-run, and safe to run over the older auth-based schema
+-- (it removes the coach_id column and the per-user policies).
 -- ============================================================
 
--- Every table carries coach_id, defaulting to the logged-in user's id.
--- RLS then restricts each row to its owning coach.
+create extension if not exists "pgcrypto";
 
--- ---------- Tables ----------
+-- ---------- Tables (created only if missing) ----------
 create table if not exists public.clients (
   id          uuid primary key default gen_random_uuid(),
-  coach_id    uuid not null default auth.uid() references auth.users(id) on delete cascade,
   name        text not null,
   goal        text,
   created_at  timestamptz not null default now()
@@ -18,7 +18,6 @@ create table if not exists public.clients (
 
 create table if not exists public.programs (
   id          uuid primary key default gen_random_uuid(),
-  coach_id    uuid not null default auth.uid() references auth.users(id) on delete cascade,
   client_id   uuid not null references public.clients(id) on delete cascade,
   name        text not null,
   weeks       int  not null default 4,
@@ -27,7 +26,6 @@ create table if not exists public.programs (
 
 create table if not exists public.days (
   id          uuid primary key default gen_random_uuid(),
-  coach_id    uuid not null default auth.uid() references auth.users(id) on delete cascade,
   program_id  uuid not null references public.programs(id) on delete cascade,
   label       text not null,
   focus       text,
@@ -37,21 +35,15 @@ create table if not exists public.days (
 
 create table if not exists public.exercises (
   id          uuid primary key default gen_random_uuid(),
-  coach_id    uuid not null default auth.uid() references auth.users(id) on delete cascade,
   day_id      uuid not null references public.days(id) on delete cascade,
   name        text not null,
-  sets        text,
-  reps        text,
-  load        text,
-  rest        text,
-  notes       text,
+  sets        text, reps text, load text, rest text, notes text,
   position    int  not null default 0,
   created_at  timestamptz not null default now()
 );
 
 create table if not exists public.sessions (
   id          uuid primary key default gen_random_uuid(),
-  coach_id    uuid not null default auth.uid() references auth.users(id) on delete cascade,
   client_id   uuid not null references public.clients(id) on delete cascade,
   day_id      uuid references public.days(id) on delete set null,
   date        date not null,
@@ -59,31 +51,44 @@ create table if not exists public.sessions (
   created_at  timestamptz not null default now()
 );
 
--- ---------- Helpful indexes ----------
-create index if not exists idx_programs_client  on public.programs(client_id);
-create index if not exists idx_days_program     on public.days(program_id);
-create index if not exists idx_exercises_day     on public.exercises(day_id);
-create index if not exists idx_sessions_client   on public.sessions(client_id);
-create index if not exists idx_sessions_date     on public.sessions(date);
+-- ---------- Migrate away from the old auth-based design ----------
+-- Drop coach_id if a previous (logged-in) schema created it.
+alter table public.clients   drop column if exists coach_id;
+alter table public.programs  drop column if exists coach_id;
+alter table public.days      drop column if exists coach_id;
+alter table public.exercises drop column if exists coach_id;
+alter table public.sessions  drop column if exists coach_id;
 
--- ---------- Enable RLS ----------
+-- ---------- Indexes ----------
+create index if not exists idx_programs_client on public.programs(client_id);
+create index if not exists idx_days_program    on public.days(program_id);
+create index if not exists idx_exercises_day   on public.exercises(day_id);
+create index if not exists idx_sessions_client on public.sessions(client_id);
+create index if not exists idx_sessions_date   on public.sessions(date);
+
+-- ---------- RLS: enable, but allow shared (anon) access ----------
+-- NOTE: this intentionally makes the data PUBLIC to anyone with the
+-- site URL — that is the "no login, shared workspace" choice.
 alter table public.clients   enable row level security;
 alter table public.programs  enable row level security;
 alter table public.days      enable row level security;
 alter table public.exercises enable row level security;
 alter table public.sessions  enable row level security;
 
--- ---------- Policies (coach sees only their own rows) ----------
 do $$
 declare t text;
 begin
   foreach t in array array['clients','programs','days','exercises','sessions']
   loop
+    -- remove old per-user policy if present
     execute format('drop policy if exists %I_owner on public.%I;', t, t);
+    -- shared policy: anyone (anon or authenticated) can read/write
+    execute format('drop policy if exists %I_public on public.%I;', t, t);
     execute format(
-      'create policy %I_owner on public.%I
+      'create policy %I_public on public.%I
          for all
-         using (coach_id = auth.uid())
-         with check (coach_id = auth.uid());', t, t);
+         to anon, authenticated
+         using (true)
+         with check (true);', t, t);
   end loop;
 end $$;

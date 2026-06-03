@@ -3,7 +3,6 @@ import * as api from "../lib/api";
 import Modal from "./Modal.jsx";
 
 export default function Sidebar({
-  user,
   clients,
   programs,
   selectedClient,
@@ -14,7 +13,6 @@ export default function Sidebar({
   onSetView,
   onClientsChanged,
   onProgramsChanged,
-  onSignOut,
 }) {
   const [clientModal, setClientModal] = useState(false);
   const [programModal, setProgramModal] = useState(false);
@@ -91,10 +89,11 @@ export default function Sidebar({
         </ul>
       </div>
 
-      {/* Account footer */}
+      {/* Footer */}
       <div className="sidebar-foot">
-        <span className="user-email" title={user.email}>{user.email}</span>
-        <button className="linklike" onClick={onSignOut}>Sign out</button>
+        <span className="user-email" title="Shared workspace — no login">
+          Shared workspace
+        </span>
       </div>
 
       {clientModal && (
