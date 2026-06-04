@@ -1,6 +1,7 @@
 import { useState } from "react";
 import * as api from "../lib/api";
 import Modal from "./Modal.jsx";
+import ClientForm from "./ClientForm.jsx";
 
 export default function Sidebar({
   clients,
@@ -17,6 +18,16 @@ export default function Sidebar({
   const [clientModal, setClientModal] = useState(false);
   const [programModal, setProgramModal] = useState(false);
 
+  const navBtn = (key, icon, label, extra = {}) => (
+    <button
+      className={"nav-btn" + (view === key ? " active" : "")}
+      onClick={() => onSetView(key)}
+      {...extra}
+    >
+      <span className="nav-icon">{icon}</span> {label}
+    </button>
+  );
+
   return (
     <aside className="sidebar">
       <div className="brand">
@@ -25,18 +36,9 @@ export default function Sidebar({
       </div>
 
       <nav className="nav">
-        <button
-          className={"nav-btn" + (view === "calendar" ? " active" : "")}
-          onClick={() => onSetView("calendar")}
-        >
-          <span className="nav-icon">📅</span> Calendar
-        </button>
-        <button
-          className={"nav-btn" + (view === "programs" ? " active" : "")}
-          onClick={() => onSetView("programs")}
-        >
-          <span className="nav-icon">📋</span> Programs
-        </button>
+        {navBtn("calendar", "📅", "Calendar")}
+        {navBtn("programs", "📋", "Programs")}
+        {navBtn("client", "👤", "Client")}
       </nav>
 
       {/* Clients */}
@@ -120,44 +122,6 @@ export default function Sidebar({
         />
       )}
     </aside>
-  );
-}
-
-function ClientForm({ onClose, onSaved }) {
-  const [name, setName] = useState("");
-  const [goal, setGoal] = useState("");
-  const [busy, setBusy] = useState(false);
-
-  async function submit(e) {
-    e.preventDefault();
-    if (!name.trim()) return;
-    setBusy(true);
-    try {
-      const created = await api.createClient(name.trim(), goal.trim());
-      onSaved(created);
-    } catch (err) {
-      alert(err.message);
-      setBusy(false);
-    }
-  }
-
-  return (
-    <Modal title="New client" onClose={onClose}>
-      <form onSubmit={submit} className="form">
-        <label className="field">
-          <span>Name</span>
-          <input value={name} onChange={(e) => setName(e.target.value)} autoFocus required />
-        </label>
-        <label className="field">
-          <span>Primary goal</span>
-          <input value={goal} onChange={(e) => setGoal(e.target.value)} placeholder="e.g. Strength" />
-        </label>
-        <div className="form-actions">
-          <button type="button" className="btn secondary" onClick={onClose}>Cancel</button>
-          <button type="submit" className="btn" disabled={busy}>Add client</button>
-        </div>
-      </form>
-    </Modal>
   );
 }
 

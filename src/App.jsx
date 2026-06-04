@@ -4,6 +4,7 @@ import * as api from "./lib/api";
 import Sidebar from "./components/Sidebar.jsx";
 import ProgramView from "./components/ProgramView.jsx";
 import CalendarView from "./components/CalendarView.jsx";
+import ClientDetail from "./components/ClientDetail.jsx";
 
 function NotConfigured() {
   return (
@@ -33,6 +34,12 @@ export default function App() {
     setClients(data);
     return data;
   }, []);
+
+  // Client was edited: update the selected reference and refresh the list.
+  const handleClientChanged = useCallback(async (updated) => {
+    if (updated) setSelectedClient(updated);
+    await refreshClients();
+  }, [refreshClients]);
 
   // No login — load the shared dataset on mount.
   useEffect(() => {
@@ -82,10 +89,17 @@ export default function App() {
 
       <main className="content">
         {error && <div className="api-error">{error}</div>}
-        {view === "calendar" ? (
-          <CalendarView client={selectedClient} />
-        ) : (
-          <ProgramView client={selectedClient} program={selectedProgram} />
+        {view === "calendar" && <CalendarView client={selectedClient} />}
+        {view === "client" && (
+          <ClientDetail client={selectedClient} onChanged={handleClientChanged} />
+        )}
+        {view === "programs" && (
+          <ProgramView
+            client={selectedClient}
+            program={selectedProgram}
+            onProgramsChanged={() => refreshPrograms(selectedClient?.id)}
+            onSelectProgram={setSelectedProgram}
+          />
         )}
       </main>
     </div>

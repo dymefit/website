@@ -13,10 +13,10 @@ export async function listClients() {
   return data;
 }
 
-export async function createClient(name, goal) {
+export async function createClient(fields) {
   const { data, error } = await supabase
     .from("clients")
-    .insert({ name, goal })
+    .insert(fields)
     .select()
     .single();
   if (error) throw error;
@@ -155,4 +155,33 @@ export async function createSession(clientId, dayId, date) {
 export async function deleteSession(id) {
   const { error } = await supabase.from("sessions").delete().eq("id", id);
   if (error) throw error;
+}
+
+// ---------- Duplication helpers ----------
+const exerciseFields = (ex) => ({
+  name: ex.name, sets: ex.sets, reps: ex.reps, load: ex.load,
+  rest: ex.rest, notes: ex.notes, progressions: ex.progressions ?? {},
+});
+
+// Duplicate a single day (with its exercises) into the same program.
+// `day` is a loaded day object from listDays (includes program_id + exercises).
+export async function duplicateDay(day, position) {
+  const copy = await createDay(day.program_id, `${day.label} (copy)`, day.focus, position);
+  for (const ex of day.exercises || []) {
+    await createExercise(copy.id, exerciseFields(ex), ex.position);
+  }
+  return copy;
+}
+
+// Duplicate a whole program (all days + exercises) for the same client.
+export async function duplicateProgram(program) {
+  const copy = await createProgram(program.client_id, `${program.name} (copy)`, program.weeks);
+  const days = await listDays(program.id);
+  for (const d of days) {
+    const newDay = await createDay(copy.id, d.label, d.focus, d.position);
+    for (const ex of d.exercises || []) {
+      await createExercise(newDay.id, exerciseFields(ex), ex.position);
+    }
+  }
+  return copy;
 }

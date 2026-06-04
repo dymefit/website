@@ -1,0 +1,68 @@
+import { useState } from "react";
+import ClientForm from "./ClientForm.jsx";
+
+function Field({ label, value, href }) {
+  return (
+    <div className="detail-field">
+      <span className="detail-label">{label}</span>
+      {value ? (
+        href ? <a className="detail-value link" href={href}>{value}</a>
+             : <span className="detail-value">{value}</span>
+      ) : (
+        <span className="detail-value empty">—</span>
+      )}
+    </div>
+  );
+}
+
+export default function ClientDetail({ client, onChanged }) {
+  const [editing, setEditing] = useState(false);
+
+  if (!client) {
+    return (
+      <div className="placeholder">
+        <div>
+          <div className="big">👤</div>
+          <p>Select a client to see their details.</p>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <>
+      <div className="content-header">
+        <div>
+          <h1>{client.name}</h1>
+          <div className="sub">{client.goal || "No goal set"}</div>
+        </div>
+        <button className="btn" onClick={() => setEditing(true)}>Edit client</button>
+      </div>
+
+      <div className="detail-grid">
+        <Field label="Email" value={client.email} href={client.email ? `mailto:${client.email}` : null} />
+        <Field label="Phone" value={client.phone} href={client.phone ? `tel:${client.phone}` : null} />
+        <Field label="Start date" value={client.start_date} />
+        <Field label="Goal" value={client.goal} />
+      </div>
+
+      <div className="detail-notes">
+        <span className="detail-label">Notes</span>
+        {client.notes
+          ? <p className="detail-value">{client.notes}</p>
+          : <p className="detail-value empty">No notes yet.</p>}
+      </div>
+
+      {editing && (
+        <ClientForm
+          client={client}
+          onClose={() => setEditing(false)}
+          onSaved={(updated) => {
+            setEditing(false);
+            onChanged(updated);
+          }}
+        />
+      )}
+    </>
+  );
+}

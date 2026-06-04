@@ -2,31 +2,28 @@ import { useEffect, useState, useCallback } from "react";
 import * as api from "../lib/api";
 import Modal from "./Modal.jsx";
 
-export default function ProgramView({ client, program }) {
+export default function ProgramView({ client, program, onProgramsChanged, onSelectProgram }) {
   const [days, setDays] = useState([]);
   const [loading, setLoading] = useState(false);
   const [dayModal, setDayModal] = useState(null); // {mode:'add'|'edit', day?}
   const [exModal, setExModal] = useState(null);    // {dayId, exercise?}
+  const [week, setWeek] = useState(1);
+  const [busy, setBusy] = useState(false);
 
   const refresh = useCallback(async () => {
-    if (!program) {
-      setDays([]);
-      return;
-    }
+    if (!program) { setDays([]); return; }
     setLoading(true);
     try {
       setDays(await api.listDays(program.id));
     } catch (err) {
-      console.error(err);
       alert(err.message);
     } finally {
       setLoading(false);
     }
   }, [program]);
 
-  useEffect(() => {
-    refresh();
-  }, [refresh]);
+  useEffect(() => { refresh(); }, [refresh]);
+  useEffect(() => { setWeek(1); }, [program?.id]);
 
   if (!program) {
     return (
@@ -39,29 +36,52 @@ export default function ProgramView({ client, program }) {
     );
   }
 
+  const weeks = program.weeks || 1;
+
+  // Effective value for an exercise field in the selected week.
+  const override = (ex) => ex.progressions?.[String(week)] || {};
+  const eff = (ex, k) => {
+    const o = override(ex);
+    return o[k] ?? ex[k] ?? "";
+  };
+  const isProgressed = (ex) => Object.keys(override(ex)).length > 0;
+
   async function deleteDay(day) {
     if (!confirm(`Delete "${day.label}" and its exercises?`)) return;
     await api.deleteDay(day.id);
     refresh();
   }
-
   async function deleteExercise(ex) {
     if (!confirm(`Remove "${ex.name}"?`)) return;
     await api.deleteExercise(ex.id);
     refresh();
   }
-
   async function moveExercise(day, index, dir) {
     const arr = day.exercises;
     const j = index + dir;
     if (j < 0 || j >= arr.length) return;
     const a = arr[index], b = arr[j];
-    // swap positions
     await Promise.all([
       api.updateExercise(a.id, { position: b.position }),
       api.updateExercise(b.id, { position: a.position }),
     ]);
     refresh();
+  }
+  async function dupDay(day) {
+    setBusy(true);
+    try { await api.duplicateDay(day, days.length); await refresh(); }
+    catch (e) { alert(e.message); }
+    finally { setBusy(false); }
+  }
+  async function dupProgram() {
+    setBusy(true);
+    try {
+      const copy = await api.duplicateProgram(program);
+      const list = await onProgramsChanged?.();
+      const fresh = (list || []).find((p) => p.id === copy.id) || copy;
+      onSelectProgram?.(fresh);
+    } catch (e) { alert(e.message); }
+    finally { setBusy(false); }
   }
 
   return (
@@ -70,16 +90,28 @@ export default function ProgramView({ client, program }) {
         <div>
           <h1>{program.name}</h1>
           <div className="sub">
-            {client?.name} · {program.weeks}-week block · {days.length} training days
+            {client?.name} · {weeks}-week block · {days.length} training days
           </div>
         </div>
-        <button className="btn" onClick={() => setDayModal({ mode: "add" })}>
-          + Add Day
-        </button>
+        <div className="row-actions">
+          {weeks > 1 && (
+            <label className="week-select">
+              Week
+              <select value={week} onChange={(e) => setWeek(Number(e.target.value))}>
+                {Array.from({ length: weeks }, (_, i) => i + 1).map((w) => (
+                  <option key={w} value={w}>{w}</option>
+                ))}
+              </select>
+            </label>
+          )}
+          <button className="btn secondary" onClick={dupProgram} disabled={busy} title="Duplicate this whole program">
+            Duplicate
+          </button>
+          <button className="btn" onClick={() => setDayModal({ mode: "add" })}>+ Add Day</button>
+        </div>
       </div>
 
       {loading && <div className="muted-note">Loading…</div>}
-
       {!loading && days.length === 0 && (
         <div className="empty-block">
           No training days yet. Click <strong>+ Add Day</strong> to start building.
@@ -96,6 +128,7 @@ export default function ProgramView({ client, program }) {
               </div>
               <div className="row-actions">
                 <button className="mini-btn" onClick={() => setDayModal({ mode: "edit", day: d })}>Edit</button>
+                <button className="mini-btn" onClick={() => dupDay(d)} disabled={busy}>Duplicate</button>
                 <button className="mini-btn danger" onClick={() => deleteDay(d)}>Delete</button>
               </div>
             </div>
@@ -105,11 +138,8 @@ export default function ProgramView({ client, program }) {
                 <tr>
                   <th style={{ width: "32px" }}></th>
                   <th>Exercise</th>
-                  <th>Sets</th>
-                  <th>Reps</th>
-                  <th>Load</th>
-                  <th>Rest</th>
-                  <th style={{ width: "120px" }}></th>
+                  <th>Sets</th><th>Reps</th><th>Load</th><th>Rest</th>
+                  <th style={{ width: "110px" }}></th>
                 </tr>
               </thead>
               <tbody>
@@ -117,16 +147,20 @@ export default function ProgramView({ client, program }) {
                   <tr><td colSpan="7" className="muted-note">No exercises yet.</td></tr>
                 )}
                 {d.exercises.map((ex, i) => (
-                  <tr key={ex.id}>
+                  <tr key={ex.id} className={isProgressed(ex) ? "progressed" : ""}>
                     <td className="reorder">
                       <button className="tiny" disabled={i === 0} onClick={() => moveExercise(d, i, -1)}>▲</button>
                       <button className="tiny" disabled={i === d.exercises.length - 1} onClick={() => moveExercise(d, i, 1)}>▼</button>
                     </td>
-                    <td className="name">{ex.name}</td>
-                    <td>{ex.sets}</td>
-                    <td>{ex.reps}</td>
-                    <td>{ex.load}</td>
-                    <td>{ex.rest}</td>
+                    <td className="name">
+                      {ex.name}
+                      {isProgressed(ex) && <span className="wk-badge" title={`Adjusted for week ${week}`}>W{week}</span>}
+                      {ex.notes && <div className="ex-notes">{ex.notes}</div>}
+                    </td>
+                    <td>{eff(ex, "sets")}</td>
+                    <td>{eff(ex, "reps")}</td>
+                    <td>{eff(ex, "load")}</td>
+                    <td>{eff(ex, "rest")}</td>
                     <td className="row-actions">
                       <button className="mini-btn" onClick={() => setExModal({ dayId: d.id, exercise: ex })}>Edit</button>
                       <button className="mini-btn danger" onClick={() => deleteExercise(ex)}>✕</button>
@@ -160,9 +194,8 @@ export default function ProgramView({ client, program }) {
         <ExerciseForm
           dayId={exModal.dayId}
           exercise={exModal.exercise}
-          position={
-            days.find((d) => d.id === exModal.dayId)?.exercises.length ?? 0
-          }
+          weeks={weeks}
+          position={days.find((d) => d.id === exModal.dayId)?.exercises.length ?? 0}
           onClose={() => setExModal(null)}
           onSaved={() => { setExModal(null); refresh(); }}
         />
@@ -181,16 +214,10 @@ function DayForm({ programId, mode, day, position, onClose, onSaved }) {
     if (!label.trim()) return;
     setBusy(true);
     try {
-      if (mode === "edit") {
-        await api.updateDay(day.id, { label: label.trim(), focus: focus.trim() });
-      } else {
-        await api.createDay(programId, label.trim(), focus.trim(), position);
-      }
+      if (mode === "edit") await api.updateDay(day.id, { label: label.trim(), focus: focus.trim() });
+      else await api.createDay(programId, label.trim(), focus.trim(), position);
       onSaved();
-    } catch (err) {
-      alert(err.message);
-      setBusy(false);
-    }
+    } catch (err) { alert(err.message); setBusy(false); }
   }
 
   return (
@@ -213,7 +240,7 @@ function DayForm({ programId, mode, day, position, onClose, onSaved }) {
   );
 }
 
-function ExerciseForm({ dayId, exercise, position, onClose, onSaved }) {
+function ExerciseForm({ dayId, exercise, weeks, position, onClose, onSaved }) {
   const [f, setF] = useState({
     name: exercise?.name ?? "",
     sets: exercise?.sets ?? "",
@@ -222,24 +249,35 @@ function ExerciseForm({ dayId, exercise, position, onClose, onSaved }) {
     rest: exercise?.rest ?? "",
     notes: exercise?.notes ?? "",
   });
+  // progression overrides keyed by week string
+  const [prog, setProg] = useState(() => ({ ...(exercise?.progressions || {}) }));
+  const [showProg, setShowProg] = useState(
+    () => Object.keys(exercise?.progressions || {}).length > 0
+  );
   const [busy, setBusy] = useState(false);
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
+
+  const setWeekField = (w, k) => (e) => {
+    const val = e.target.value;
+    setProg((p) => {
+      const row = { ...(p[w] || {}) };
+      if (val) row[k] = val; else delete row[k];
+      const next = { ...p };
+      if (Object.keys(row).length) next[w] = row; else delete next[w];
+      return next;
+    });
+  };
 
   async function submit(e) {
     e.preventDefault();
     if (!f.name.trim()) return;
     setBusy(true);
     try {
-      if (exercise) {
-        await api.updateExercise(exercise.id, f);
-      } else {
-        await api.createExercise(dayId, f, position);
-      }
+      const fields = { ...f, progressions: prog };
+      if (exercise) await api.updateExercise(exercise.id, fields);
+      else await api.createExercise(dayId, fields, position);
       onSaved();
-    } catch (err) {
-      alert(err.message);
-      setBusy(false);
-    }
+    } catch (err) { alert(err.message); setBusy(false); }
   }
 
   return (
@@ -250,29 +288,52 @@ function ExerciseForm({ dayId, exercise, position, onClose, onSaved }) {
           <input value={f.name} onChange={set("name")} autoFocus required placeholder="e.g. Back Squat" />
         </label>
         <div className="field-row">
-          <label className="field">
-            <span>Sets</span>
-            <input value={f.sets} onChange={set("sets")} placeholder="4" />
-          </label>
-          <label className="field">
-            <span>Reps</span>
-            <input value={f.reps} onChange={set("reps")} placeholder="5" />
-          </label>
+          <label className="field"><span>Sets</span><input value={f.sets} onChange={set("sets")} placeholder="4" /></label>
+          <label className="field"><span>Reps</span><input value={f.reps} onChange={set("reps")} placeholder="5" /></label>
         </div>
         <div className="field-row">
-          <label className="field">
-            <span>Load</span>
-            <input value={f.load} onChange={set("load")} placeholder="75% 1RM" />
-          </label>
-          <label className="field">
-            <span>Rest</span>
-            <input value={f.rest} onChange={set("rest")} placeholder="2:30" />
-          </label>
+          <label className="field"><span>Load</span><input value={f.load} onChange={set("load")} placeholder="75% 1RM" /></label>
+          <label className="field"><span>Rest</span><input value={f.rest} onChange={set("rest")} placeholder="2:30" /></label>
         </div>
         <label className="field">
           <span>Notes</span>
           <input value={f.notes} onChange={set("notes")} placeholder="optional cue / tempo" />
         </label>
+
+        {weeks > 1 && (
+          <div className="prog-section">
+            <button type="button" className="linklike" onClick={() => setShowProg((s) => !s)}>
+              {showProg ? "▾" : "▸"} Week-by-week progression
+            </button>
+            {showProg && (
+              <>
+                <p className="muted-note">Leave a cell blank to keep the base value above.</p>
+                <table className="prog-table">
+                  <thead>
+                    <tr><th>Week</th><th>Sets</th><th>Reps</th><th>Load</th><th>Rest</th></tr>
+                  </thead>
+                  <tbody>
+                    {Array.from({ length: weeks }, (_, i) => String(i + 1)).map((w) => (
+                      <tr key={w}>
+                        <td className="wk">{w}</td>
+                        {["sets", "reps", "load", "rest"].map((k) => (
+                          <td key={k}>
+                            <input
+                              value={prog[w]?.[k] ?? ""}
+                              onChange={setWeekField(w, k)}
+                              placeholder={f[k] || "—"}
+                            />
+                          </td>
+                        ))}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </>
+            )}
+          </div>
+        )}
+
         <div className="form-actions">
           <button type="button" className="btn secondary" onClick={onClose}>Cancel</button>
           <button type="submit" className="btn" disabled={busy}>Save</button>
