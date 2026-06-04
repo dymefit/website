@@ -4,6 +4,7 @@ import Sidebar from "./components/Sidebar.jsx";
 import ProgramView from "./components/ProgramView.jsx";
 import CalendarView from "./components/CalendarView.jsx";
 import ClientDetail from "./components/ClientDetail.jsx";
+import ClientLogs from "./components/ClientLogs.jsx";
 
 export default function CoachApp({ user, onSignOut }) {
   const [clients, setClients] = useState([]);
@@ -66,6 +67,7 @@ export default function CoachApp({ user, onSignOut }) {
       <main className="content">
         {error && <div className="api-error">{error}</div>}
         {view === "calendar" && <CalendarView client={selectedClient} />}
+        {view === "logs" && <ClientLogs client={selectedClient} />}
         {view === "client" && (
           <ClientDetail client={selectedClient} onChanged={handleClientChanged} />
         )}

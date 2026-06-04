@@ -41,6 +41,7 @@ export default function Sidebar({
         {navBtn("calendar", "📅", "Calendar")}
         {navBtn("programs", "📋", "Programs")}
         {navBtn("client", "👤", "Client")}
+        {navBtn("logs", "📊", "Logs")}
       </nav>
 
       {/* Clients */}

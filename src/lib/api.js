@@ -193,6 +193,17 @@ export async function saveLog(entry) {
   return data;
 }
 
+// Coach: read a client's logged workouts (with exercise + session context).
+export async function listClientLogs(clientId) {
+  const { data, error } = await supabase
+    .from("workout_logs")
+    .select("*, exercises(name, sets, reps, load), sessions(date, days(label))")
+    .eq("client_id", clientId)
+    .order("date", { ascending: false });
+  if (error) throw error;
+  return data;
+}
+
 // ---------- Duplication helpers ----------
 const exerciseFields = (ex) => ({
   name: ex.name, sets: ex.sets, reps: ex.reps, load: ex.load,
