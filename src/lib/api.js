@@ -157,6 +157,42 @@ export async function deleteSession(id) {
   if (error) throw error;
 }
 
+// ---------- Client portal + workout logs ----------
+// Find the logged-in client's record by their email (set by the coach).
+export async function getMyClient(email) {
+  const { data, error } = await supabase
+    .from("clients").select("*").eq("email", email).maybeSingle();
+  if (error) throw error;
+  return data;
+}
+
+// A single day with its exercises (for logging a scheduled session).
+export async function getDay(dayId) {
+  const { data, error } = await supabase
+    .from("days").select("*, exercises(*)").eq("id", dayId).single();
+  if (error) throw error;
+  data.exercises = (data.exercises || []).sort((a, b) => a.position - b.position);
+  return data;
+}
+
+export async function listLogsForSession(sessionId) {
+  const { data, error } = await supabase
+    .from("workout_logs").select("*").eq("session_id", sessionId);
+  if (error) throw error;
+  return data;
+}
+
+// Upsert one exercise's log for a session (one row per session+exercise).
+export async function saveLog(entry) {
+  const { data, error } = await supabase
+    .from("workout_logs")
+    .upsert(entry, { onConflict: "session_id,exercise_id" })
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
 // ---------- Duplication helpers ----------
 const exerciseFields = (ex) => ({
   name: ex.name, sets: ex.sets, reps: ex.reps, load: ex.load,

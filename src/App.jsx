@@ -1,10 +1,8 @@
-import { useEffect, useState, useCallback } from "react";
 import { isConfigured } from "./lib/supabase";
-import * as api from "./lib/api";
-import Sidebar from "./components/Sidebar.jsx";
-import ProgramView from "./components/ProgramView.jsx";
-import CalendarView from "./components/CalendarView.jsx";
-import ClientDetail from "./components/ClientDetail.jsx";
+import { useAuth, isCoachEmail } from "./auth.jsx";
+import Login from "./components/Login.jsx";
+import CoachApp from "./CoachApp.jsx";
+import ClientPortal from "./components/ClientPortal.jsx";
 
 function NotConfigured() {
   return (
@@ -22,86 +20,14 @@ function NotConfigured() {
 }
 
 export default function App() {
-  const [clients, setClients] = useState([]);
-  const [programs, setPrograms] = useState([]);
-  const [selectedClient, setSelectedClient] = useState(null);
-  const [selectedProgram, setSelectedProgram] = useState(null);
-  const [view, setView] = useState("programs"); // "programs" | "calendar"
-  const [error, setError] = useState("");
-
-  const refreshClients = useCallback(async () => {
-    const data = await api.listClients();
-    setClients(data);
-    return data;
-  }, []);
-
-  // Client was edited: update the selected reference and refresh the list.
-  const handleClientChanged = useCallback(async (updated) => {
-    if (updated) setSelectedClient(updated);
-    await refreshClients();
-  }, [refreshClients]);
-
-  // No login — load the shared dataset on mount.
-  useEffect(() => {
-    if (isConfigured) refreshClients().catch((e) => setError(e.message));
-  }, [refreshClients]);
-
-  const refreshPrograms = useCallback(async (clientId) => {
-    if (!clientId) {
-      setPrograms([]);
-      return [];
-    }
-    const data = await api.listPrograms(clientId);
-    setPrograms(data);
-    return data;
-  }, []);
-
-  useEffect(() => {
-    if (selectedClient) {
-      refreshPrograms(selectedClient.id)
-        .then((ps) => setSelectedProgram(ps[0] ?? null))
-        .catch((e) => setError(e.message));
-    } else {
-      setPrograms([]);
-      setSelectedProgram(null);
-    }
-  }, [selectedClient, refreshPrograms]);
+  const { user, loading, signOut } = useAuth();
 
   if (!isConfigured) return <NotConfigured />;
+  if (loading) return <div className="splash">Loading…</div>;
+  if (!user) return <Login />;
 
-  return (
-    <div className="app">
-      <Sidebar
-        clients={clients}
-        programs={programs}
-        selectedClient={selectedClient}
-        selectedProgram={selectedProgram}
-        view={view}
-        onSelectClient={setSelectedClient}
-        onSelectProgram={(p) => {
-          setSelectedProgram(p);
-          setView("programs");
-        }}
-        onSetView={setView}
-        onClientsChanged={refreshClients}
-        onProgramsChanged={() => refreshPrograms(selectedClient?.id)}
-      />
-
-      <main className="content">
-        {error && <div className="api-error">{error}</div>}
-        {view === "calendar" && <CalendarView client={selectedClient} />}
-        {view === "client" && (
-          <ClientDetail client={selectedClient} onChanged={handleClientChanged} />
-        )}
-        {view === "programs" && (
-          <ProgramView
-            client={selectedClient}
-            program={selectedProgram}
-            onProgramsChanged={() => refreshPrograms(selectedClient?.id)}
-            onSelectProgram={setSelectedProgram}
-          />
-        )}
-      </main>
-    </div>
-  );
+  // Single coach (by email) gets the full builder; everyone else is a client.
+  return isCoachEmail(user.email)
+    ? <CoachApp user={user} onSignOut={signOut} />
+    : <ClientPortal user={user} onSignOut={signOut} />;
 }

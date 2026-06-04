@@ -4,6 +4,8 @@ import Modal from "./Modal.jsx";
 import ClientForm from "./ClientForm.jsx";
 
 export default function Sidebar({
+  user,
+  onSignOut,
   clients,
   programs,
   selectedClient,
@@ -93,9 +95,8 @@ export default function Sidebar({
 
       {/* Footer */}
       <div className="sidebar-foot">
-        <span className="user-email" title="Shared workspace — no login">
-          Shared workspace
-        </span>
+        <span className="user-email" title={user?.email}>{user?.email || "Coach"}</span>
+        {onSignOut && <button className="linklike" onClick={onSignOut}>Sign out</button>}
       </div>
 
       {clientModal && (
