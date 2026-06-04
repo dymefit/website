@@ -25,6 +25,7 @@ create table if not exists public.programs (
   client_id   uuid not null references public.clients(id) on delete cascade,
   name        text not null,
   weeks       int  not null default 4,
+  week_notes  jsonb not null default '{}'::jsonb,
   created_at  timestamptz not null default now()
 );
 
@@ -70,6 +71,7 @@ alter table public.clients   add column if not exists phone      text;
 alter table public.clients   add column if not exists start_date date;
 alter table public.clients   add column if not exists notes      text;
 alter table public.exercises add column if not exists progressions jsonb not null default '{}'::jsonb;
+alter table public.programs   add column if not exists week_notes   jsonb not null default '{}'::jsonb;
 
 -- ---------- Indexes ----------
 create index if not exists idx_programs_client on public.programs(client_id);

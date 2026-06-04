@@ -176,6 +176,38 @@ table.exercises tr.progressed td.name { position: relative; }
 }
 .detail-notes p { white-space: pre-wrap; }
 
+/* Per-week program note */
+.week-note { display: flex; flex-direction: column; gap: 6px; margin: -6px 0 22px; }
+.week-note textarea {
+  background: var(--panel); border: 1px solid var(--line); color: var(--text);
+  border-radius: 8px; padding: 9px 11px; font-size: 13px; width: 100%;
+  resize: vertical; font-family: inherit;
+}
+.week-note textarea:focus { outline: none; border-color: var(--accent); }
+
+/* Day reorder controls */
+.day-reorder { display: inline-flex; gap: 2px; margin-right: 4px; }
+
+/* ---------- Print / PDF ---------- */
+@media print {
+  .sidebar { display: none !important; }
+  .app { display: block; height: auto; overflow: visible; }
+  .content { width: 100%; overflow: visible; padding: 0; }
+  body { background: #fff; color: #000; }
+  .content-header .row-actions,
+  .mini-btn, .tiny, .reorder, .day-reorder,
+  .day-card-foot, .wk-badge, .api-error { display: none !important; }
+  .content-header { border-color: #ccc; }
+  .content-header h1, .content-header .sub, .detail-label { color: #000; }
+  .day-card { border-color: #bbb; break-inside: avoid; }
+  .day-card-head { background: #f2f2f2; border-color: #bbb; }
+  .day-card-head h3, .day-card-head .focus { color: #000; }
+  table.exercises th { color: #333; }
+  table.exercises th, table.exercises td { border-color: #ddd; color: #000; }
+  .ex-notes { color: #555; }
+  .week-note textarea { border: none; padding: 0; color: #000; resize: none; background: #fff; }
+}
+
 /* Program day cards */
 .day-grid { display: flex; flex-direction: column; gap: 18px; }
 .day-card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }

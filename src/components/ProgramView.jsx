@@ -9,6 +9,8 @@ export default function ProgramView({ client, program, onProgramsChanged, onSele
   const [exModal, setExModal] = useState(null);    // {dayId, exercise?}
   const [week, setWeek] = useState(1);
   const [busy, setBusy] = useState(false);
+  const [weekNotes, setWeekNotes] = useState({});
+  const [noteDraft, setNoteDraft] = useState("");
 
   const refresh = useCallback(async () => {
     if (!program) { setDays([]); return; }
@@ -23,7 +25,14 @@ export default function ProgramView({ client, program, onProgramsChanged, onSele
   }, [program]);
 
   useEffect(() => { refresh(); }, [refresh]);
-  useEffect(() => { setWeek(1); }, [program?.id]);
+  useEffect(() => {
+    setWeek(1);
+    setWeekNotes(program?.week_notes || {});
+  }, [program?.id]);
+  // keep the editable draft in sync with the selected week
+  useEffect(() => {
+    setNoteDraft(weekNotes?.[String(week)] || "");
+  }, [week, weekNotes]);
 
   if (!program) {
     return (
@@ -67,6 +76,24 @@ export default function ProgramView({ client, program, onProgramsChanged, onSele
     ]);
     refresh();
   }
+  async function moveDay(index, dir) {
+    const j = index + dir;
+    if (j < 0 || j >= days.length) return;
+    const a = days[index], b = days[j];
+    await Promise.all([
+      api.updateDay(a.id, { position: b.position }),
+      api.updateDay(b.id, { position: a.position }),
+    ]);
+    refresh();
+  }
+  async function saveWeekNote() {
+    const next = { ...weekNotes };
+    if (noteDraft.trim()) next[String(week)] = noteDraft.trim();
+    else delete next[String(week)];
+    setWeekNotes(next);
+    try { await api.updateProgram(program.id, { week_notes: next }); }
+    catch (e) { alert(e.message); }
+  }
   async function dupDay(day) {
     setBusy(true);
     try { await api.duplicateDay(day, days.length); await refresh(); }
@@ -104,11 +131,29 @@ export default function ProgramView({ client, program, onProgramsChanged, onSele
               </select>
             </label>
           )}
+          <button className="btn secondary" onClick={() => window.print()} title="Print or save as PDF">
+            Print
+          </button>
           <button className="btn secondary" onClick={dupProgram} disabled={busy} title="Duplicate this whole program">
             Duplicate
           </button>
           <button className="btn" onClick={() => setDayModal({ mode: "add" })}>+ Add Day</button>
         </div>
+      </div>
+
+      {/* Per-week note (shown for the selected week) */}
+      <div className="week-note">
+        <label className="detail-label" htmlFor="weeknote">
+          Week {week} note
+        </label>
+        <textarea
+          id="weeknote"
+          rows="2"
+          value={noteDraft}
+          onChange={(e) => setNoteDraft(e.target.value)}
+          onBlur={saveWeekNote}
+          placeholder={`Notes for week ${week} (e.g. deload, test maxes)…`}
+        />
       </div>
 
       {loading && <div className="muted-note">Loading…</div>}
@@ -119,7 +164,7 @@ export default function ProgramView({ client, program, onProgramsChanged, onSele
       )}
 
       <div className="day-grid">
-        {days.map((d) => (
+        {days.map((d, di) => (
           <div className="day-card" key={d.id}>
             <div className="day-card-head">
               <div>
@@ -127,6 +172,10 @@ export default function ProgramView({ client, program, onProgramsChanged, onSele
                 {d.focus && <span className="focus">{d.focus}</span>}
               </div>
               <div className="row-actions">
+                <span className="day-reorder">
+                  <button className="mini-btn" disabled={di === 0} onClick={() => moveDay(di, -1)} title="Move day up">↑</button>
+                  <button className="mini-btn" disabled={di === days.length - 1} onClick={() => moveDay(di, 1)} title="Move day down">↓</button>
+                </span>
                 <button className="mini-btn" onClick={() => setDayModal({ mode: "edit", day: d })}>Edit</button>
                 <button className="mini-btn" onClick={() => dupDay(d)} disabled={busy}>Duplicate</button>
                 <button className="mini-btn danger" onClick={() => deleteDay(d)}>Delete</button>
