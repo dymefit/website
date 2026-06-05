@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import * as api from "../lib/api";
+import ProgressCharts from "./ProgressCharts.jsx";
 
 function prettyDate(iso) {
   if (!iso) return "";
@@ -71,6 +72,8 @@ export default function ClientLogs({ client }) {
       {!loading && logs.length === 0 && (
         <div className="empty-block">No logged workouts yet for this client.</div>
       )}
+
+      {!loading && logs.length > 0 && <ProgressCharts logs={logs} />}
 
       <div className="day-grid">
         {dates.map((date) => (
