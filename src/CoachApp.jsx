@@ -25,6 +25,12 @@ export default function CoachApp({ user, onSignOut }) {
     await refreshClients();
   }, [refreshClients]);
 
+  const handleClientDeleted = useCallback(async () => {
+    setSelectedClient(null);
+    setView("client");
+    await refreshClients();
+  }, [refreshClients]);
+
   useEffect(() => {
     refreshClients().catch((e) => setError(e.message));
   }, [refreshClients]);
@@ -69,7 +75,7 @@ export default function CoachApp({ user, onSignOut }) {
         {view === "calendar" && <CalendarView client={selectedClient} />}
         {view === "logs" && <ClientLogs client={selectedClient} />}
         {view === "client" && (
-          <ClientDetail client={selectedClient} onChanged={handleClientChanged} />
+          <ClientDetail client={selectedClient} onChanged={handleClientChanged} onDeleted={handleClientDeleted} />
         )}
         {view === "programs" && (
           <ProgramView

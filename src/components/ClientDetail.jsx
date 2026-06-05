@@ -1,4 +1,5 @@
 import { useState } from "react";
+import * as api from "../lib/api";
 import ClientForm from "./ClientForm.jsx";
 
 function Field({ label, value, href }) {
@@ -15,8 +16,18 @@ function Field({ label, value, href }) {
   );
 }
 
-export default function ClientDetail({ client, onChanged }) {
+export default function ClientDetail({ client, onChanged, onDeleted }) {
   const [editing, setEditing] = useState(false);
+
+  async function handleDelete() {
+    if (!confirm(`Delete ${client.name}? This removes their programs, schedule, and logs. This cannot be undone.`)) return;
+    try {
+      await api.deleteClient(client.id);
+      onDeleted?.(client.id);
+    } catch (e) {
+      alert(e.message);
+    }
+  }
 
   if (!client) {
     return (
@@ -36,7 +47,10 @@ export default function ClientDetail({ client, onChanged }) {
           <h1>{client.name}</h1>
           <div className="sub">{client.goal || "No goal set"}</div>
         </div>
-        <button className="btn" onClick={() => setEditing(true)}>Edit client</button>
+        <div className="row-actions">
+          <button className="btn secondary danger-btn" onClick={handleDelete}>Delete</button>
+          <button className="btn" onClick={() => setEditing(true)}>Edit client</button>
+        </div>
       </div>
 
       <div className="detail-grid">

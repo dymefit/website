@@ -118,6 +118,7 @@ body {
 .muted-note { color: var(--muted); font-size: 13px; padding: 8px 0; }
 .api-error { background: rgba(239,68,68,.12); color: #fca5a5; padding: 10px 14px; border-radius: 8px; margin-bottom: 16px; font-size: 13px; }
 table.exercises td.muted-cell { color: var(--muted); }
+.btn.danger-btn:hover { border-color: var(--danger); color: var(--danger); }
 
 /* Exercise notes + week progression */
 .ex-notes { font-size: 11px; color: var(--muted); margin-top: 3px; font-weight: 400; }
