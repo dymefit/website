@@ -81,9 +81,24 @@ function SessionList({ sessions, onOpen }) {
     return <div className="empty-block">No sessions scheduled yet. Check back soon.</div>;
   }
   const todayStr = ymd(new Date());
+  // Shortcut: today's session, or the next upcoming one.
+  const todays = sessions.filter((s) => s.date === todayStr);
+  const hero = todays[0] || sessions.find((s) => s.date > todayStr);
+
   return (
     <>
-      <h1 className="portal-title">Your workouts</h1>
+      {hero && (
+        <button className="hero-card" onClick={() => onOpen(hero)}>
+          <div className="hero-kicker">
+            {hero.date === todayStr ? "Today's workout" : `Next workout · ${prettyDate(hero.date)}`}
+          </div>
+          <div className="hero-label">{hero.days?.label ?? "Workout"}</div>
+          {hero.days?.focus && <div className="hero-focus">{hero.days.focus}</div>}
+          <span className="hero-cta">Start workout →</span>
+        </button>
+      )}
+
+      <h2 className="portal-subtitle">All workouts</h2>
       <div className="session-list">
         {sessions.map((s) => (
           <button key={s.id} className="session-card" onClick={() => onOpen(s)}>

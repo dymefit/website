@@ -1,16 +1,22 @@
-# Netlify build configuration for ProgramLab (Vite + React SPA)
+# Netlify build configuration for ProgramLab (Vite + React SPA + Functions)
 [build]
   command = "npm run build"
   publish = "dist"
+  functions = "netlify/functions"
 
-# Single-page app: route all paths back to index.html
+# API → serverless functions (must come before the SPA catch-all).
+[[redirects]]
+  from = "/api/*"
+  to = "/.netlify/functions/:splat"
+  status = 200
+
+# Single-page app: everything else falls back to index.html.
 [[redirects]]
   from = "/*"
   to = "/index.html"
   status = 200
 
-# Remember to set these in Netlify:
-#   Site settings → Environment variables
-#     VITE_SUPABASE_URL
-#     VITE_SUPABASE_ANON_KEY
-# (The anon key is a public client key and is safe to expose.)
+# Env vars (Netlify → Site configuration → Environment variables):
+#   VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY, VITE_COACH_EMAIL   (already set)
+#   RESEND_API_KEY   — your Resend API key (enables client email notifications)
+#   NOTIFY_FROM      — sender, e.g. "ProgramLab <notify@yourdomain.com>"

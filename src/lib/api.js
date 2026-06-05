@@ -204,6 +204,23 @@ export async function listClientLogs(clientId) {
   return data;
 }
 
+// Notify a client by email that a workout was scheduled (fire-and-forget).
+// Calls the Netlify Function, which no-ops if email isn't configured.
+export async function notifySessionScheduled(payload) {
+  try {
+    const { data } = await supabase.auth.getSession();
+    const token = data?.session?.access_token;
+    if (!token) return;
+    await fetch("/api/notify-session", {
+      method: "POST",
+      headers: { "content-type": "application/json", Authorization: `Bearer ${token}` },
+      body: JSON.stringify(payload),
+    });
+  } catch {
+    /* non-blocking: scheduling must succeed even if email fails */
+  }
+}
+
 // ---------- Duplication helpers ----------
 const exerciseFields = (ex) => ({
   name: ex.name, sets: ex.sets, reps: ex.reps, load: ex.load,

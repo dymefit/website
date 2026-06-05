@@ -64,6 +64,17 @@ export default function CalendarView({ client }) {
 
   async function assign(dayId) {
     await api.createSession(client.id, dayId, picker);
+    // Email the client (fire-and-forget; safe no-op if email isn't configured).
+    const opt = dayOptions.find((o) => o.id === dayId);
+    if (client.email) {
+      api.notifySessionScheduled({
+        to: client.email,
+        clientName: client.name,
+        dayLabel: opt?.label,
+        focus: opt?.focus,
+        date: picker,
+      });
+    }
     setPicker(null);
     refreshSessions();
   }

@@ -287,6 +287,20 @@ table.exercises td.name { font-weight: 600; }
 .portal-body .sub { color: var(--muted); margin-bottom: 18px; }
 .back-link { display: inline-block; margin-bottom: 12px; }
 
+.portal-subtitle { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin: 26px 0 4px; }
+
+/* Today's-workout hero shortcut */
+.hero-card {
+  display: block; width: 100%; text-align: left; cursor: pointer; color: var(--text);
+  background: linear-gradient(135deg, rgba(79,140,255,.22), rgba(79,140,255,.06));
+  border: 1px solid var(--accent); border-radius: 14px; padding: 20px; margin-top: 8px;
+}
+.hero-card:hover { filter: brightness(1.06); }
+.hero-kicker { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: #cfe0ff; font-weight: 600; }
+.hero-label { font-size: 24px; font-weight: 700; margin-top: 4px; }
+.hero-focus { font-size: 13px; color: #cfe0ff; margin-top: 2px; }
+.hero-cta { display: inline-block; margin-top: 14px; font-weight: 600; color: #fff; }
+
 .session-list { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
 .session-card {
   width: 100%; text-align: left; background: var(--panel); border: 1px solid var(--line);
