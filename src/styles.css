@@ -122,6 +122,21 @@ table.exercises td.muted-cell { color: var(--muted); }
 /* Progress charts */
 .charts-section { margin-bottom: 26px; }
 .charts-heading { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 12px; }
+.charts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 14px; }
+.chart-card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 14px; }
+.chart-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+.chart-name { font-weight: 600; font-size: 14px; }
+.chart-delta { font-size: 12px; color: var(--muted); }
+.chart-delta.up { color: var(--good, #34d399); }
+.chart-delta.down { color: var(--danger); }
+.chart-svg { width: 100%; height: auto; display: block; }
+.chart-line { stroke: var(--accent); stroke-width: 2; }
+.chart-dot { fill: var(--accent); }
+.chart-axis { fill: var(--muted); font-size: 9px; }
+
+/* Progress charts */
+.charts-section { margin-bottom: 26px; }
+.charts-heading { font-size: 13px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 12px; }
 .charts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; }
 .chart-card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 12px 14px; }
 .chart-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
