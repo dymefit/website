@@ -363,13 +363,15 @@ table.exercises td.name { font-weight: 600; }
 }
 .landing-cta.outline:hover { background: rgba(255, 255, 255, 0.16); }
 
-/* scroll cue at bottom of hero */
+/* scroll cue centered just below the hero buttons */
 .scroll-cue {
-  position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%);
+  display: block;
+  width: max-content;
+  margin: 26px auto 0;
   color: rgba(255,255,255,.7); font-size: 22px; text-decoration: none;
   animation: bob 1.8s ease-in-out infinite;
 }
-@keyframes bob { 0%,100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, 6px); } }
+@keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(6px); } }
 
 /* page sections below the hero */
 .landing-page { background: var(--bg); }
