@@ -26,6 +26,15 @@ const SERVICES = [
   },
 ];
 
+const CERTS = [
+  { abbr: "CSCS", name: "Certified Strength & Conditioning Specialist" },
+  { abbr: "TPI", name: "Titleist Performance Institute Certified" },
+  { abbr: "PTA", name: "Physical Therapist Assistant" },
+  { abbr: "LMT", name: "Licensed Massage Therapist" },
+  { abbr: "SFMA", name: "Selective Functional Movement Assessment" },
+  { abbr: "FMS", name: "Functional Movement Screen" },
+];
+
 export default function Landing({ onEnter }) {
   const inquiry =
     `mailto:${COACH_EMAIL}` +
@@ -81,8 +90,23 @@ export default function Landing({ onEnter }) {
         </div>
       </section>
 
+      {/* Certifications */}
+      <section className="page-section alt" id="certifications">
+        <div className="section-inner">
+          <h2 className="section-title">Certifications</h2>
+          <div className="cert-strip">
+            {CERTS.map((c) => (
+              <div className="cert-badge" key={c.abbr} title={c.name}>
+                <span className="cert-abbr">{c.abbr}</span>
+                <span className="cert-name">{c.name}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* Services */}
-      <section className="page-section alt" id="services">
+      <section className="page-section" id="services">
         <div className="section-inner">
           <h2 className="section-title">Services</h2>
           <div className="services-grid">
