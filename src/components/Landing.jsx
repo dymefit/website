@@ -5,24 +5,24 @@ import { COACH_EMAIL } from "../auth.jsx";
 
 const SERVICES = [
   {
-    icon: "🎯",
-    title: "1-on-1 Coaching",
-    body: "Personalized programming, technique coaching, and weekly accountability built entirely around you.",
+    icon: "⛳",
+    title: "Golf Performance (TPI)",
+    body: "TPI-certified assessment and training that builds a more powerful, repeatable, pain-free swing — for PGA pros to youth players.",
   },
   {
-    icon: "📋",
-    title: "Custom Programs",
-    body: "Training tailored to your goals, equipment, and schedule — progressing week over week.",
+    icon: "🎿",
+    title: "Ski-Ready Strength",
+    body: "Develop the leg strength, mobility, and balance to ski hard all season and keep your knees healthy on the mountain.",
   },
   {
-    icon: "🔄",
-    title: "Comeback Training",
-    body: "Returning from injury or a long layoff? Rebuild strength safely and intelligently. No setback is final.",
+    icon: "🩹",
+    title: "Injury Prevention & Return-to-Sport",
+    body: "Rehab-informed programming and manual therapy to keep you off the sidelines — and guide a strong comeback when you need one.",
   },
   {
     icon: "📱",
     title: "Online Coaching",
-    body: "Train anywhere. Log every set, track your progress, and get feedback — all from your phone.",
+    body: "Train anywhere. Get custom programming, log every set, track progress, and get feedback — all from your phone.",
   },
 ];
 
