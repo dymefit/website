@@ -378,7 +378,8 @@ table.exercises td.name { font-weight: 600; }
 .section-inner { max-width: 960px; margin: 0 auto; text-align: center; }
 .section-title { font-size: clamp(28px, 4vw, 40px); font-weight: 700; margin-bottom: 18px; }
 .section-lead { font-size: clamp(17px, 2.2vw, 20px); color: var(--text); max-width: 640px; margin: 0 auto 14px; }
-.section-text { color: var(--muted); max-width: 640px; margin: 0 auto; line-height: 1.7; }
+.section-text { color: var(--muted); max-width: 640px; margin: 0 auto 14px; line-height: 1.7; }
+.section-text:last-child { margin-bottom: 0; }
 
 .services-grid {
   display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));

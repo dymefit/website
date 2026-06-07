@@ -55,14 +55,28 @@ export default function Landing({ onEnter }) {
         <div className="section-inner">
           <h2 className="section-title">About</h2>
           <p className="section-lead">
-            DYME-FIT is built on one belief: progress is for everyone, and a setback is
-            just the start of the next comeback.
+            Dymond Unutoa helps golfers and skiers move better, perform stronger, and
+            stay injury-free — for a lifetime.
           </p>
           <p className="section-text">
-            Whether you're chasing a new personal best, getting back after time away, or
-            building a habit that lasts a lifetime, training here is personal, structured,
-            and built to keep you moving — for good. <em>(Placeholder bio — send me your
-            real story and I'll drop it in.)</em>
+            A strength coach, physical therapist assistant, and board-certified licensed
+            massage therapist, Dymond has served as Co-Director of Strength &amp;
+            Conditioning at MountainTop PT since 2008. He earned his degree in Exercise
+            Science with an emphasis in Fitness Leadership at the University of Utah, where
+            he was a full-time student athlete playing cornerback under Urban Meyer and
+            Kyle Whittingham. He is a Certified Strength and Conditioning Specialist (CSCS),
+            specializes in sports and orthopedic massage for function, movement, and
+            recovery, and spent the 2007 season with Real Salt Lake supporting athlete
+            preparation, recovery, and performance.
+          </p>
+          <p className="section-text">
+            Today his focus is keeping golfers and skiers resilient on the course and the
+            mountain. He is TPI Certified and trains golfers of every level — from PGA
+            professionals to youth players — and serves as Director of Fitness for the
+            Glenmoor GC Youth Travel Team. His approach blends performance training, manual
+            therapy, and rehab-informed programming to prevent injuries before they start
+            and guide strong comebacks when they happen. Because no setback is final.
+            Off the clock, Dymond enjoys life with his wife, Tracy, and their son, Abraham.
           </p>
         </div>
       </section>
