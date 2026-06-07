@@ -362,6 +362,44 @@ table.exercises td.name { font-weight: 600; }
   backdrop-filter: blur(4px);
 }
 .landing-cta.outline:hover { background: rgba(255, 255, 255, 0.16); }
+
+/* scroll cue at bottom of hero */
+.scroll-cue {
+  position: absolute; bottom: 26px; left: 50%; transform: translateX(-50%);
+  color: rgba(255,255,255,.7); font-size: 22px; text-decoration: none;
+  animation: bob 1.8s ease-in-out infinite;
+}
+@keyframes bob { 0%,100% { transform: translate(-50%, 0); } 50% { transform: translate(-50%, 6px); } }
+
+/* page sections below the hero */
+.landing-page { background: var(--bg); }
+.page-section { padding: 80px 24px; }
+.page-section.alt { background: var(--panel); }
+.section-inner { max-width: 960px; margin: 0 auto; text-align: center; }
+.section-title { font-size: clamp(28px, 4vw, 40px); font-weight: 700; margin-bottom: 18px; }
+.section-lead { font-size: clamp(17px, 2.2vw, 20px); color: var(--text); max-width: 640px; margin: 0 auto 14px; }
+.section-text { color: var(--muted); max-width: 640px; margin: 0 auto; line-height: 1.7; }
+
+.services-grid {
+  display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 18px; margin-top: 34px; text-align: left;
+}
+.service-card {
+  background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius); padding: 22px;
+}
+.page-section.alt .service-card { background: var(--panel-2); }
+.service-icon { font-size: 30px; }
+.service-title { font-size: 17px; margin: 10px 0 6px; }
+.service-body { color: var(--muted); font-size: 14px; line-height: 1.6; }
+
+.cta-band { background: linear-gradient(135deg, rgba(79,140,255,.16), rgba(79,140,255,.04)); }
+
+.landing-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 22px 24px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px;
+}
+.landing-footer a { color: var(--accent); text-decoration: none; }
+.landing-footer a:hover { text-decoration: underline; }
 .auth-sub { text-align: center; color: var(--muted); font-size: 13px; margin-top: -6px; }
 
 /* ---------- Client portal ---------- */
