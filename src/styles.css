@@ -341,12 +341,27 @@ table.exercises td.name { font-weight: 600; }
   font-style: italic;
   text-shadow: 0 1px 12px rgba(0,0,0,.6);
 }
-.landing-cta {
+.landing-actions {
   margin-top: 32px;
+  display: flex;
+  gap: 14px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+.landing-cta {
   padding: 13px 30px;
   font-size: 15px;
   border-radius: 999px;
+  text-decoration: none;
+  display: inline-block;
 }
+.landing-cta.outline {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.55);
+  color: #fff;
+  backdrop-filter: blur(4px);
+}
+.landing-cta.outline:hover { background: rgba(255, 255, 255, 0.16); }
 .auth-sub { text-align: center; color: var(--muted); font-size: 13px; margin-top: -6px; }
 
 /* ---------- Client portal ---------- */
