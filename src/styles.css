@@ -303,6 +303,50 @@ table.exercises td.name { font-weight: 600; }
 .auth-error { background: rgba(239,68,68,.12); color: #fca5a5; padding: 9px 12px; border-radius: 8px; font-size: 13px; }
 .auth-info { background: var(--accent-soft); color: #cfe0ff; padding: 9px 12px; border-radius: 8px; font-size: 13px; }
 .auth-switch { text-align: center; color: var(--muted); font-size: 13px; }
+.auth-back { display: block; margin: 4px auto 0; }
+
+/* ---------- Landing / front page ---------- */
+.landing {
+  position: relative;
+  min-height: 100vh;
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 24px;
+  background-color: #0b0d11; /* fallback before photo is added */
+  background-image: url("/hero.jpg");
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+}
+/* dark gradient so the title/motto stay readable over any photo */
+.landing-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(180deg, rgba(11,13,17,.45) 0%, rgba(11,13,17,.65) 55%, rgba(11,13,17,.85) 100%);
+}
+.landing-inner { position: relative; z-index: 1; max-width: 760px; }
+.landing-title {
+  font-size: clamp(48px, 12vw, 120px);
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  line-height: 1;
+  color: #fff;
+  text-shadow: 0 2px 24px rgba(0,0,0,.5);
+}
+.landing-motto {
+  margin-top: 18px;
+  font-size: clamp(16px, 2.6vw, 24px);
+  font-weight: 500;
+  color: #e6e9ef;
+  font-style: italic;
+  text-shadow: 0 1px 12px rgba(0,0,0,.6);
+}
+.landing-cta {
+  margin-top: 32px;
+  padding: 13px 30px;
+  font-size: 15px;
+  border-radius: 999px;
+}
 .auth-sub { text-align: center; color: var(--muted); font-size: 13px; margin-top: -6px; }
 
 /* ---------- Client portal ---------- */

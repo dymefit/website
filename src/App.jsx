@@ -1,5 +1,7 @@
+import { useState } from "react";
 import { isConfigured } from "./lib/supabase";
 import { useAuth, isCoachEmail } from "./auth.jsx";
+import Landing from "./components/Landing.jsx";
 import Login from "./components/Login.jsx";
 import CoachApp from "./CoachApp.jsx";
 import ClientPortal from "./components/ClientPortal.jsx";
@@ -21,10 +23,15 @@ function NotConfigured() {
 
 export default function App() {
   const { user, loading, signOut } = useAuth();
+  const [showLogin, setShowLogin] = useState(false);
 
   if (!isConfigured) return <NotConfigured />;
   if (loading) return <div className="splash">Loading…</div>;
-  if (!user) return <Login />;
+  if (!user) {
+    return showLogin
+      ? <Login onBack={() => setShowLogin(false)} />
+      : <Landing onEnter={() => setShowLogin(true)} />;
+  }
 
   // Single coach (by email) gets the full builder; everyone else is a client.
   return isCoachEmail(user.email)

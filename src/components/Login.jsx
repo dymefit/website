@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../auth.jsx";
 
-export default function Login() {
+export default function Login({ onBack }) {
   const { signIn, signUp } = useAuth();
   const [mode, setMode] = useState("signin");
   const [email, setEmail] = useState("");
@@ -68,6 +68,10 @@ export default function Login() {
             {mode === "signin" ? "Create account" : "Sign in"}
           </button>
         </p>
+
+        {onBack && (
+          <button type="button" className="linklike auth-back" onClick={onBack}>← Back to home</button>
+        )}
       </form>
     </div>
   );
