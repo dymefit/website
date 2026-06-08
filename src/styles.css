@@ -335,68 +335,44 @@ table.exercises td.name { font-weight: 600; }
 }
 .landing-title.stacked {
   position: relative;
-  white-space: nowrap;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   line-height: 0.9;
-  font-size: clamp(44px, 12vw, 116px);
+  font-size: clamp(46px, 11vw, 108px);
   text-shadow: none; /* keep the effect strictly inside the glyphs */
-  /* Top half = dim steel (unfilled); bottom half = brushed silver chrome.
-     Sliding it up makes the metallic fill rise from the bottom. */
-  background-image: linear-gradient(
-    to bottom,
-    #34373d 0%, #34373d 49.9%,
-    #f6f7f8 50%, #d4d7db 62%, #a9adb3 72%, #ffffff 82%, #8b9099 88%, #eef0f2 100%
-  );
-  background-size: 100% 200%;
-  background-position: 0% 0%;
+  /* Layer 1: a bright shine band (sweeps L→R in phase 2).
+     Layer 2: dim-steel top half + brushed-silver chrome bottom half
+              (slides up to "fill" the letters from the bottom in phase 1). */
+  background-image:
+    linear-gradient(100deg,
+      transparent 38%,
+      rgba(255, 255, 255, 0.9) 49%,
+      rgba(255, 255, 255, 1) 50%,
+      rgba(255, 255, 255, 0.9) 51%,
+      transparent 62%),
+    linear-gradient(to bottom,
+      #34373d 0%, #34373d 49.9%,
+      #f6f7f8 50%, #d4d7db 62%, #a9adb3 72%, #ffffff 82%, #8b9099 88%, #eef0f2 100%);
+  background-size: 220% 100%, 100% 200%;
+  background-position: -60% 0, 0% 0%;
   background-repeat: no-repeat;
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
   color: transparent;
-  animation: title-fill 1.8s cubic-bezier(0.33, 1, 0.68, 1) 0.3s forwards;
+  animation: title-reveal 3.8s ease 0.3s forwards;
 }
 .landing-title.stacked span { display: block; }
-
-/* Shimmer: a bright band overlaid on the same letters, sweeping left→right.
-   Starts after the fill finishes, then repeats. */
-.landing-title.stacked::after {
-  content: attr(data-text);
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 100%;
-  pointer-events: none;
-  background-image: linear-gradient(
-    100deg,
-    transparent 38%,
-    rgba(255, 255, 255, 0.9) 49%,
-    rgba(255, 255, 255, 1) 50%,
-    rgba(255, 255, 255, 0.9) 51%,
-    transparent 62%
-  );
-  background-size: 220% 100%;
-  background-position: -60% 0;
-  background-repeat: no-repeat;
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
-  animation: title-shimmer 3.4s ease-in-out 2.1s infinite;
-}
-@keyframes title-fill {
-  from { background-position: 0% 0%; }
-  to   { background-position: 0% 100%; }
-}
-@keyframes title-shimmer {
-  0%   { background-position: -60% 0; }
-  32%  { background-position: 160% 0; }
-  100% { background-position: 160% 0; }
+/* Phase 1 (0–42%): metallic fills from the bottom. Phase 2 (55–90%): shine sweeps L→R. */
+@keyframes title-reveal {
+  0%   { background-position: -60% 0, 0% 0%; }
+  42%  { background-position: -60% 0, 0% 100%; }
+  55%  { background-position: -60% 0, 0% 100%; }
+  90%  { background-position: 160% 0, 0% 100%; }
+  100% { background-position: 160% 0, 0% 100%; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .landing-title.stacked { animation: none; background-position: 0% 100%; }
-  .landing-title.stacked::after { animation: none; opacity: 0; }
+  .landing-title.stacked { animation: none; background-position: 160% 0, 0% 100%; }
 }
 .landing-motto {
   margin-top: 18px;

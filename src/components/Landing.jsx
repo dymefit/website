@@ -38,9 +38,9 @@ const CERTS = [
 export default function Landing({ onEnter }) {
   const inquiry =
     `mailto:${COACH_EMAIL}` +
-    `?subject=${encodeURIComponent("DYME-FIT coaching inquiry")}` +
+    `?subject=${encodeURIComponent("Fitness-Elevated coaching inquiry")}` +
     `&body=${encodeURIComponent(
-      "Hi! I'm interested in training with DYME-FIT.\n\nName:\nGoals:\nExperience:\n"
+      "Hi! I'm interested in training with Fitness-Elevated.\n\nName:\nGoals:\nExperience:\n"
     )}`;
 
   return (
@@ -49,7 +49,10 @@ export default function Landing({ onEnter }) {
       <header className="landing">
         <div className="landing-overlay" />
         <div className="landing-inner">
-          <h1 className="landing-title stacked" data-text="DYME-FIT">DYME-FIT</h1>
+          <h1 className="landing-title stacked">
+            <span>Fitness</span>
+            <span>Elevated</span>
+          </h1>
           <p className="landing-motto">A lifetime in motion because no setback is final.</p>
           <div className="landing-actions">
             <a className="btn landing-cta" href={inquiry}>Get Started</a>
@@ -134,7 +137,7 @@ export default function Landing({ onEnter }) {
       </section>
 
       <footer className="landing-footer">
-        <span>© DYME-FIT</span>
+        <span>© Fitness-Elevated</span>
         <a href={inquiry}>Contact</a>
       </footer>
     </div>
