@@ -49,7 +49,7 @@ export default function Landing({ onEnter }) {
       <header className="landing">
         <div className="landing-overlay" />
         <div className="landing-inner">
-          <h1 className="landing-title">DYME-FIT</h1>
+          <h1 className="landing-title stacked" data-text="DYME-FIT">DYME-FIT</h1>
           <p className="landing-motto">A lifetime in motion because no setback is final.</p>
           <div className="landing-actions">
             <a className="btn landing-cta" href={inquiry}>Get Started</a>

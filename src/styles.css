@@ -333,6 +333,71 @@ table.exercises td.name { font-weight: 600; }
   color: #fff;
   text-shadow: 0 2px 24px rgba(0,0,0,.5);
 }
+.landing-title.stacked {
+  position: relative;
+  white-space: nowrap;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  line-height: 0.9;
+  font-size: clamp(44px, 12vw, 116px);
+  text-shadow: none; /* keep the effect strictly inside the glyphs */
+  /* Top half = dim steel (unfilled); bottom half = brushed silver chrome.
+     Sliding it up makes the metallic fill rise from the bottom. */
+  background-image: linear-gradient(
+    to bottom,
+    #34373d 0%, #34373d 49.9%,
+    #f6f7f8 50%, #d4d7db 62%, #a9adb3 72%, #ffffff 82%, #8b9099 88%, #eef0f2 100%
+  );
+  background-size: 100% 200%;
+  background-position: 0% 0%;
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: title-fill 1.8s cubic-bezier(0.33, 1, 0.68, 1) 0.3s forwards;
+}
+.landing-title.stacked span { display: block; }
+
+/* Shimmer: a bright band overlaid on the same letters, sweeping left→right.
+   Starts after the fill finishes, then repeats. */
+.landing-title.stacked::after {
+  content: attr(data-text);
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  pointer-events: none;
+  background-image: linear-gradient(
+    100deg,
+    transparent 38%,
+    rgba(255, 255, 255, 0.9) 49%,
+    rgba(255, 255, 255, 1) 50%,
+    rgba(255, 255, 255, 0.9) 51%,
+    transparent 62%
+  );
+  background-size: 220% 100%;
+  background-position: -60% 0;
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+  animation: title-shimmer 3.4s ease-in-out 2.1s infinite;
+}
+@keyframes title-fill {
+  from { background-position: 0% 0%; }
+  to   { background-position: 0% 100%; }
+}
+@keyframes title-shimmer {
+  0%   { background-position: -60% 0; }
+  32%  { background-position: 160% 0; }
+  100% { background-position: 160% 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .landing-title.stacked { animation: none; background-position: 0% 100%; }
+  .landing-title.stacked::after { animation: none; opacity: 0; }
+}
 .landing-motto {
   margin-top: 18px;
   font-size: clamp(16px, 2.6vw, 24px);
