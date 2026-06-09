@@ -315,7 +315,16 @@ table.exercises td.name { font-weight: 600; }
   position: fixed;
   inset: 0;
   z-index: 0;
-  background: #0b0d11 url("/hero.jpg") center / cover no-repeat;
+  background-color: #0b0d11;
+  background-image: url("/hero.jpg");
+  background-repeat: no-repeat;
+  background-position: center;
+  background-size: cover;
+}
+/* On portrait/phone screens, ease back from "cover" so the figure is a little
+   smaller and the side equipment comes into frame (dark bg fills the edges). */
+@media (max-aspect-ratio: 3 / 4) {
+  .home-bg { background-size: 142%; }
 }
 /* keep all page content above the fixed photo */
 .landing,
