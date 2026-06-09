@@ -47,7 +47,6 @@ export default function Landing({ onEnter }) {
     <div className="landing-page">
       {/* Hero */}
       <header className="landing">
-        <div className="landing-overlay" />
         <div className="landing-inner">
           <h1 className="landing-title stacked">
             <span>Fitness</span>
@@ -60,6 +59,7 @@ export default function Landing({ onEnter }) {
           </div>
           <a className="scroll-cue" href="#about" aria-label="Scroll to learn more">↓</a>
         </div>
+        <div className="landing-photo" role="img" aria-label="Dymond Unutoa — Fitness-Elevated" />
       </header>
 
       {/* About */}

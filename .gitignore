@@ -7,3 +7,6 @@ dist
 
 # Local Netlify folder
 .netlify
+
+# original source photo (served copy lives in public/)
+/Me.jpg
