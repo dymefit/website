@@ -324,7 +324,7 @@ table.exercises td.name { font-weight: 600; }
 /* On portrait/phone screens, ease back from "cover" so the figure is a little
    smaller and the side equipment comes into frame (dark bg fills the edges). */
 @media (max-aspect-ratio: 3 / 4) {
-  .home-bg { background-size: 142%; }
+  .home-bg { background-size: 125%; }
 }
 /* keep all page content above the fixed photo */
 .landing,
