@@ -309,44 +309,34 @@ table.exercises td.name { font-weight: 600; }
 .landing {
   position: relative;
   min-height: 100vh;
-  display: grid;
-  grid-template-columns: 1fr 1fr;
+  display: flex;
+  flex-direction: column;
   align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: 56px 24px;
   background-color: var(--bg);
 }
 .landing-inner {
   position: relative;
   z-index: 1;
-  max-width: 640px;
-  margin-left: auto;
-  padding: 48px clamp(24px, 4vw, 60px);
-  text-align: left;
+  width: 100%;
+  max-width: 600px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
-.landing-photo {
-  position: relative;
-  align-self: stretch;
-  min-height: 100vh;
+/* photo framed between the title (above the head) and the motto (below the feet) */
+.hero-photo {
+  width: min(420px, 80vw);
+  aspect-ratio: 1 / 1;
+  margin: 22px 0 18px;
   background-image: url("/hero.jpg");
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-}
-/* soft blend of the photo into the dark text side */
-.landing-photo::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(90deg, var(--bg) 0%, rgba(11, 13, 17, 0) 22%);
-}
-@media (max-width: 860px) {
-  .landing { grid-template-columns: 1fr; }
-  .landing-photo { order: -1; min-height: 46vh; }
-  .landing-photo::before {
-    background: linear-gradient(0deg, var(--bg) 0%, rgba(11, 13, 17, 0) 32%);
-  }
-  .landing-inner { margin: 0 auto; max-width: 560px; text-align: center; padding-top: 30px; }
-  .landing-inner .landing-actions { justify-content: center; }
-  .landing-inner .scroll-cue { margin: 26px auto 0; }
+  border-radius: 16px;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
 }
 .landing-title {
   font-size: clamp(48px, 12vw, 120px);
@@ -406,10 +396,10 @@ table.exercises td.name { font-weight: 600; }
   text-shadow: 0 1px 12px rgba(0,0,0,.6);
 }
 .landing-actions {
-  margin-top: 32px;
+  margin-top: 26px;
   display: flex;
   gap: 14px;
-  justify-content: flex-start;
+  justify-content: center;
   flex-wrap: wrap;
 }
 .landing-cta {
@@ -431,7 +421,7 @@ table.exercises td.name { font-weight: 600; }
 .scroll-cue {
   display: block;
   width: max-content;
-  margin: 26px 0 0;
+  margin: 24px auto 0;
   color: rgba(255,255,255,.7); font-size: 22px; text-decoration: none;
   animation: bob 1.8s ease-in-out infinite;
 }

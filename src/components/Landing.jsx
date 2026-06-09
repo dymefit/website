@@ -52,6 +52,7 @@ export default function Landing({ onEnter }) {
             <span>Fitness</span>
             <span>Elevated</span>
           </h1>
+          <div className="hero-photo" role="img" aria-label="Dymond Unutoa — Fitness-Elevated" />
           <p className="landing-motto">A lifetime in motion because no setback is final.</p>
           <div className="landing-actions">
             <a className="btn landing-cta" href={inquiry}>Get Started</a>
@@ -59,7 +60,6 @@ export default function Landing({ onEnter }) {
           </div>
           <a className="scroll-cue" href="#about" aria-label="Scroll to learn more">↓</a>
         </div>
-        <div className="landing-photo" role="img" aria-label="Dymond Unutoa — Fitness-Elevated" />
       </header>
 
       {/* About */}
