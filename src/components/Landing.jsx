@@ -45,14 +45,16 @@ export default function Landing({ onEnter }) {
 
   return (
     <div className="landing-page">
+      {/* Fixed photo background — home page only */}
+      <div className="home-bg" aria-hidden="true" />
+
       {/* Hero */}
       <header className="landing">
-        <div className="landing-inner">
-          <h1 className="landing-title stacked">
-            <span>Fitness</span>
-            <span>Elevated</span>
-          </h1>
-          <div className="hero-photo" role="img" aria-label="Dymond Unutoa — Fitness-Elevated" />
+        <h1 className="landing-title stacked">
+          <span>Fitness</span>
+          <span>Elevated</span>
+        </h1>
+        <div className="landing-bottom">
           <p className="landing-motto">A lifetime in motion because no setback is final.</p>
           <div className="landing-actions">
             <a className="btn landing-cta" href={inquiry}>Get Started</a>
