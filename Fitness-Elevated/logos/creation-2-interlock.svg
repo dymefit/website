@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+  <defs><linearGradient id="g2" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#7CF29B"/><stop offset="0.55" stop-color="#27C24C"/><stop offset="1" stop-color="#159A37"/>
+  </linearGradient></defs>
+  <rect width="240" height="240" rx="36" fill="#0B0F0C"/>
+  <polygon points="120,28 212,120 120,212 28,120" fill="none" stroke="#FFFFFF" stroke-width="7" stroke-linejoin="round"/>
+  <g transform="translate(120,120)">
+    <!-- one shared central spine -->
+    <rect x="-7" y="-58" width="14" height="116" rx="5" fill="#FFFFFF"/>
+    <!-- reversed F arms (white) reach LEFT -->
+    <rect x="-44" y="-38" width="37" height="12" rx="4" fill="#FFFFFF"/>
+    <rect x="-48" y="-6"  width="41" height="12" rx="4" fill="#FFFFFF"/>
+    <!-- E arms (green) reach RIGHT -->
+    <rect x="7"  y="-38" width="37" height="12" rx="4" fill="url(#g2)"/>
+    <rect x="7"  y="-6"  width="41" height="12" rx="4" fill="url(#g2)"/>
+    <rect x="7"  y="26"  width="37" height="12" rx="4" fill="url(#g2)"/>
+  </g>
+</svg>

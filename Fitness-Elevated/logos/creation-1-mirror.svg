@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 240 240" width="240" height="240">
+  <defs><linearGradient id="g1" x1="0" y1="0" x2="1" y2="1">
+    <stop offset="0" stop-color="#7CF29B"/><stop offset="0.55" stop-color="#27C24C"/><stop offset="1" stop-color="#159A37"/>
+  </linearGradient></defs>
+  <rect width="240" height="240" rx="36" fill="#0B0F0C"/>
+  <polygon points="120,28 212,120 120,212 28,120" fill="none" stroke="#FFFFFF" stroke-width="7" stroke-linejoin="round"/>
+  <g transform="translate(120,120)">
+    <!-- reversed F (white): spine right-of-letter near centre, arms reach LEFT -->
+    <rect x="-18" y="-58" width="12" height="116" rx="4" fill="#FFFFFF"/>
+    <rect x="-42" y="-38" width="36" height="12" rx="4" fill="#FFFFFF"/>
+    <rect x="-46" y="-6"  width="40" height="12" rx="4" fill="#FFFFFF"/>
+    <!-- E (green): spine left-of-letter near centre, arms reach RIGHT -->
+    <rect x="6"  y="-58" width="12" height="116" rx="4" fill="url(#g1)"/>
+    <rect x="6"  y="-38" width="36" height="12" rx="4" fill="url(#g1)"/>
+    <rect x="6"  y="-6"  width="40" height="12" rx="4" fill="url(#g1)"/>
+    <rect x="6"  y="26"  width="36" height="12" rx="4" fill="url(#g1)"/>
+  </g>
+</svg>
