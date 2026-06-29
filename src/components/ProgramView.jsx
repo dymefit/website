@@ -1,7 +1,7 @@
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useMemo } from "react";
 import * as api from "../lib/api";
 import { MOVEMENT_PATTERNS, MACHINES, EQUIPMENT_GROUPS } from "../lib/constants";
-import { projectLoad, isPowerPattern, POWER_MIN_REPS } from "../lib/progression";
+import { projectLoad, isPowerPattern, POWER_MIN_REPS, coeffFor, patternReferences } from "../lib/progression";
 import Modal from "./Modal.jsx";
 
 export default function ProgramView({ client, program, onProgramsChanged, onSelectProgram }) {
@@ -64,16 +64,31 @@ export default function ProgramView({ client, program, onProgramsChanged, onSele
   };
   const isProgressed = (ex) => Object.keys(override(ex)).length > 0;
 
-  // Load cell: if a %1RM is set for this week and the client has logged work,
-  // show the projected load; otherwise show the manual load.
+  // Best logged 1RM per movement pattern (de-rated to the reference lift),
+  // so a max on one lift can seed loads for related same-pattern lifts.
+  const allExercises = useMemo(() => days.flatMap((d) => d.exercises), [days]);
+  const patternRefs = useMemo(() => patternReferences(allExercises, e1rms), [allExercises, e1rms]);
+
+  // Estimated 1RM for an exercise: its own logged max, else derived from the
+  // best same-pattern lift via strength ratios.
+  const estimated1RM = (ex) => {
+    if (e1rms[ex.id]) return { e1: e1rms[ex.id], crossed: false };
+    const ref = ex.pattern && patternRefs[ex.pattern];
+    if (ref) return { e1: ref * coeffFor(ex.name), crossed: true };
+    return { e1: null, crossed: false };
+  };
+
+  // Load cell: if a %1RM is set and a 1RM is known (own or same-pattern),
+  // show the projected load; otherwise the manual load.
   const loadCell = (ex) => {
     const pct = override(ex).pct;
-    const e1 = e1rms[ex.id];
+    const { e1, crossed } = estimated1RM(ex);
     const proj = projectLoad(e1, pct, ex.equipment);
     if (proj != null) {
+      const src = crossed ? `~ projected from a related ${ex.pattern} lift` : "from this lift's logs";
       return (
-        <span className="proj-load" title={`${pct}% of est. 1RM ≈ ${Math.round(e1)} (from logs)`}>
-          {proj}<span className="proj-pct">{pct}%</span>
+        <span className="proj-load" title={`${pct}% of est. 1RM ≈ ${Math.round(e1)} (${src})`}>
+          {crossed && "~"}{proj}<span className="proj-pct">{pct}%</span>
         </span>
       );
     }

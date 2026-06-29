@@ -66,3 +66,51 @@ export function projectLoad(e1RM, pct, equipment) {
 // Power work should never drop below 3 reps.
 export const POWER_MIN_REPS = 3;
 export const isPowerPattern = (pattern) => /power/i.test(pattern || "");
+
+// ---- Same-pattern cross-projection ----
+// Strength coefficients relative to the "reference" lift of each pattern
+// (reference = 1.0). Lets a logged max on one lift seed loads for related
+// lifts in the same movement pattern. Unknown lifts default to 1.0.
+const COEFFICIENTS = {
+  // Squat (ref: back squat)
+  "back squat": 1.0, squat: 1.0, "front squat": 0.85, "hex bar squat": 1.05,
+  "trap bar squat": 1.05, "goblet squat": 0.6, "leg press": 1.8,
+  "split squat": 0.5, "bulgarian split squat": 0.5, "box squat": 0.95,
+  // Hinge (ref: deadlift)
+  deadlift: 1.0, "conventional deadlift": 1.0, "trap bar deadlift": 1.05,
+  "hex bar deadlift": 1.05, "romanian deadlift": 0.8, rdl: 0.8,
+  "good morning": 0.6, "hamstring curl": 0.4, "hip thrust": 1.1,
+  // Horizontal push (ref: bench press)
+  "bench press": 1.0, "barbell bench press": 1.0, "incline bench press": 0.85,
+  "db bench press": 0.9, "dumbbell bench press": 0.9, "chest press": 0.95,
+  "push up": 0.5, "pushup": 0.5,
+  // Vertical push (ref: overhead press)
+  "overhead press": 1.0, ohp: 1.0, "shoulder press": 1.0, "push press": 1.15,
+  "db shoulder press": 0.9,
+  // Horizontal pull (ref: barbell row)
+  "barbell row": 1.0, "bent over row": 1.0, "seated row": 0.95, "cable row": 0.9,
+  "db row": 0.55, "dumbbell row": 0.55,
+  // Vertical pull (ref: lat pulldown)
+  "lat pulldown": 1.0, pulldown: 1.0, "pull up": 1.1, "pullup": 1.1, "chin up": 1.1,
+  // Leg extension (knee)
+  "leg extension": 0.5,
+};
+
+export function coeffFor(name) {
+  const key = (name || "").trim().toLowerCase();
+  return COEFFICIENTS[key] ?? 1.0;
+}
+
+// Given exercises (each {id, name, pattern}) and a map of exercise_id -> e1RM,
+// compute the reference 1RM per pattern (best logged lift, de-rated to the
+// pattern's reference lift). { [pattern]: refE1RM }.
+export function patternReferences(exercises, e1rmById) {
+  const refs = {};
+  for (const ex of exercises || []) {
+    const e1 = e1rmById[ex.id];
+    if (!e1 || !ex.pattern) continue;
+    const ref = e1 / coeffFor(ex.name);
+    refs[ex.pattern] = Math.max(refs[ex.pattern] || 0, ref);
+  }
+  return refs;
+}
