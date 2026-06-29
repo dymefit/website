@@ -152,6 +152,17 @@ table.exercises td.muted-cell { color: var(--muted); }
 
 /* Exercise notes + week progression */
 .ex-notes { font-size: 11px; color: var(--muted); margin-top: 3px; font-weight: 400; }
+.equip-tag {
+  display: inline-block; margin-left: 8px; font-size: 10px; font-weight: 600;
+  color: var(--muted); background: var(--panel-2); border: 1px solid var(--line);
+  border-radius: 4px; padding: 1px 6px; vertical-align: middle;
+}
+.alt-toggle {
+  margin-top: 8px; background: var(--panel-2); border: 1px solid var(--line);
+  color: var(--accent); border-radius: 8px; padding: 6px 10px; font-size: 12px;
+  cursor: pointer;
+}
+.alt-toggle:hover { border-color: var(--accent); }
 .wk-badge {
   display: inline-block; margin-left: 8px; font-size: 10px; font-weight: 700;
   color: var(--accent); background: var(--accent-soft); border-radius: 4px; padding: 1px 5px;

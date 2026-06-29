@@ -1,6 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import * as api from "../lib/api";
-import { MOVEMENT_PATTERNS } from "../lib/constants";
+import { MOVEMENT_PATTERNS, MACHINES, EQUIPMENT_GROUPS } from "../lib/constants";
 import Modal from "./Modal.jsx";
 
 export default function ProgramView({ client, program, onProgramsChanged, onSelectProgram }) {
@@ -207,8 +207,10 @@ export default function ProgramView({ client, program, onProgramsChanged, onSele
                     </td>
                     <td className="name">
                       {ex.name}
+                      {ex.equipment && <span className="equip-tag">{ex.equipment}</span>}
                       {isProgressed(ex) && <span className="wk-badge" title={`Adjusted for week ${week}`}>W{week}</span>}
                       {ex.notes && <div className="ex-notes">{ex.notes}</div>}
+                      {ex.alt && <div className="ex-notes">🏨 alt: {ex.alt}</div>}
                     </td>
                     <td>{eff(ex, "sets")}</td>
                     <td>{eff(ex, "reps")}</td>
@@ -297,6 +299,8 @@ function ExerciseForm({ dayId, exercise, weeks, position, onClose, onSaved }) {
   const [f, setF] = useState({
     name: exercise?.name ?? "",
     pattern: exercise?.pattern ?? "",
+    equipment: exercise?.equipment ?? "",
+    alt: exercise?.alt ?? "",
     sets: exercise?.sets ?? "",
     reps: exercise?.reps ?? "",
     load: exercise?.load ?? "",
@@ -341,12 +345,37 @@ function ExerciseForm({ dayId, exercise, weeks, position, onClose, onSaved }) {
           <span>Exercise</span>
           <input value={f.name} onChange={set("name")} autoFocus required placeholder="e.g. Back Squat" />
         </label>
+        <div className="field-row">
+          <label className="field">
+            <span>Movement pattern</span>
+            <select value={f.pattern} onChange={set("pattern")}>
+              <option value="">— none —</option>
+              {MOVEMENT_PATTERNS.map((p) => <option key={p}>{p}</option>)}
+            </select>
+          </label>
+          <label className="field">
+            <span>Equipment</span>
+            <select value={f.equipment} onChange={set("equipment")}>
+              <option value="">— none —</option>
+              {EQUIPMENT_GROUPS.map((g) => (
+                <optgroup key={g.group} label={g.group}>
+                  {g.items.map((it) => <option key={it}>{it}</option>)}
+                </optgroup>
+              ))}
+            </select>
+          </label>
+        </div>
         <label className="field">
-          <span>Movement pattern</span>
-          <select value={f.pattern} onChange={set("pattern")}>
-            <option value="">— none —</option>
-            {MOVEMENT_PATTERNS.map((p) => <option key={p}>{p}</option>)}
-          </select>
+          <span>Hotel / no-free-weights alternative</span>
+          <input
+            value={f.alt}
+            onChange={set("alt")}
+            list="machine-alts"
+            placeholder="e.g. Leg Press (client can pick this when traveling)"
+          />
+          <datalist id="machine-alts">
+            {MACHINES.map((m) => <option key={m} value={m} />)}
+          </datalist>
         </label>
         <div className="field-row">
           <label className="field"><span>Sets</span><input value={f.sets} onChange={set("sets")} placeholder="4" /></label>

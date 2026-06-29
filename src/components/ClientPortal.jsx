@@ -171,6 +171,7 @@ function ExerciseLogger({ exercise, client, session, existing }) {
   const [sets, setSets] = useState(initialSets);
   const [note, setNote] = useState(existing?.note ?? "");
   const [status, setStatus] = useState(existing ? "saved" : "idle"); // idle|saving|saved|error
+  const [useAlt, setUseAlt] = useState(false); // traveling: swap to the machine alternative
 
   const setField = (i, k) => (e) => {
     const next = sets.map((s, j) => (j === i ? { ...s, [k]: e.target.value } : s));
@@ -212,9 +213,14 @@ function ExerciseLogger({ exercise, client, session, existing }) {
     <div className="log-card">
       <div className="log-head">
         <div>
-          <h3>{exercise.name}</h3>
+          <h3>{useAlt && exercise.alt ? exercise.alt : exercise.name}</h3>
           {prescription && <div className="prescription">{prescription}</div>}
           {exercise.notes && <div className="ex-notes">{exercise.notes}</div>}
+          {exercise.alt && (
+            <button type="button" className="alt-toggle" onClick={() => setUseAlt((v) => !v)}>
+              {useAlt ? `↩ Back to ${exercise.name}` : `🏨 No free weights? Use ${exercise.alt}`}
+            </button>
+          )}
         </div>
         <span className={"log-status " + status}>
           {status === "saved" ? "✓ Logged" : status === "saving" ? "Saving…" : ""}
