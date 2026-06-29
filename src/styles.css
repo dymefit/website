@@ -163,6 +163,11 @@ table.exercises td.muted-cell { color: var(--muted); }
   cursor: pointer;
 }
 .alt-toggle:hover { border-color: var(--accent); }
+.proj-load { color: var(--good, #34d399); font-weight: 600; }
+.proj-pct {
+  margin-left: 5px; font-size: 10px; font-weight: 600; color: var(--accent);
+  background: var(--accent-soft); border-radius: 4px; padding: 1px 5px;
+}
 .wk-badge {
   display: inline-block; margin-left: 8px; font-size: 10px; font-weight: 700;
   color: var(--accent); background: var(--accent-soft); border-radius: 4px; padding: 1px 5px;

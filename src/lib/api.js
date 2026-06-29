@@ -1,4 +1,5 @@
 import { supabase } from "./supabase";
+import { bestE1RM } from "./progression";
 
 // All tables carry a coach_id with a DB default of auth.uid(), and RLS
 // restricts rows to the owning coach — so the client never sends coach_id.
@@ -191,6 +192,22 @@ export async function saveLog(entry) {
     .single();
   if (error) throw error;
   return data;
+}
+
+// Estimated 1RM per exercise for a client, from all their logged sets.
+// Returns { [exercise_id]: bestE1RM }.
+export async function getClientE1RMs(clientId) {
+  const { data, error } = await supabase
+    .from("workout_logs")
+    .select("exercise_id, sets")
+    .eq("client_id", clientId);
+  if (error) throw error;
+  const map = {};
+  for (const row of data || []) {
+    const e = bestE1RM(row.sets);
+    if (e != null) map[row.exercise_id] = Math.max(map[row.exercise_id] || 0, e);
+  }
+  return map;
 }
 
 // Coach: read a client's logged workouts (with exercise + session context).

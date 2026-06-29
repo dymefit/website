@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import * as api from "../lib/api";
 import { MOVEMENT_PATTERNS, MACHINES, EQUIPMENT_GROUPS } from "../lib/constants";
+import { projectLoad, isPowerPattern, POWER_MIN_REPS } from "../lib/progression";
 import Modal from "./Modal.jsx";
 
 export default function ProgramView({ client, program, onProgramsChanged, onSelectProgram }) {
@@ -12,6 +13,13 @@ export default function ProgramView({ client, program, onProgramsChanged, onSele
   const [busy, setBusy] = useState(false);
   const [weekNotes, setWeekNotes] = useState({});
   const [noteDraft, setNoteDraft] = useState("");
+  const [e1rms, setE1rms] = useState({}); // exercise_id -> client's estimated 1RM
+
+  // Pull the client's estimated 1RMs (from logged work) to project loads.
+  useEffect(() => {
+    if (!client) { setE1rms({}); return; }
+    api.getClientE1RMs(client.id).then(setE1rms).catch(() => setE1rms({}));
+  }, [client?.id]);
 
   const refresh = useCallback(async () => {
     if (!program) { setDays([]); return; }
@@ -55,6 +63,25 @@ export default function ProgramView({ client, program, onProgramsChanged, onSele
     return o[k] ?? ex[k] ?? "";
   };
   const isProgressed = (ex) => Object.keys(override(ex)).length > 0;
+
+  // Load cell: if a %1RM is set for this week and the client has logged work,
+  // show the projected load; otherwise show the manual load.
+  const loadCell = (ex) => {
+    const pct = override(ex).pct;
+    const e1 = e1rms[ex.id];
+    const proj = projectLoad(e1, pct, ex.equipment);
+    if (proj != null) {
+      return (
+        <span className="proj-load" title={`${pct}% of est. 1RM ≈ ${Math.round(e1)} (from logs)`}>
+          {proj}<span className="proj-pct">{pct}%</span>
+        </span>
+      );
+    }
+    if (pct) {
+      return <span className="proj-pct" title="No client logs yet to project from">{pct}%</span>;
+    }
+    return eff(ex, "load");
+  };
 
   async function deleteDay(day) {
     if (!confirm(`Delete "${day.label}" and its exercises?`)) return;
@@ -214,7 +241,7 @@ export default function ProgramView({ client, program, onProgramsChanged, onSele
                     </td>
                     <td>{eff(ex, "sets")}</td>
                     <td>{eff(ex, "reps")}</td>
-                    <td>{eff(ex, "load")}</td>
+                    <td>{loadCell(ex)}</td>
                     <td>{eff(ex, "rest")}</td>
                     <td className="row-actions">
                       <button className="mini-btn" onClick={() => setExModal({ dayId: d.id, exercise: ex })}>Edit</button>
@@ -329,6 +356,14 @@ function ExerciseForm({ dayId, exercise, weeks, position, onClose, onSaved }) {
   async function submit(e) {
     e.preventDefault();
     if (!f.name.trim()) return;
+    // Power work never drops below 3 reps.
+    if (isPowerPattern(f.pattern)) {
+      const allReps = [f.reps, ...Object.values(prog).map((r) => r.reps)].filter(Boolean);
+      if (allReps.some((r) => parseInt(r, 10) < POWER_MIN_REPS)) {
+        alert(`Power exercises can't go below ${POWER_MIN_REPS} reps.`);
+        return;
+      }
+    }
     setBusy(true);
     try {
       const fields = { ...f, progressions: prog };
@@ -397,21 +432,24 @@ function ExerciseForm({ dayId, exercise, weeks, position, onClose, onSaved }) {
             </button>
             {showProg && (
               <>
-                <p className="muted-note">Leave a cell blank to keep the base value above.</p>
+                <p className="muted-note">
+                  Blank cells keep the base value. Set <strong>%1RM</strong> to auto‑project the
+                  load from the client's logged max.
+                </p>
                 <table className="prog-table">
                   <thead>
-                    <tr><th>Week</th><th>Sets</th><th>Reps</th><th>Load</th><th>Rest</th></tr>
+                    <tr><th>Week</th><th>Sets</th><th>Reps</th><th>Load</th><th>Rest</th><th>%1RM</th></tr>
                   </thead>
                   <tbody>
                     {Array.from({ length: weeks }, (_, i) => String(i + 1)).map((w) => (
                       <tr key={w}>
                         <td className="wk">{w}</td>
-                        {["sets", "reps", "load", "rest"].map((k) => (
+                        {["sets", "reps", "load", "rest", "pct"].map((k) => (
                           <td key={k}>
                             <input
                               value={prog[w]?.[k] ?? ""}
                               onChange={setWeekField(w, k)}
-                              placeholder={f[k] || "—"}
+                              placeholder={k === "pct" ? "%" : (f[k] || "—")}
                             />
                           </td>
                         ))}
