@@ -11,3 +11,10 @@ dist
 # original source photo (served copy lives in public/)
 /Me.jpg
 /MtnSelfie.png
+
+# Personal assets / brand kit (kept locally, not in repo)
+/Bio Info.docx
+/VISION.docx
+/Fitness-Elevated/
+/Logos/
+/Pictures/
