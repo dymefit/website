@@ -147,6 +147,32 @@
   .ok .check{width:64px;height:64px;border-radius:50%;background:rgba(212,175,55,.15);color:var(--teal);font-size:34px;display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
   .pill{display:inline-block;background:rgba(212,175,55,.12);color:var(--spring);font-size:12px;font-weight:700;padding:4px 10px;border-radius:999px;margin-bottom:14px}
 </style>
+
+<style>
+/* metallic sheen sweeping across the hero headline */
+h1.sheen { position: relative; }
+h1.sheen::after {
+  content: attr(data-text);
+  position: absolute; left: 0; top: 0; width: 100%;
+  pointer-events: none;
+  background-image: linear-gradient(100deg,
+    transparent 42%,
+    rgba(255,255,255,0.92) 50%,
+    transparent 58%);
+  background-size: 250% 100%;
+  background-position: 180% 0;
+  background-repeat: no-repeat;
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
+  animation: heroSheen 5s ease-in-out 1.2s infinite;
+}
+@keyframes heroSheen {
+  0%   { background-position: 180% 0; }
+  28%  { background-position: -80% 0; }
+  100% { background-position: -80% 0; }
+}
+@media (prefers-reduced-motion: reduce){ h1.sheen::after{ animation:none; opacity:0; } }
+</style>
 </head>
 <body>
 
@@ -200,7 +226,7 @@
       </g>
     </svg>
     <span class="eyebrow">Online Performance Coaching</span>
-    <h1>Train for a <span class="hl">lifetime in motion.</span></h1>
+    <h1 class="sheen" data-text="Train for a lifetime in motion.">Train for a <span class="hl">lifetime in motion.</span></h1>
     <p class="lead">Personalized online coaching that blends injury prevention, sport-specific performance, and sustainable strength — so athletes of every age and ability build durability, confidence, and lasting results.</p>
     <div class="hero-cta">
       <button class="btn btn-p" onclick="openBook()">Book a Free Assessment →</button>
