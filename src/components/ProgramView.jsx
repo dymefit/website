@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import * as api from "../lib/api";
+import { MOVEMENT_PATTERNS } from "../lib/constants";
 import Modal from "./Modal.jsx";
 
 export default function ProgramView({ client, program, onProgramsChanged, onSelectProgram }) {
@@ -117,7 +118,10 @@ export default function ProgramView({ client, program, onProgramsChanged, onSele
         <div>
           <h1>{program.name}</h1>
           <div className="sub">
-            {client?.name} · {weeks}-week block · {days.length} training days
+            {client?.name}
+            {program.type && <> · {program.type}</>}
+            {program.level && <> · {program.level}</>}
+            {" "}· {weeks}-week block · {days.length} training days
           </div>
         </div>
         <div className="row-actions">
@@ -292,6 +296,7 @@ function DayForm({ programId, mode, day, position, onClose, onSaved }) {
 function ExerciseForm({ dayId, exercise, weeks, position, onClose, onSaved }) {
   const [f, setF] = useState({
     name: exercise?.name ?? "",
+    pattern: exercise?.pattern ?? "",
     sets: exercise?.sets ?? "",
     reps: exercise?.reps ?? "",
     load: exercise?.load ?? "",
@@ -335,6 +340,13 @@ function ExerciseForm({ dayId, exercise, weeks, position, onClose, onSaved }) {
         <label className="field">
           <span>Exercise</span>
           <input value={f.name} onChange={set("name")} autoFocus required placeholder="e.g. Back Squat" />
+        </label>
+        <label className="field">
+          <span>Movement pattern</span>
+          <select value={f.pattern} onChange={set("pattern")}>
+            <option value="">— none —</option>
+            {MOVEMENT_PATTERNS.map((p) => <option key={p}>{p}</option>)}
+          </select>
         </label>
         <div className="field-row">
           <label className="field"><span>Sets</span><input value={f.sets} onChange={set("sets")} placeholder="4" /></label>

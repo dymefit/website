@@ -46,10 +46,10 @@ export async function listPrograms(clientId) {
   return data;
 }
 
-export async function createProgram(clientId, name, weeks) {
+export async function createProgram(clientId, fields) {
   const { data, error } = await supabase
     .from("programs")
-    .insert({ client_id: clientId, name, weeks })
+    .insert({ client_id: clientId, ...fields })
     .select()
     .single();
   if (error) throw error;

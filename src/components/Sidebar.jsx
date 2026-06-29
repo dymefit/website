@@ -1,5 +1,6 @@
 import { useState } from "react";
 import * as api from "../lib/api";
+import { PROGRAM_TYPES, LEVELS } from "../lib/constants";
 import Modal from "./Modal.jsx";
 import ClientForm from "./ClientForm.jsx";
 
@@ -129,7 +130,9 @@ export default function Sidebar({
 
 function ProgramForm({ clientId, onClose, onSaved }) {
   const [name, setName] = useState("");
-  const [weeks, setWeeks] = useState(4);
+  const [type, setType] = useState(PROGRAM_TYPES[1]); // Strength
+  const [level, setLevel] = useState(LEVELS[0]); // Beginner
+  const [weeks, setWeeks] = useState(12); // 3-month block default
   const [busy, setBusy] = useState(false);
 
   async function submit(e) {
@@ -137,7 +140,12 @@ function ProgramForm({ clientId, onClose, onSaved }) {
     if (!name.trim()) return;
     setBusy(true);
     try {
-      const created = await api.createProgram(clientId, name.trim(), Number(weeks) || 4);
+      const created = await api.createProgram(clientId, {
+        name: name.trim(),
+        type,
+        level,
+        weeks: Number(weeks) || 12,
+      });
       onSaved(created);
     } catch (err) {
       alert(err.message);
@@ -152,9 +160,27 @@ function ProgramForm({ clientId, onClose, onSaved }) {
           <span>Program name</span>
           <input value={name} onChange={(e) => setName(e.target.value)} autoFocus required />
         </label>
+        <div className="field-row">
+          <label className="field">
+            <span>Type</span>
+            <select value={type} onChange={(e) => setType(e.target.value)}>
+              {PROGRAM_TYPES.map((t) => <option key={t}>{t}</option>)}
+            </select>
+          </label>
+          <label className="field">
+            <span>Level</span>
+            <select value={level} onChange={(e) => setLevel(e.target.value)}>
+              {LEVELS.map((l) => <option key={l}>{l}</option>)}
+            </select>
+          </label>
+        </div>
         <label className="field">
-          <span>Length (weeks)</span>
-          <input type="number" min="1" max="52" value={weeks} onChange={(e) => setWeeks(e.target.value)} />
+          <span>Length (weeks · 4-week microcycles)</span>
+          <select value={weeks} onChange={(e) => setWeeks(e.target.value)}>
+            <option value={4}>4 weeks (1 microcycle)</option>
+            <option value={8}>8 weeks (2 microcycles)</option>
+            <option value={12}>12 weeks · 3 months (3 microcycles)</option>
+          </select>
         </label>
         <div className="form-actions">
           <button type="button" className="btn secondary" onClick={onClose}>Cancel</button>
