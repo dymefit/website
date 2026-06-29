@@ -37,7 +37,7 @@ export default function Login({ onBack }) {
       <form className="auth-card" onSubmit={handleSubmit}>
         <div className="brand auth-brand">
           <span className="brand-mark">◆</span>
-          <span className="brand-name">ProgramLab</span>
+          <span className="brand-name">Fitness-Elevated</span>
         </div>
         <h1 className="auth-title">
           {mode === "signin" ? "Sign in" : "Create your account"}

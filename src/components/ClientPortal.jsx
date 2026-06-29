@@ -42,7 +42,7 @@ export default function ClientPortal({ user, onSignOut }) {
   return (
     <div className="portal">
       <header className="portal-head">
-        <div className="brand"><span className="brand-mark">◆</span> ProgramLab</div>
+        <div className="brand"><span className="brand-mark">◆</span> Fitness-Elevated</div>
         <div className="portal-user">
           {client?.name && <span>{client.name}</span>}
           <button className="linklike" onClick={onSignOut}>Sign out</button>

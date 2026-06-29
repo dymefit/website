@@ -34,7 +34,7 @@ export default function Sidebar({
     <aside className="sidebar">
       <div className="brand">
         <span className="brand-mark">◆</span>
-        <span className="brand-name">ProgramLab</span>
+        <span className="brand-name">Fitness-Elevated</span>
       </div>
 
       <nav className="nav">

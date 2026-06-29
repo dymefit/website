@@ -1,22 +1,22 @@
-# Netlify build configuration for ProgramLab (Vite + React SPA + Functions)
+# Netlify config — Cowork marketing site at "/", React member portal at "/app".
 [build]
-  command = "npm run build"
+  # Build the React app into dist/app, then drop the home page + hero at the root.
+  command = "npm run build && cp home/index.html dist/index.html && cp public/hero.jpg dist/hero.jpg"
   publish = "dist"
   functions = "netlify/functions"
 
-# API → serverless functions (must come before the SPA catch-all).
+# API → serverless functions.
 [[redirects]]
   from = "/api/*"
   to = "/.netlify/functions/:splat"
   status = 200
 
-# Single-page app: everything else falls back to index.html.
+# Member portal SPA fallback.
 [[redirects]]
-  from = "/*"
-  to = "/index.html"
+  from = "/app/*"
+  to = "/app/index.html"
   status = 200
 
-# Env vars (Netlify → Site configuration → Environment variables):
-#   VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY, VITE_COACH_EMAIL   (already set)
-#   RESEND_API_KEY   — your Resend API key (enables client email notifications)
-#   NOTIFY_FROM      — sender, e.g. "ProgramLab <notify@yourdomain.com>"
+# Env vars (set in Netlify or via CLI):
+#   VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY, VITE_COACH_EMAIL
+#   RESEND_API_KEY, NOTIFY_FROM, APP_URL
