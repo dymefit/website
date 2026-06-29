@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import * as api from "../lib/api";
+import Modal from "./Modal.jsx";
 
 // local-time YYYY-MM-DD
 function ymd(d) {
@@ -18,6 +19,7 @@ export default function ClientPortal({ user, onSignOut }) {
   const [openSession, setOpenSession] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [testMax, setTestMax] = useState(false); // "log a tested max" modal
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -61,7 +63,14 @@ export default function ClientPortal({ user, onSignOut }) {
         )}
 
         {!loading && client && !openSession && (
-          <SessionList sessions={sessions} onOpen={setOpenSession} />
+          <>
+            <div className="portal-actions">
+              <button className="btn secondary small" onClick={() => setTestMax(true)}>
+                ＋ Log a tested max
+              </button>
+            </div>
+            <SessionList sessions={sessions} onOpen={setOpenSession} />
+          </>
         )}
 
         {!loading && client && openSession && (
@@ -72,7 +81,92 @@ export default function ClientPortal({ user, onSignOut }) {
           />
         )}
       </main>
+
+      {testMax && client && (
+        <TestedMaxModal
+          client={client}
+          onClose={() => setTestMax(false)}
+          onSaved={() => { setTestMax(false); }}
+        />
+      )}
     </div>
+  );
+}
+
+function TestedMaxModal({ client, onClose, onSaved }) {
+  const [exercises, setExercises] = useState([]);
+  const [exId, setExId] = useState("");
+  const [weight, setWeight] = useState("");
+  const [reps, setReps] = useState("1");
+  const [busy, setBusy] = useState(false);
+  const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    api.listClientExercises(client.id)
+      .then((l) => { setExercises(l); if (l[0]) setExId(l[0].id); })
+      .catch(() => setExercises([]));
+  }, [client.id]);
+
+  async function submit(e) {
+    e.preventDefault();
+    if (!exId || !weight) return;
+    setBusy(true);
+    try {
+      await api.logTestedMax({
+        clientId: client.id,
+        exerciseId: exId,
+        weight: weight.trim(),
+        reps: (reps || "1").trim(),
+        date: ymd(new Date()),
+      });
+      setDone(true);
+    } catch (err) {
+      alert(err.message);
+      setBusy(false);
+    }
+  }
+
+  return (
+    <Modal title="Log a tested max" onClose={onClose}>
+      {done ? (
+        <div className="form">
+          <p>✓ Saved. Your coach's projected loads will use this max.</p>
+          <div className="form-actions">
+            <button className="btn" onClick={onSaved}>Done</button>
+          </div>
+        </div>
+      ) : (
+        <form onSubmit={submit} className="form">
+          <p className="muted-note">
+            Log a heavy set you tested (e.g. a 1–5 rep max). This seeds the
+            loads your coach prescribes — even before your first session.
+          </p>
+          <label className="field">
+            <span>Exercise</span>
+            <select value={exId} onChange={(e) => setExId(e.target.value)} required>
+              {exercises.length === 0 && <option value="">No exercises yet</option>}
+              {exercises.map((ex) => (
+                <option key={ex.id} value={ex.id}>{ex.name}</option>
+              ))}
+            </select>
+          </label>
+          <div className="field-row">
+            <label className="field">
+              <span>Weight</span>
+              <input value={weight} onChange={(e) => setWeight(e.target.value)} inputMode="decimal" placeholder="225" required />
+            </label>
+            <label className="field">
+              <span>Reps</span>
+              <input value={reps} onChange={(e) => setReps(e.target.value)} inputMode="numeric" placeholder="1" />
+            </label>
+          </div>
+          <div className="form-actions">
+            <button type="button" className="btn secondary" onClick={onClose}>Cancel</button>
+            <button type="submit" className="btn" disabled={busy || !exId}>Save max</button>
+          </div>
+        </form>
+      )}
+    </Modal>
   );
 }
 

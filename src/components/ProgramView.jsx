@@ -1,7 +1,7 @@
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback } from "react";
 import * as api from "../lib/api";
 import { MOVEMENT_PATTERNS, MACHINES, EQUIPMENT_GROUPS } from "../lib/constants";
-import { projectLoad, isPowerPattern, POWER_MIN_REPS, coeffFor, patternReferences } from "../lib/progression";
+import { projectLoad, isPowerPattern, POWER_MIN_REPS, coeffFor } from "../lib/progression";
 import Modal from "./Modal.jsx";
 
 export default function ProgramView({ client, program, onProgramsChanged, onSelectProgram }) {
@@ -13,12 +13,14 @@ export default function ProgramView({ client, program, onProgramsChanged, onSele
   const [busy, setBusy] = useState(false);
   const [weekNotes, setWeekNotes] = useState({});
   const [noteDraft, setNoteDraft] = useState("");
-  const [e1rms, setE1rms] = useState({}); // exercise_id -> client's estimated 1RM
+  // Client's logged maxes across ALL programs: { byId, patternRefs }.
+  const [maxes, setMaxes] = useState({ byId: {}, patternRefs: {} });
 
-  // Pull the client's estimated 1RMs (from logged work) to project loads.
   useEffect(() => {
-    if (!client) { setE1rms({}); return; }
-    api.getClientE1RMs(client.id).then(setE1rms).catch(() => setE1rms({}));
+    if (!client) { setMaxes({ byId: {}, patternRefs: {} }); return; }
+    api.getClientMaxes(client.id)
+      .then(setMaxes)
+      .catch(() => setMaxes({ byId: {}, patternRefs: {} }));
   }, [client?.id]);
 
   const refresh = useCallback(async () => {
@@ -64,16 +66,11 @@ export default function ProgramView({ client, program, onProgramsChanged, onSele
   };
   const isProgressed = (ex) => Object.keys(override(ex)).length > 0;
 
-  // Best logged 1RM per movement pattern (de-rated to the reference lift),
-  // so a max on one lift can seed loads for related same-pattern lifts.
-  const allExercises = useMemo(() => days.flatMap((d) => d.exercises), [days]);
-  const patternRefs = useMemo(() => patternReferences(allExercises, e1rms), [allExercises, e1rms]);
-
-  // Estimated 1RM for an exercise: its own logged max, else derived from the
-  // best same-pattern lift via strength ratios.
+  // Estimated 1RM for an exercise: its own logged max (any program), else
+  // derived from the best same-pattern lift via strength ratios.
   const estimated1RM = (ex) => {
-    if (e1rms[ex.id]) return { e1: e1rms[ex.id], crossed: false };
-    const ref = ex.pattern && patternRefs[ex.pattern];
+    if (maxes.byId[ex.id]) return { e1: maxes.byId[ex.id], crossed: false };
+    const ref = ex.pattern && maxes.patternRefs[ex.pattern];
     if (ref) return { e1: ref * coeffFor(ex.name), crossed: true };
     return { e1: null, crossed: false };
   };

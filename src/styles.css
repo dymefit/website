@@ -523,6 +523,7 @@ table.exercises td.name { font-weight: 600; }
 }
 .portal-user { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 13px; }
 .portal-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+.portal-actions { display: flex; justify-content: flex-end; margin-bottom: 4px; }
 .portal-body .sub { color: var(--muted); margin-bottom: 18px; }
 .back-link { display: inline-block; margin-bottom: 12px; }
 

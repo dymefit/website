@@ -1,5 +1,5 @@
 import { supabase } from "./supabase";
-import { bestE1RM } from "./progression";
+import { bestE1RM, patternReferences } from "./progression";
 
 // All tables carry a coach_id with a DB default of auth.uid(), and RLS
 // restricts rows to the owning coach — so the client never sends coach_id.
@@ -194,20 +194,61 @@ export async function saveLog(entry) {
   return data;
 }
 
-// Estimated 1RM per exercise for a client, from all their logged sets.
-// Returns { [exercise_id]: bestE1RM }.
-export async function getClientE1RMs(clientId) {
+// A client's logged maxes across ALL programs. Returns:
+//   { byId: { exercise_id: e1RM }, patternRefs: { pattern: referenceE1RM } }
+// patternRefs lets a max on one lift seed loads for related same-pattern lifts.
+export async function getClientMaxes(clientId) {
   const { data, error } = await supabase
     .from("workout_logs")
-    .select("exercise_id, sets")
+    .select("exercise_id, sets, exercises(name, pattern)")
     .eq("client_id", clientId);
   if (error) throw error;
-  const map = {};
+  const byId = {};
+  const meta = {};
   for (const row of data || []) {
     const e = bestE1RM(row.sets);
-    if (e != null) map[row.exercise_id] = Math.max(map[row.exercise_id] || 0, e);
+    if (e == null) continue;
+    if (!byId[row.exercise_id] || e > byId[row.exercise_id]) byId[row.exercise_id] = e;
+    meta[row.exercise_id] = row.exercises || {};
   }
-  return map;
+  const exList = Object.keys(byId).map((id) => ({
+    id, name: meta[id]?.name, pattern: meta[id]?.pattern,
+  }));
+  return { byId, patternRefs: patternReferences(exList, byId) };
+}
+
+// All exercises across a client's programs (deduped by name) — for the
+// "log a tested max" picker.
+export async function listClientExercises(clientId) {
+  const programs = await listPrograms(clientId);
+  const seen = new Set();
+  const out = [];
+  for (const p of programs) {
+    const days = await listDays(p.id);
+    for (const d of days) {
+      for (const ex of d.exercises) {
+        const key = (ex.name || "").toLowerCase();
+        if (key && !seen.has(key)) {
+          seen.add(key);
+          out.push({ id: ex.id, name: ex.name, pattern: ex.pattern, equipment: ex.equipment });
+        }
+      }
+    }
+  }
+  return out.sort((a, b) => a.name.localeCompare(b.name));
+}
+
+// Record a tested max (outside a scheduled session) so projections can start.
+export async function logTestedMax({ clientId, exerciseId, weight, reps, date }) {
+  const { error } = await supabase.from("workout_logs").insert({
+    client_id: clientId,
+    exercise_id: exerciseId,
+    session_id: null,
+    date,
+    sets: [{ weight: String(weight), reps: String(reps), rpe: "" }],
+    note: "Tested max",
+  });
+  if (error) throw error;
 }
 
 // Coach: read a client's logged workouts (with exercise + session context).
