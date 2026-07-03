@@ -43,6 +43,7 @@ export default function Sidebar({
         {navBtn("programs", "📋", "Programs")}
         {navBtn("client", "👤", "Client")}
         {navBtn("logs", "📊", "Logs")}
+        {navBtn("library", "📚", "Library")}
       </nav>
 
       {/* Clients */}

@@ -5,6 +5,7 @@ import ProgramView from "./components/ProgramView.jsx";
 import CalendarView from "./components/CalendarView.jsx";
 import ClientDetail from "./components/ClientDetail.jsx";
 import ClientLogs from "./components/ClientLogs.jsx";
+import ExerciseLibrary from "./components/ExerciseLibrary.jsx";
 
 export default function CoachApp({ user, onSignOut }) {
   const [clients, setClients] = useState([]);
@@ -74,6 +75,7 @@ export default function CoachApp({ user, onSignOut }) {
         {error && <div className="api-error">{error}</div>}
         {view === "calendar" && <CalendarView client={selectedClient} />}
         {view === "logs" && <ClientLogs client={selectedClient} />}
+        {view === "library" && <ExerciseLibrary />}
         {view === "client" && (
           <ClientDetail client={selectedClient} onChanged={handleClientChanged} onDeleted={handleClientDeleted} />
         )}

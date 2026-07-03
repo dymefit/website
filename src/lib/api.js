@@ -279,6 +279,31 @@ export async function notifySessionScheduled(payload) {
   }
 }
 
+// ---------- Exercise library ----------
+export async function listLibrary() {
+  const { data, error } = await supabase
+    .from("exercise_library")
+    .select("*")
+    .order("category").order("pattern").order("equipment").order("name");
+  if (error) throw error;
+  return data;
+}
+
+export async function addLibraryItem({ category, pattern, equipment, name }) {
+  const { data, error } = await supabase
+    .from("exercise_library")
+    .insert({ category, pattern, equipment, name })
+    .select()
+    .single();
+  if (error) throw error;
+  return data;
+}
+
+export async function deleteLibraryItem(id) {
+  const { error } = await supabase.from("exercise_library").delete().eq("id", id);
+  if (error) throw error;
+}
+
 // ---------- Duplication helpers ----------
 const exerciseFields = (ex) => ({
   name: ex.name, sets: ex.sets, reps: ex.reps, load: ex.load,

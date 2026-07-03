@@ -524,6 +524,35 @@ table.exercises td.name { font-weight: 600; }
 .portal-user { display: flex; align-items: center; gap: 12px; color: var(--muted); font-size: 13px; }
 .portal-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
 .portal-actions { display: flex; justify-content: flex-end; margin-bottom: 4px; }
+
+/* Exercise library */
+.lib-cat { margin-bottom: 30px; }
+.lib-cat-title {
+  font-size: 13px; text-transform: uppercase; letter-spacing: .07em;
+  color: var(--accent); font-weight: 700; margin: 0 0 10px;
+}
+.lib-pattern { margin-bottom: 12px; }
+.lib-eq-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+  gap: 0; padding: 6px 8px 10px;
+}
+.lib-eq { padding: 8px 10px; }
+.lib-eq-name {
+  font-size: 10px; text-transform: uppercase; letter-spacing: .05em;
+  color: var(--muted); font-weight: 700; margin-bottom: 6px;
+}
+.lib-item {
+  display: flex; align-items: center; justify-content: space-between; gap: 6px;
+  font-size: 13px; padding: 3px 0;
+}
+.lib-item .tiny { opacity: 0; }
+.lib-item:hover .tiny { opacity: 1; }
+
+.field select {
+  background: var(--bg); border: 1px solid var(--line); color: var(--text);
+  border-radius: 8px; padding: 9px 11px; font-size: 14px; width: 100%;
+}
+.field select:focus { outline: none; border-color: var(--accent); }
 .portal-body .sub { color: var(--muted); margin-bottom: 18px; }
 .back-link { display: inline-block; margin-bottom: 12px; }
 
