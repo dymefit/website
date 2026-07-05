@@ -1,5 +1,6 @@
 import { useEffect, useState, useCallback } from "react";
 import * as api from "../lib/api";
+import { karvonenZones, estimateMaxHR } from "../lib/zones";
 import Modal from "./Modal.jsx";
 
 // local-time YYYY-MM-DD
@@ -70,6 +71,7 @@ export default function ClientPortal({ user, onSignOut }) {
               </button>
             </div>
             <SessionList sessions={sessions} onOpen={setOpenSession} />
+            <TrainingZones client={client} onSaved={(c) => setClient(c)} />
           </>
         )}
 
@@ -90,6 +92,81 @@ export default function ClientPortal({ user, onSignOut }) {
         />
       )}
     </div>
+  );
+}
+
+// Karvonen HR zones — client enters age + resting HR; zones display live.
+function TrainingZones({ client, onSaved }) {
+  const [age, setAge] = useState(client.age ?? "");
+  const [rest, setRest] = useState(client.resting_hr ?? "");
+  const [status, setStatus] = useState("idle"); // idle|saving|saved
+
+  const zones = karvonenZones(age, rest);
+  const maxHR = estimateMaxHR(age);
+
+  async function save() {
+    setStatus("saving");
+    try {
+      const updated = await api.updateClient(client.id, {
+        age: parseInt(age, 10) || null,
+        resting_hr: parseInt(rest, 10) || null,
+      });
+      setStatus("saved");
+      onSaved?.(updated);
+    } catch (e) {
+      alert(e.message);
+      setStatus("idle");
+    }
+  }
+
+  return (
+    <section className="zones-card">
+      <div className="zones-head">
+        <h2 className="portal-subtitle">Heart-rate training zones</h2>
+        <span className={"log-status " + status}>{status === "saved" ? "✓ Saved" : status === "saving" ? "Saving…" : ""}</span>
+      </div>
+      <p className="muted-note">
+        Enter your age and resting heart rate — your zones for cardio and
+        metabolic days are calculated with the Karvonen method.
+      </p>
+      <div className="zones-inputs">
+        <label className="field">
+          <span>Age</span>
+          <input value={age} onChange={(e) => { setAge(e.target.value); setStatus("idle"); }} inputMode="numeric" placeholder="35" />
+        </label>
+        <label className="field">
+          <span>Resting HR (bpm)</span>
+          <input value={rest} onChange={(e) => { setRest(e.target.value); setStatus("idle"); }} inputMode="numeric" placeholder="60" />
+        </label>
+        <label className="field">
+          <span>Max HR (220 − age)</span>
+          <input value={maxHR ?? "—"} disabled />
+        </label>
+        <button className="btn small" onClick={save} disabled={status === "saving" || !age || !rest}>
+          Save
+        </button>
+      </div>
+
+      {zones && (
+        <table className="zones-table">
+          <thead>
+            <tr><th>Zone</th><th>Range (bpm)</th><th>What it's for</th></tr>
+          </thead>
+          <tbody>
+            {zones.zones.map((z) => (
+              <tr key={z.zone} className={`zrow z${z.zone}`}>
+                <td className="zname">Z{z.zone} · {z.name}</td>
+                <td className="zbpm">{z.low}–{z.high}</td>
+                <td className="zwhy">{z.purpose}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+      {!zones && age && rest && (
+        <p className="muted-note">Check your numbers — resting HR must be below your max HR.</p>
+      )}
+    </section>
   );
 }
 

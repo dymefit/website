@@ -1,5 +1,6 @@
 import { useState } from "react";
 import * as api from "../lib/api";
+import { karvonenZones } from "../lib/zones";
 import ClientForm from "./ClientForm.jsx";
 
 function Field({ label, value, href }) {
@@ -11,6 +12,33 @@ function Field({ label, value, href }) {
              : <span className="detail-value">{value}</span>
       ) : (
         <span className="detail-value empty">—</span>
+      )}
+    </div>
+  );
+}
+
+function ZonesBlock({ client }) {
+  const z = karvonenZones(client.age, client.resting_hr);
+  return (
+    <div className="detail-notes" style={{ marginTop: 14 }}>
+      <span className="detail-label">
+        HR training zones (Karvonen{client.age ? ` · age ${client.age}` : ""}{client.resting_hr ? ` · resting ${client.resting_hr}` : ""})
+      </span>
+      {z ? (
+        <table className="zones-table">
+          <tbody>
+            {z.zones.map((row) => (
+              <tr key={row.zone} className={`zrow z${row.zone}`}>
+                <td className="zname">Z{row.zone} · {row.name}</td>
+                <td className="zbpm">{row.low}–{row.high} bpm</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      ) : (
+        <p className="detail-value empty">
+          Not set — the client enters age + resting HR in their portal.
+        </p>
       )}
     </div>
   );
@@ -66,6 +94,8 @@ export default function ClientDetail({ client, onChanged, onDeleted }) {
           ? <p className="detail-value">{client.notes}</p>
           : <p className="detail-value empty">No notes yet.</p>}
       </div>
+
+      <ZonesBlock client={client} />
 
       {editing && (
         <ClientForm
