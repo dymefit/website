@@ -1,6 +1,7 @@
 import { useEffect, useState, useCallback } from "react";
 import * as api from "../lib/api";
 import { karvonenZones, estimateMaxHR } from "../lib/zones";
+import { HOTEL_GROUPS, availableAtHotel } from "../lib/hotel";
 import Modal from "./Modal.jsx";
 
 // local-time YYYY-MM-DD
@@ -21,6 +22,7 @@ export default function ClientPortal({ user, onSignOut }) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [testMax, setTestMax] = useState(false); // "log a tested max" modal
+  const [hotel, setHotel] = useState(false);     // hotel-equipment modal
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -66,6 +68,13 @@ export default function ClientPortal({ user, onSignOut }) {
         {!loading && client && !openSession && (
           <>
             <div className="portal-actions">
+              <button
+                className={"btn secondary small" + ((client.hotel_equipment || []).length ? " hotel-on" : "")}
+                onClick={() => setHotel(true)}
+                title="Tell us what your hotel gym has"
+              >
+                🏨 Hotel{(client.hotel_equipment || []).length ? ` (${client.hotel_equipment.length})` : ""}
+              </button>
               <button className="btn secondary small" onClick={() => setTestMax(true)}>
                 ＋ Log a tested max
               </button>
@@ -91,7 +100,80 @@ export default function ClientPortal({ user, onSignOut }) {
           onSaved={() => { setTestMax(false); }}
         />
       )}
+
+      {hotel && client && (
+        <HotelModal
+          client={client}
+          onClose={() => setHotel(false)}
+          onSaved={(updated) => { setHotel(false); setClient(updated); }}
+        />
+      )}
     </div>
+  );
+}
+
+// Hotel mode: check off what the hotel gym has; programming adapts to it.
+function HotelModal({ client, onClose, onSaved }) {
+  const [sel, setSel] = useState(() => new Set(client.hotel_equipment || []));
+  const [busy, setBusy] = useState(false);
+
+  const toggle = (item) =>
+    setSel((s) => {
+      const next = new Set(s);
+      next.has(item) ? next.delete(item) : next.add(item);
+      return next;
+    });
+
+  async function save(clear = false) {
+    setBusy(true);
+    try {
+      const updated = await api.updateClient(client.id, {
+        hotel_equipment: clear ? [] : [...sel],
+      });
+      onSaved(updated);
+    } catch (e) {
+      alert(e.message);
+      setBusy(false);
+    }
+  }
+
+  return (
+    <Modal title="🏨 Hotel gym equipment" onClose={onClose}>
+      <div className="form">
+        <p className="muted-note">
+          Check what's available at your hotel gym. Your workouts will flag
+          anything that needs a swap and point you to the alternative.
+        </p>
+        {HOTEL_GROUPS.map((g) => (
+          <div key={g.group} className="hotel-group">
+            <div className="lib-eq-name">{g.group}</div>
+            <div className="hotel-items">
+              {g.items.map((item) => (
+                <label key={item} className={"hotel-check" + (sel.has(item) ? " on" : "")}>
+                  <input
+                    type="checkbox"
+                    checked={sel.has(item)}
+                    onChange={() => toggle(item)}
+                  />
+                  <span>{item}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+        ))}
+        <div className="form-actions">
+          {(client.hotel_equipment || []).length > 0 && (
+            <button type="button" className="btn secondary" onClick={() => save(true)} disabled={busy}>
+              Back home (clear)
+            </button>
+          )}
+          <button type="button" className="btn secondary" onClick={onClose}>Cancel</button>
+          <button type="button" className="btn" onClick={() => save(false)} disabled={busy}>
+            Save
+          </button>
+        </div>
+      </div>
+    </Modal>
   );
 }
 
@@ -342,7 +424,10 @@ function ExerciseLogger({ exercise, client, session, existing }) {
   const [sets, setSets] = useState(initialSets);
   const [note, setNote] = useState(existing?.note ?? "");
   const [status, setStatus] = useState(existing ? "saved" : "idle"); // idle|saving|saved|error
-  const [useAlt, setUseAlt] = useState(false); // traveling: swap to the machine alternative
+  // Hotel mode: if the client saved a hotel checklist and this exercise's
+  // equipment isn't on it, start on the alternative and flag it.
+  const hotelOK = availableAtHotel(exercise.equipment, client.hotel_equipment);
+  const [useAlt, setUseAlt] = useState(hotelOK === false && !!exercise.alt);
 
   const setField = (i, k) => (e) => {
     const next = sets.map((s, j) => (j === i ? { ...s, [k]: e.target.value } : s));
@@ -387,6 +472,11 @@ function ExerciseLogger({ exercise, client, session, existing }) {
           <h3>{useAlt && exercise.alt ? exercise.alt : exercise.name}</h3>
           {prescription && <div className="prescription">{prescription}</div>}
           {exercise.notes && <div className="ex-notes">{exercise.notes}</div>}
+          {hotelOK === false && (
+            <div className="hotel-flag">
+              🏨 Not at your hotel{exercise.alt ? "" : " — ask your coach for a swap"}
+            </div>
+          )}
           {exercise.alt && (
             <button type="button" className="alt-toggle" onClick={() => setUseAlt((v) => !v)}>
               {useAlt ? `↩ Back to ${exercise.name}` : `🏨 No free weights? Use ${exercise.alt}`}

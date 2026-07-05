@@ -97,6 +97,13 @@ export default function ClientDetail({ client, onChanged, onDeleted }) {
 
       <ZonesBlock client={client} />
 
+      {(client.hotel_equipment || []).length > 0 && (
+        <div className="detail-notes" style={{ marginTop: 14 }}>
+          <span className="detail-label">🏨 Traveling — hotel gym has</span>
+          <p className="detail-value">{client.hotel_equipment.join(" · ")}</p>
+        </div>
+      )}
+
       {editing && (
         <ClientForm
           client={client}

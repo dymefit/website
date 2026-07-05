@@ -525,6 +525,19 @@ table.exercises td.name { font-weight: 600; }
 .portal-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
 .portal-actions { display: flex; justify-content: flex-end; margin-bottom: 4px; }
 
+/* Hotel mode */
+.hotel-group { margin-bottom: 10px; }
+.hotel-items { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 6px; }
+.hotel-check {
+  display: flex; align-items: center; gap: 7px; cursor: pointer;
+  background: var(--bg); border: 1px solid var(--line); border-radius: 999px;
+  padding: 7px 13px; font-size: 13px; user-select: none;
+}
+.hotel-check input { accent-color: var(--accent); }
+.hotel-check.on { border-color: var(--accent); background: var(--accent-soft); }
+.btn.hotel-on { border-color: var(--accent); color: var(--accent); }
+.hotel-flag { font-size: 12px; color: #fdba74; margin-top: 4px; }
+
 /* HR training zones */
 .zones-card {
   background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);
