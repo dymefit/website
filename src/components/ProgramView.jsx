@@ -334,6 +334,17 @@ function DayForm({ programId, mode, day, position, onClose, onSaved }) {
   );
 }
 
+// Library equipment labels -> the form's equipment values.
+const LIB_EQUIP_MAP = {
+  Barbell: "Barbell",
+  Dumbbell: "Dumbbells",
+  Kettlebell: "Kettlebell",
+  "Machine / Cable": "Cable column",
+  Band: "Bands",
+  Bodyweight: "Bodyweight",
+  Default: "",
+};
+
 function ExerciseForm({ dayId, exercise, weeks, position, onClose, onSaved }) {
   const [f, setF] = useState({
     name: exercise?.name ?? "",
@@ -346,6 +357,29 @@ function ExerciseForm({ dayId, exercise, weeks, position, onClose, onSaved }) {
     rest: exercise?.rest ?? "",
     notes: exercise?.notes ?? "",
   });
+  // Library picker state
+  const [lib, setLib] = useState([]);
+  const [libCat, setLibCat] = useState("");
+  const [libPat, setLibPat] = useState("");
+
+  useEffect(() => {
+    api.listLibrary().then(setLib).catch(() => setLib([]));
+  }, []);
+
+  const libCats = [...new Set(lib.map((i) => i.category))];
+  const libPats = [...new Set(lib.filter((i) => i.category === libCat).map((i) => i.pattern))];
+  const libExs = lib.filter((i) => i.category === libCat && i.pattern === libPat);
+
+  function pickFromLibrary(id) {
+    const item = lib.find((i) => i.id === id);
+    if (!item) return;
+    setF((prev) => ({
+      ...prev,
+      name: item.name,
+      pattern: item.pattern,
+      equipment: LIB_EQUIP_MAP[item.equipment] ?? prev.equipment,
+    }));
+  }
   // progression overrides keyed by week string
   const [prog, setProg] = useState(() => ({ ...(exercise?.progressions || {}) }));
   const [showProg, setShowProg] = useState(
@@ -388,6 +422,38 @@ function ExerciseForm({ dayId, exercise, weeks, position, onClose, onSaved }) {
   return (
     <Modal title={exercise ? "Edit exercise" : "Add exercise"} onClose={onClose}>
       <form onSubmit={submit} className="form">
+        {lib.length > 0 && (
+          <div className="lib-picker">
+            <div className="lib-picker-title">📚 Pick from library</div>
+            <div className="field-row">
+              <label className="field">
+                <span>Category</span>
+                <select value={libCat} onChange={(e) => { setLibCat(e.target.value); setLibPat(""); }}>
+                  <option value="">—</option>
+                  {libCats.map((c) => <option key={c}>{c}</option>)}
+                </select>
+              </label>
+              <label className="field">
+                <span>Pattern</span>
+                <select value={libPat} onChange={(e) => setLibPat(e.target.value)} disabled={!libCat}>
+                  <option value="">—</option>
+                  {libPats.map((p) => <option key={p}>{p}</option>)}
+                </select>
+              </label>
+              <label className="field">
+                <span>Exercise</span>
+                <select value="" onChange={(e) => pickFromLibrary(e.target.value)} disabled={!libPat}>
+                  <option value="">— pick —</option>
+                  {libExs.map((i) => (
+                    <option key={i.id} value={i.id}>{i.name} ({i.equipment})</option>
+                  ))}
+                </select>
+              </label>
+            </div>
+            <p className="muted-note">Picking fills the fields below — or just type your own.</p>
+          </div>
+        )}
+
         <label className="field">
           <span>Exercise</span>
           <input value={f.name} onChange={set("name")} autoFocus required placeholder="e.g. Back Squat" />
@@ -397,6 +463,9 @@ function ExerciseForm({ dayId, exercise, weeks, position, onClose, onSaved }) {
             <span>Movement pattern</span>
             <select value={f.pattern} onChange={set("pattern")}>
               <option value="">— none —</option>
+              {f.pattern && !MOVEMENT_PATTERNS.includes(f.pattern) && (
+                <option value={f.pattern}>{f.pattern}</option>
+              )}
               {MOVEMENT_PATTERNS.map((p) => <option key={p}>{p}</option>)}
             </select>
           </label>
