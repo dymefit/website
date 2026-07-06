@@ -23,13 +23,13 @@ export const HOTEL_GROUPS = [
   },
   {
     group: "Accessories",
-    items: ["Stability Ball", "Medicine Ball"],
+    items: ["Stability Ball", "Medicine Ball", "Bands (Handles)", "TRX"],
   },
 ];
 
 // Equipment that travels with you / needs no gym — never flagged.
 const ALWAYS_OK = new Set([
-  "Bodyweight", "TRX", "Bands", "Plyo box", "Airex", "Ankle weights",
+  "Bodyweight", "Plyo box", "Airex", "Ankle weights",
 ]);
 
 // exercise.equipment (or machine alt) -> hotel checklist item that covers it.
@@ -50,6 +50,8 @@ const EQUIP_TO_HOTEL = {
   "Stability ball": "Stability Ball",
   "Med ball": "Medicine Ball",
   "Slam ball": "Medicine Ball",
+  "Bands": "Bands (Handles)",
+  "TRX": "TRX",
 };
 
 // true  -> available at this hotel (or needs no equipment)
