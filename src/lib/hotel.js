@@ -21,12 +21,15 @@ export const HOTEL_GROUPS = [
       "Seated Leg Curl/Knee Extension",
     ],
   },
+  {
+    group: "Accessories",
+    items: ["Stability Ball", "Medicine Ball"],
+  },
 ];
 
 // Equipment that travels with you / needs no gym — never flagged.
 const ALWAYS_OK = new Set([
-  "Bodyweight", "TRX", "Bands", "Plyo box", "Med ball", "Slam ball",
-  "Stability ball", "Airex", "Ankle weights",
+  "Bodyweight", "TRX", "Bands", "Plyo box", "Airex", "Ankle weights",
 ]);
 
 // exercise.equipment (or machine alt) -> hotel checklist item that covers it.
@@ -44,6 +47,9 @@ const EQUIP_TO_HOTEL = {
   "Back Extension": "Back Extension",
   "Hamstring Curl": "Seated Leg Curl/Knee Extension",
   "Leg Extension": "Seated Leg Curl/Knee Extension",
+  "Stability ball": "Stability Ball",
+  "Med ball": "Medicine Ball",
+  "Slam ball": "Medicine Ball",
 };
 
 // true  -> available at this hotel (or needs no equipment)
