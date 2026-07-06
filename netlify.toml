@@ -17,6 +17,17 @@
   to = "/app/index.html"
   status = 200
 
+# Browser security headers (clickjacking, MIME-sniffing, referrer leakage).
+# CSP is scoped to frame-ancestors only so inline scripts/styles keep working.
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    Content-Security-Policy = "frame-ancestors 'none'"
+
 # Env vars (set in Netlify or via CLI):
 #   VITE_SUPABASE_URL, VITE_SUPABASE_ANON_KEY, VITE_COACH_EMAIL
 #   RESEND_API_KEY, NOTIFY_FROM, APP_URL
