@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import * as api from "../lib/api";
 import { karvonenZones, estimateMaxHR } from "../lib/zones";
 import { HOTEL_GROUPS, availableAtHotel } from "../lib/hotel";
+import { swapCandidates, effortHint } from "../lib/swap";
 import Modal from "./Modal.jsx";
 
 // local-time YYYY-MM-DD
@@ -370,6 +371,7 @@ function SessionList({ sessions, onOpen }) {
 function SessionLogger({ client, session, onBack }) {
   const [day, setDay] = useState(null);
   const [logs, setLogs] = useState({}); // exercise_id -> log row
+  const [library, setLibrary] = useState([]); // for hotel-mode swaps
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
@@ -389,6 +391,12 @@ function SessionLogger({ client, session, onBack }) {
       }
     })();
   }, [session.id, session.day_id]);
+
+  // Load the library only when hotel mode is on — it powers the swap picker.
+  useEffect(() => {
+    if ((client.hotel_equipment || []).length === 0) return;
+    api.listLibrary().then(setLibrary).catch(() => setLibrary([]));
+  }, [client.hotel_equipment]);
 
   return (
     <>
@@ -410,6 +418,7 @@ function SessionLogger({ client, session, onBack }) {
               client={client}
               session={session}
               existing={logs[ex.id]}
+              library={library}
             />
           ))}
         </div>
@@ -418,16 +427,31 @@ function SessionLogger({ client, session, onBack }) {
   );
 }
 
-function ExerciseLogger({ exercise, client, session, existing }) {
+function ExerciseLogger({ exercise, client, session, existing, library }) {
   const initialSets =
     existing?.sets?.length ? existing.sets : [{ weight: "", reps: "", rpe: "" }];
   const [sets, setSets] = useState(initialSets);
   const [note, setNote] = useState(existing?.note ?? "");
   const [status, setStatus] = useState(existing ? "saved" : "idle"); // idle|saving|saved|error
-  // Hotel mode: if the client saved a hotel checklist and this exercise's
-  // equipment isn't on it, start on the alternative and flag it.
+  // Hotel mode: flag equipment the hotel doesn't have.
+  const hotelMode = (client.hotel_equipment || []).length > 0;
   const hotelOK = availableAtHotel(exercise.equipment, client.hotel_equipment);
   const [useAlt, setUseAlt] = useState(hotelOK === false && !!exercise.alt);
+  // SWAP: ranked same-pattern substitutes from the library the hotel supports.
+  const candidates = hotelMode
+    ? swapCandidates(exercise, client.hotel_equipment, library)
+    : [];
+  const [swapped, setSwapped] = useState(null); // {name, equipment} | null
+  const [showPicker, setShowPicker] = useState(false);
+  const [autoPicked, setAutoPicked] = useState(false);
+
+  // When flagged and substitutes exist, start on the best one automatically.
+  useEffect(() => {
+    if (!autoPicked && hotelOK === false && candidates.length > 0 && !swapped) {
+      setSwapped(candidates[0]);
+      setAutoPicked(true);
+    }
+  }, [hotelOK, candidates.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const setField = (i, k) => (e) => {
     const next = sets.map((s, j) => (j === i ? { ...s, [k]: e.target.value } : s));
@@ -443,13 +467,16 @@ function ExerciseLogger({ exercise, client, session, existing }) {
       const cleanSets = sets
         .map((s) => ({ weight: s.weight.trim(), reps: s.reps.trim(), rpe: (s.rpe || "").trim() }))
         .filter((s) => s.weight || s.reps);
+      // Tag the log with the swap so the coach sees what was actually done.
+      const tag = swapped ? `[Swapped to: ${swapped.name}] ` : "";
+      const noteText = note.trim().startsWith("[Swapped to:") ? note.trim() : `${tag}${note.trim()}`;
       await api.saveLog({
         client_id: client.id,
         session_id: session.id,
         exercise_id: exercise.id,
         date: session.date,
         sets: cleanSets,
-        note: note.trim() || null,
+        note: noteText.trim() || null,
       });
       setStatus("saved");
     } catch (e) {
@@ -469,18 +496,52 @@ function ExerciseLogger({ exercise, client, session, existing }) {
     <div className="log-card">
       <div className="log-head">
         <div>
-          <h3>{useAlt && exercise.alt ? exercise.alt : exercise.name}</h3>
+          <h3>
+            {swapped ? swapped.name : useAlt && exercise.alt ? exercise.alt : exercise.name}
+            {swapped && <span className="swap-badge">⇄ swap</span>}
+          </h3>
           {prescription && <div className="prescription">{prescription}</div>}
+          {swapped && effortHint(swapped.equipment) && (
+            <div className="ex-notes">{effortHint(swapped.equipment)}</div>
+          )}
           {exercise.notes && <div className="ex-notes">{exercise.notes}</div>}
-          {hotelOK === false && (
+          {hotelOK === false && !swapped && (
             <div className="hotel-flag">
-              🏨 Not at your hotel{exercise.alt ? "" : " — ask your coach for a swap"}
+              🏨 Not at your hotel{candidates.length ? "" : " — ask your coach for a swap"}
             </div>
           )}
-          {exercise.alt && (
+          {swapped && (
+            <div className="hotel-flag ok">🏨 Swapped from {exercise.name} — same movement pattern</div>
+          )}
+          {hotelMode && candidates.length > 0 && (
+            <button type="button" className="alt-toggle" onClick={() => setShowPicker((v) => !v)}>
+              ⇄ Swap{swapped ? " / change" : ""} ({candidates.length} option{candidates.length > 1 ? "s" : ""})
+            </button>
+          )}
+          {!hotelMode && exercise.alt && (
             <button type="button" className="alt-toggle" onClick={() => setUseAlt((v) => !v)}>
               {useAlt ? `↩ Back to ${exercise.name}` : `🏨 No free weights? Use ${exercise.alt}`}
             </button>
+          )}
+          {showPicker && (
+            <div className="swap-picker">
+              {swapped && (
+                <button type="button" className="swap-option" onClick={() => { setSwapped(null); setShowPicker(false); }}>
+                  ↩ Original: {exercise.name}
+                </button>
+              )}
+              {candidates.map((c) => (
+                <button
+                  type="button"
+                  key={c.name}
+                  className={"swap-option" + (swapped?.name === c.name ? " on" : "")}
+                  onClick={() => { setSwapped(c); setShowPicker(false); setStatus("idle"); }}
+                >
+                  <span>{c.name}</span>
+                  <span className="swap-eq">{c.source === "alt" ? "★ Coach pick" : c.equipment}</span>
+                </button>
+              ))}
+            </div>
           )}
         </div>
         <span className={"log-status " + status}>

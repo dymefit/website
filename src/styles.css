@@ -537,6 +537,27 @@ table.exercises td.name { font-weight: 600; }
 .hotel-check.on { border-color: var(--accent); background: var(--accent-soft); }
 .btn.hotel-on { border-color: var(--accent); color: var(--accent); }
 .hotel-flag { font-size: 12px; color: #fdba74; margin-top: 4px; }
+.hotel-flag.ok { color: var(--good, #34d399); }
+
+/* SWAP picker */
+.swap-badge {
+  font-size: 10px; font-weight: 700; color: var(--accent);
+  background: var(--accent-soft); border-radius: 5px; padding: 2px 6px;
+  margin-left: 8px; vertical-align: middle; text-transform: uppercase;
+}
+.swap-picker {
+  display: flex; flex-direction: column; gap: 6px;
+  background: var(--bg); border: 1px solid var(--line); border-radius: 10px;
+  padding: 8px; margin-top: 8px;
+}
+.swap-option {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  background: var(--panel-2); border: 1px solid var(--line); color: var(--text);
+  border-radius: 8px; padding: 9px 12px; font-size: 13px; cursor: pointer; text-align: left;
+}
+.swap-option:hover { border-color: var(--accent); }
+.swap-option.on { border-color: var(--accent); background: var(--accent-soft); }
+.swap-eq { font-size: 11px; color: var(--muted); white-space: nowrap; }
 
 /* HR training zones */
 .zones-card {
