@@ -559,6 +559,23 @@ table.exercises td.name { font-weight: 600; }
 .swap-option.on { border-color: var(--accent); background: var(--accent-soft); }
 .swap-eq { font-size: 11px; color: var(--muted); white-space: nowrap; }
 
+/* Rest timer */
+.rest-timer {
+  width: 100%; margin-top: 12px; padding: 12px;
+  background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px;
+  color: var(--text); font-size: 16px; font-weight: 700; cursor: pointer;
+  font-variant-numeric: tabular-nums; transition: border-color .12s, background .12s;
+}
+.rest-timer:hover { border-color: var(--accent); }
+.rest-timer.running { border-color: var(--accent); background: var(--accent-soft); font-size: 22px; }
+.rest-timer.running .rest-cancel { font-size: 12px; font-weight: 400; color: var(--muted); }
+.rest-timer.done {
+  border-color: var(--good, #34d399); color: var(--good, #34d399);
+  background: rgba(52, 211, 153, 0.12);
+  animation: rest-flash 0.8s ease-in-out 3;
+}
+@keyframes rest-flash { 50% { background: rgba(52, 211, 153, 0.35); } }
+
 /* HR training zones */
 .zones-card {
   background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius);

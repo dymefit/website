@@ -2,6 +2,7 @@ import { useEffect, useState, useCallback } from "react";
 import * as api from "../lib/api";
 import { MOVEMENT_PATTERNS, MACHINES, EQUIPMENT_GROUPS } from "../lib/constants";
 import { projectLoad, isPowerPattern, POWER_MIN_REPS, coeffFor } from "../lib/progression";
+import { defaultRestForType } from "../lib/rest";
 import Modal from "./Modal.jsx";
 
 export default function ProgramView({ client, program, onProgramsChanged, onSelectProgram }) {
@@ -289,6 +290,7 @@ export default function ProgramView({ client, program, onProgramsChanged, onSele
           dayId={exModal.dayId}
           exercise={exModal.exercise}
           weeks={weeks}
+          programType={program.type}
           position={days.find((d) => d.id === exModal.dayId)?.exercises.length ?? 0}
           onClose={() => setExModal(null)}
           onSaved={() => { setExModal(null); refresh(); }}
@@ -345,7 +347,7 @@ const LIB_EQUIP_MAP = {
   Default: "",
 };
 
-function ExerciseForm({ dayId, exercise, weeks, position, onClose, onSaved }) {
+function ExerciseForm({ dayId, exercise, weeks, programType, position, onClose, onSaved }) {
   const [f, setF] = useState({
     name: exercise?.name ?? "",
     pattern: exercise?.pattern ?? "",
@@ -413,6 +415,8 @@ function ExerciseForm({ dayId, exercise, weeks, position, onClose, onSaved }) {
     setBusy(true);
     try {
       const fields = { ...f, progressions: prog };
+      // Every exercise ships with a rest time — default matches the day's goal.
+      if (!fields.rest.trim()) fields.rest = defaultRestForType(programType);
       if (exercise) await api.updateExercise(exercise.id, fields);
       else await api.createExercise(dayId, fields, position);
       onSaved();
@@ -499,7 +503,7 @@ function ExerciseForm({ dayId, exercise, weeks, position, onClose, onSaved }) {
         </div>
         <div className="field-row">
           <label className="field"><span>Load</span><input value={f.load} onChange={set("load")} placeholder="75% 1RM" /></label>
-          <label className="field"><span>Rest</span><input value={f.rest} onChange={set("rest")} placeholder="2:30" /></label>
+          <label className="field"><span>Rest</span><input value={f.rest} onChange={set("rest")} placeholder={`${defaultRestForType(programType)} (goal default)`} /></label>
         </div>
         <label className="field">
           <span>Notes</span>

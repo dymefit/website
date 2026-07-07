@@ -3,6 +3,7 @@ import * as api from "../lib/api";
 import { karvonenZones, estimateMaxHR } from "../lib/zones";
 import { HOTEL_GROUPS, availableAtHotel } from "../lib/hotel";
 import { swapCandidates, effortHint } from "../lib/swap";
+import { parseRest, formatSecs } from "../lib/rest";
 import Modal from "./Modal.jsx";
 
 // local-time YYYY-MM-DD
@@ -250,6 +251,86 @@ function TrainingZones({ client, onSaved }) {
         <p className="muted-note">Check your numbers — resting HR must be below your max HR.</p>
       )}
     </section>
+  );
+}
+
+// One-tap rest timer, preset to the exercise's prescribed rest. Countdown is
+// timestamp-based (immune to background-tab throttling); finishing beeps,
+// vibrates, and flashes so the client knows to start the next set.
+function RestTimer({ restStr }) {
+  const preset = parseRest(restStr) ?? 90;
+  const [endsAt, setEndsAt] = useState(null); // ms timestamp | null
+  const [left, setLeft] = useState(preset);
+  const [done, setDone] = useState(false);
+  const audioRef = { current: null };
+
+  function beep() {
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      const ctx = audioRef.current || new Ctx();
+      audioRef.current = ctx;
+      [0, 0.35, 0.7].forEach((t) => {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.frequency.value = 880;
+        g.gain.setValueAtTime(0.001, ctx.currentTime + t);
+        g.gain.exponentialRampToValueAtTime(0.4, ctx.currentTime + t + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.28);
+        o.start(ctx.currentTime + t); o.stop(ctx.currentTime + t + 0.3);
+      });
+    } catch { /* audio unavailable — vibration/visual still fire */ }
+    if (navigator.vibrate) navigator.vibrate([250, 100, 250, 100, 400]);
+  }
+
+  useEffect(() => {
+    if (!endsAt) return;
+    const tick = () => {
+      const rem = Math.ceil((endsAt - Date.now()) / 1000);
+      if (rem <= 0) {
+        setEndsAt(null);
+        setLeft(preset);
+        setDone(true);
+        beep();
+        setTimeout(() => setDone(false), 6000);
+      } else {
+        setLeft(rem);
+      }
+    };
+    tick();
+    const id = setInterval(tick, 250);
+    return () => clearInterval(id);
+  }, [endsAt]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  function start() {
+    // unlock audio inside the user gesture so the finish beep is allowed
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!audioRef.current) audioRef.current = new Ctx();
+      if (audioRef.current.state === "suspended") audioRef.current.resume();
+    } catch { /* ignore */ }
+    setDone(false);
+    setEndsAt(Date.now() + preset * 1000);
+  }
+
+  if (done) {
+    return (
+      <button type="button" className="rest-timer done" onClick={start}>
+        ✅ Rest complete — go!
+      </button>
+    );
+  }
+  if (endsAt) {
+    return (
+      <button type="button" className="rest-timer running" onClick={() => { setEndsAt(null); setLeft(preset); }}>
+        ⏱ {formatSecs(left)} <span className="rest-cancel">· tap to cancel</span>
+      </button>
+    );
+  }
+  return (
+    <button type="button" className="rest-timer" onClick={start}>
+      ⏱ Rest {formatSecs(preset)}
+    </button>
   );
 }
 
@@ -570,6 +651,7 @@ function ExerciseLogger({ exercise, client, session, existing, library }) {
         </tbody>
       </table>
 
+      <RestTimer restStr={exercise.rest} />
       <div className="log-actions">
         <button className="btn secondary small" onClick={addSet}>+ Set</button>
         <input className="log-note" value={note} onChange={(e) => { setNote(e.target.value); setStatus("idle"); }} placeholder="Note (optional)" />
