@@ -31,7 +31,7 @@ const TYPE_REST = {
   "Power": "3:00",
   "Strength": "2:30",
   "Hypertrophy": "1:30",
-  "Weight-loss bias": "0:45",
+  "Weight Loss": "0:45",
   "Endurance": "0:45",
   "Functional": "1:00",
   "Recovery": "0:30",
