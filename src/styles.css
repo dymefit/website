@@ -1,12 +1,12 @@
 :root {
-  --bg: #0f1115;
-  --panel: #171a21;
-  --panel-2: #1e222b;
-  --line: #2a2f3a;
-  --text: #e6e9ef;
-  --muted: #8b93a3;
-  --accent: #4f8cff;
-  --accent-soft: rgba(79, 140, 255, 0.15);
+  --bg: #0B0C0E;
+  --panel: #17181C;
+  --panel-2: #1E1F24;
+  --line: #2A2A2E;
+  --text: #F2EFE8;
+  --muted: #9A958C;
+  --accent: #D4AF37;
+  --accent-soft: rgba(212, 175, 55, 0.15);
   --danger: #ef4444;
   --radius: 10px;
 }
@@ -99,8 +99,9 @@ body {
 .content-header .sub { color: var(--muted); margin-top: 4px; }
 
 .btn {
-  background: var(--accent); color: #fff; border: none;
-  padding: 9px 16px; border-radius: 8px; font-size: 13px; font-weight: 600; cursor: pointer;
+  background: linear-gradient(120deg, #F6E2B0, #D4AF37, #9A6E16 55%, #F6D899);
+  color: #241B07; border: none;
+  padding: 9px 16px; border-radius: 8px; font-size: 13px; font-weight: 700; cursor: pointer;
 }
 .btn:hover { filter: brightness(1.08); }
 .btn:disabled { opacity: .5; cursor: not-allowed; }
@@ -302,7 +303,7 @@ table.exercises td.name { font-weight: 600; }
 .cal-cell .date { color: var(--muted); margin-bottom: 6px; }
 .cal-cell.today { border-color: var(--accent); }
 .cal-tag {
-  background: var(--accent-soft); color: #cfe0ff; border-radius: 5px;
+  background: var(--accent-soft); color: #F6D899; border-radius: 5px;
   padding: 2px 6px; margin-top: 4px; display: block; font-size: 11px; cursor: pointer;
 }
 .cal-tag:hover { background: rgba(239,68,68,.2); color: #fecaca; }
@@ -317,7 +318,7 @@ table.exercises td.name { font-weight: 600; }
 .auth-brand { justify-content: center; font-size: 20px; }
 .auth-title { font-size: 20px; text-align: center; margin-bottom: 4px; }
 .auth-error { background: rgba(239,68,68,.12); color: #fca5a5; padding: 9px 12px; border-radius: 8px; font-size: 13px; }
-.auth-info { background: var(--accent-soft); color: #cfe0ff; padding: 9px 12px; border-radius: 8px; font-size: 13px; }
+.auth-info { background: var(--accent-soft); color: #F6D899; padding: 9px 12px; border-radius: 8px; font-size: 13px; }
 .auth-switch { text-align: center; color: var(--muted); font-size: 13px; }
 .auth-back { display: block; margin: 4px auto 0; }
 
@@ -503,7 +504,7 @@ table.exercises td.name { font-weight: 600; }
 .cert-abbr { font-size: 20px; font-weight: 800; letter-spacing: .04em; color: var(--accent); }
 .cert-name { font-size: 11px; color: var(--muted); text-align: center; line-height: 1.4; }
 
-.cta-band { background: linear-gradient(135deg, rgba(79,140,255,.16), rgba(79,140,255,.04)); }
+.cta-band { background: linear-gradient(135deg, rgba(212,175,55,.16), rgba(212,175,55,.04)); }
 
 .landing-footer {
   display: flex; align-items: center; justify-content: space-between;
@@ -636,7 +637,7 @@ table.exercises td.name { font-weight: 600; }
   background: var(--accent-soft); border: 1px solid var(--accent);
   border-radius: var(--radius); padding: 12px 14px 6px;
 }
-.lib-picker-title { font-size: 12px; font-weight: 700; color: #cfe0ff; margin-bottom: 8px; }
+.lib-picker-title { font-size: 12px; font-weight: 700; color: #F6D899; margin-bottom: 8px; }
 .lib-picker .muted-note { padding: 4px 0 2px; }
 .portal-body .sub { color: var(--muted); margin-bottom: 18px; }
 .back-link { display: inline-block; margin-bottom: 12px; }
@@ -646,13 +647,13 @@ table.exercises td.name { font-weight: 600; }
 /* Today's-workout hero shortcut */
 .hero-card {
   display: block; width: 100%; text-align: left; cursor: pointer; color: var(--text);
-  background: linear-gradient(135deg, rgba(79,140,255,.22), rgba(79,140,255,.06));
+  background: linear-gradient(135deg, rgba(212,175,55,.22), rgba(212,175,55,.06));
   border: 1px solid var(--accent); border-radius: 14px; padding: 20px; margin-top: 8px;
 }
 .hero-card:hover { filter: brightness(1.06); }
-.hero-kicker { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: #cfe0ff; font-weight: 600; }
+.hero-kicker { font-size: 12px; text-transform: uppercase; letter-spacing: .06em; color: #F6D899; font-weight: 600; }
 .hero-label { font-size: 24px; font-weight: 700; margin-top: 4px; }
-.hero-focus { font-size: 13px; color: #cfe0ff; margin-top: 2px; }
+.hero-focus { font-size: 13px; color: #F6D899; margin-top: 2px; }
 .hero-cta { display: inline-block; margin-top: 14px; font-weight: 600; color: #fff; }
 
 .session-list { display: flex; flex-direction: column; gap: 10px; margin-top: 14px; }
@@ -663,7 +664,7 @@ table.exercises td.name { font-weight: 600; }
 }
 .session-card:hover { border-color: var(--accent); }
 .session-date { font-size: 12px; color: var(--muted); display: flex; align-items: center; gap: 8px; }
-.today-pill { background: var(--accent-soft); color: #cfe0ff; border-radius: 5px; padding: 1px 7px; font-size: 11px; }
+.today-pill { background: var(--accent-soft); color: #F6D899; border-radius: 5px; padding: 1px 7px; font-size: 11px; }
 .session-label { font-size: 16px; font-weight: 600; margin-top: 3px; }
 .session-focus { font-size: 12px; color: var(--accent); }
 
@@ -728,3 +729,29 @@ table.exercises td.name { font-weight: 600; }
 .pick-item .meta { color: var(--muted); font-size: 12px; }
 
 code { background: var(--panel-2); padding: 1px 5px; border-radius: 4px; font-size: 12px; }
+
+
+/* Gold sheen over the white brand lettering (matches home page identity) */
+.brand-name, .portal-head .brand {
+  /* layer 1: gold shine band that sweeps across · layer 2: solid white base */
+  background-image:
+    linear-gradient(100deg,
+      transparent 40%, #F6D899 48%, #E6C24A 50%, #F6D899 52%, transparent 60%),
+    linear-gradient(#F2EFE8, #F2EFE8);
+  background-size: 250% 100%, 100% 100%;
+  background-position: 120% 0, 0 0;
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: brand-sheen 5.5s ease-in-out 1s infinite;
+}
+.brand-mark { -webkit-text-fill-color: initial; color: var(--accent); }
+@keyframes brand-sheen {
+  0%   { background-position: 120% 0, 0 0; }
+  30%  { background-position: -60% 0, 0 0; }
+  100% { background-position: -60% 0, 0 0; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .brand-name, .portal-head .brand { animation: none; background-position: -60% 0, 0 0; }
+}
