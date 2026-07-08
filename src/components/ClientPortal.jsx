@@ -26,6 +26,17 @@ export default function ClientPortal({ user, onSignOut }) {
   const [testMax, setTestMax] = useState(false); // "log a tested max" modal
   const [hotel, setHotel] = useState(false);     // hotel-equipment modal
 
+  // Open the members-only guide in a new tab (window opens synchronously so
+  // popup blockers allow it; content streams in after the authed fetch).
+  function openNutritionGuide() {
+    const w = window.open("", "_blank");
+    if (!w) return;
+    w.document.write("<title>Nutrition Guide</title><p style='font-family:sans-serif;padding:24px'>Loading your guide…</p>");
+    api.fetchNutritionGuide()
+      .then((html) => { w.document.open(); w.document.write(html); w.document.close(); })
+      .catch((e) => { w.document.open(); w.document.write(`<p style='font-family:sans-serif;padding:24px'>${e.message}</p>`); w.document.close(); });
+  }
+
   const load = useCallback(async () => {
     setLoading(true);
     try {
@@ -70,6 +81,9 @@ export default function ClientPortal({ user, onSignOut }) {
         {!loading && client && !openSession && (
           <>
             <div className="portal-actions">
+              <button className="btn secondary small" onClick={openNutritionGuide} title="Meal planning, fueling, and hydration guide">
+                🥗 Nutrition Guide
+              </button>
               <button
                 className={"btn secondary small" + ((client.hotel_equipment || []).length ? " hotel-on" : "")}
                 onClick={() => setHotel(true)}

@@ -279,6 +279,18 @@ export async function notifySessionScheduled(payload) {
   }
 }
 
+// Members-only nutrition guide, served by an authenticated function.
+export async function fetchNutritionGuide() {
+  const { data } = await supabase.auth.getSession();
+  const token = data?.session?.access_token;
+  if (!token) throw new Error("Sign in required");
+  const res = await fetch("/api/nutrition-guide", {
+    headers: { Authorization: `Bearer ${token}` },
+  });
+  if (!res.ok) throw new Error("Couldn't load the guide");
+  return res.text();
+}
+
 // ---------- Exercise library ----------
 export async function listLibrary() {
   const { data, error } = await supabase
