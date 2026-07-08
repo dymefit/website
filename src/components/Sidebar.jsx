@@ -21,6 +21,16 @@ export default function Sidebar({
   const [clientModal, setClientModal] = useState(false);
   const [programModal, setProgramModal] = useState(false);
 
+  // Coach access to the members-only guide (same authed flow as the portal).
+  function openNutritionGuide() {
+    const w = window.open("", "_blank");
+    if (!w) return;
+    w.document.write("<title>Nutrition Guide</title><p style='font-family:sans-serif;padding:24px'>Loading your guide…</p>");
+    api.fetchNutritionGuide()
+      .then((html) => { w.document.open(); w.document.write(html); w.document.close(); })
+      .catch((e) => { w.document.open(); w.document.write(`<p style='font-family:sans-serif;padding:24px'>${e.message}</p>`); w.document.close(); });
+  }
+
   const navBtn = (key, icon, label, extra = {}) => (
     <button
       className={"nav-btn" + (view === key ? " active" : "")}
@@ -44,6 +54,9 @@ export default function Sidebar({
         {navBtn("client", "👤", "Client")}
         {navBtn("logs", "📊", "Logs")}
         {navBtn("library", "📚", "Library")}
+        <button className="nav-btn" onClick={openNutritionGuide} title="Members-only nutrition guide">
+          <span className="nav-icon">🥗</span> Nutrition Guide
+        </button>
       </nav>
 
       {/* Clients */}
