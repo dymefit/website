@@ -1,0 +1,675 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Client Nutrition Meal Plan Guide</title>
+  <style>
+    :root {
+      --ink: #1f2a2e;
+      --muted: #607077;
+      --line: #d9e0dc;
+      --paper: #fbfcf8;
+      --panel: #ffffff;
+      --green: #2f6b4f;
+      --blue: #315f87;
+      --amber: #9b6424;
+      --red: #9c3f3f;
+      --soft-green: #eaf3ed;
+      --soft-blue: #eaf1f7;
+      --soft-amber: #f6efe4;
+      --shadow: 0 14px 38px rgba(31, 42, 46, 0.09);
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      color: var(--ink);
+      background: var(--paper);
+      font: 16px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+
+    header {
+      background: linear-gradient(110deg, #214939 0%, #315f87 100%);
+      color: white;
+      padding: 36px 24px 28px;
+    }
+
+    .wrap {
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    h1, h2, h3 { line-height: 1.1; margin: 0; letter-spacing: 0; }
+    h1 { font-size: clamp(2rem, 5vw, 4.25rem); max-width: 920px; }
+    header p { max-width: 840px; color: rgba(255,255,255,.86); font-size: 1.05rem; margin: 14px 0 0; }
+
+    .tabs {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      padding: 18px 24px 0;
+      background: var(--paper);
+      border-bottom: 1px solid var(--line);
+      position: sticky;
+      top: 0;
+      z-index: 3;
+    }
+
+    .tab {
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 6px 6px 0 0;
+      padding: 10px 14px;
+      cursor: pointer;
+      font-weight: 700;
+      min-height: 42px;
+    }
+
+    .tab[aria-selected="true"] {
+      color: white;
+      background: var(--green);
+      border-color: var(--green);
+    }
+
+    main { padding: 24px; }
+    section[role="tabpanel"] { display: none; }
+    section[role="tabpanel"].active { display: block; }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      gap: 16px;
+      align-items: start;
+    }
+
+    .panel, .meal {
+      background: var(--panel);
+      border: 1px solid var(--line);
+      border-radius: 8px;
+      box-shadow: var(--shadow);
+      padding: 18px;
+    }
+
+    .span-4 { grid-column: span 4; }
+    .span-5 { grid-column: span 5; }
+    .span-6 { grid-column: span 6; }
+    .span-7 { grid-column: span 7; }
+    .span-8 { grid-column: span 8; }
+    .span-12 { grid-column: span 12; }
+
+    label { display: block; font-weight: 750; margin: 0 0 6px; }
+    input, select, textarea {
+      width: 100%;
+      border: 1px solid #bdcac4;
+      border-radius: 6px;
+      min-height: 42px;
+      padding: 9px 10px;
+      color: var(--ink);
+      background: white;
+      font: inherit;
+    }
+
+    textarea { min-height: 94px; resize: vertical; }
+    .field { margin-bottom: 14px; }
+    .hint { color: var(--muted); font-size: .9rem; margin-top: 5px; }
+
+    .chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 8px;
+    }
+
+    .chip {
+      border: 1px solid var(--line);
+      background: var(--soft-blue);
+      color: #21496a;
+      border-radius: 999px;
+      padding: 6px 10px;
+      font-weight: 700;
+      font-size: .88rem;
+    }
+
+    .warning {
+      border-left: 4px solid var(--red);
+      background: #fff3f1;
+      padding: 12px 14px;
+      border-radius: 6px;
+    }
+
+    .metric {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 10px;
+      padding: 10px 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .metric:last-child { border-bottom: 0; }
+    .metric strong { font-size: 1.08rem; }
+    .value { font-weight: 850; color: var(--green); text-align: right; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 12px;
+      overflow: hidden;
+      border-radius: 8px;
+    }
+
+    th, td {
+      border: 1px solid var(--line);
+      padding: 10px;
+      vertical-align: top;
+      text-align: left;
+    }
+
+    th { background: var(--soft-green); }
+    .meal h3 { margin-bottom: 6px; }
+    .meal p { margin: 0 0 8px; color: var(--muted); }
+    .meal ul { margin: 8px 0 0 20px; padding: 0; }
+    .meal.hidden { display: none; }
+
+    .status {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      border-radius: 999px;
+      padding: 5px 9px;
+      font-size: .84rem;
+      font-weight: 800;
+      background: var(--soft-amber);
+      color: var(--amber);
+    }
+
+    .print {
+      float: right;
+      border: 0;
+      background: var(--blue);
+      color: white;
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-weight: 800;
+      cursor: pointer;
+    }
+
+    a { color: #245d82; }
+    ul, ol { padding-left: 22px; }
+    li { margin: 5px 0; }
+
+    @media (max-width: 850px) {
+      .span-4, .span-5, .span-6, .span-7, .span-8 { grid-column: span 12; }
+      .tabs { position: static; padding-left: 12px; padding-right: 12px; }
+      main, header { padding-left: 14px; padding-right: 14px; }
+      .tab { flex: 1 1 auto; }
+      .print { float: none; margin-bottom: 12px; width: 100%; }
+    }
+
+    @media print {
+      .tabs, .print { display: none; }
+      section[role="tabpanel"] { display: block !important; page-break-after: always; }
+      .panel, .meal { box-shadow: none; }
+      header { background: white; color: black; border-bottom: 1px solid #999; }
+      header p { color: #333; }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="wrap">
+      <button class="print" onclick="window.print()">Print / Save PDF</button>
+      <h1>Client Nutrition Meal Plan Guide</h1>
+      <p>Goal-based nutrition targets, diet-style filters, allergy-aware swaps, workout fueling windows, and daily hydration tracking for coaching clients.</p>
+    </div>
+  </header>
+
+  <nav class="tabs wrap" aria-label="Guide tabs">
+    <button class="tab" aria-selected="true" data-tab="intake">Client Intake</button>
+    <button class="tab" aria-selected="false" data-tab="targets">Targets</button>
+    <button class="tab" aria-selected="false" data-tab="meals">Meals & Swaps</button>
+    <button class="tab" aria-selected="false" data-tab="timing">Workout Timing</button>
+    <button class="tab" aria-selected="false" data-tab="hydration">Hydration</button>
+    <button class="tab" aria-selected="false" data-tab="criteria">Missing Criteria</button>
+  </nav>
+
+  <main class="wrap">
+    <section id="intake" role="tabpanel" class="active">
+      <div class="grid">
+        <div class="panel span-7">
+          <h2>Client Intake</h2>
+          <p class="hint">Use this tab during onboarding. The recommendations update after inputs change.</p>
+          <div class="grid">
+            <div class="field span-6">
+              <label for="clientName">Client name</label>
+              <input id="clientName" placeholder="Name">
+            </div>
+            <div class="field span-6">
+              <label for="weight">Body weight</label>
+              <input id="weight" type="number" min="40" max="500" value="180">
+              <div class="hint">Enter pounds.</div>
+            </div>
+            <div class="field span-6">
+              <label for="sex">Hydration baseline</label>
+              <select id="sex">
+                <option value="male">Adult male baseline</option>
+                <option value="female">Adult female baseline</option>
+                <option value="custom">Use weight-based coaching baseline</option>
+              </select>
+            </div>
+            <div class="field span-6">
+              <label for="goal">Primary goal</label>
+              <select id="goal">
+                <option value="loss">Weight loss / body recomposition</option>
+                <option value="strength">Strength / power</option>
+                <option value="hypertrophy">Hypertrophy</option>
+                <option value="endurance">Endurance</option>
+                <option value="maintenance">General health / maintenance</option>
+              </select>
+            </div>
+            <div class="field span-6">
+              <label for="diet">Diet guideline</label>
+              <select id="diet">
+                <option value="balanced">Balanced / flexible</option>
+                <option value="keto">Keto / very low carb</option>
+                <option value="vegan">Vegan</option>
+                <option value="vegetarian">Vegetarian</option>
+                <option value="pescatarian">Pescatarian</option>
+                <option value="gluten-free">Gluten-free</option>
+                <option value="dairy-free">Dairy-free</option>
+              </select>
+            </div>
+            <div class="field span-6">
+              <label for="training">Training days per week</label>
+              <input id="training" type="number" min="0" max="14" value="4">
+            </div>
+            <div class="field span-12">
+              <label for="allergies">Allergies / avoid list</label>
+              <textarea id="allergies" placeholder="Example: milk, eggs, peanuts, tree nuts, wheat, soy, fish, shellfish, sesame"></textarea>
+              <div class="hint">Major U.S. allergens: milk, eggs, fish, crustacean shellfish, tree nuts, peanuts, wheat, soybeans, sesame.</div>
+            </div>
+            <div class="field span-12">
+              <label for="notes">Coach notes</label>
+              <textarea id="notes" placeholder="Schedule, meal prep capacity, food preferences, medical referrals, budget, cultural foods, cooking access"></textarea>
+            </div>
+          </div>
+        </div>
+
+        <div class="panel span-5">
+          <h2>Snapshot</h2>
+          <div class="metric"><strong>Protein target</strong><span class="value" id="proteinOut"></span></div>
+          <div class="metric"><strong>Carbohydrate target</strong><span class="value" id="carbOut"></span></div>
+          <div class="metric"><strong>Fat target</strong><span class="value" id="fatOut"></span></div>
+          <div class="metric"><strong>Hydration baseline</strong><span class="value" id="hydrationOut"></span></div>
+          <div class="metric"><strong>Workout fluids</strong><span class="value" id="workoutFluidOut"></span></div>
+          <div class="chips" id="activeChips"></div>
+          <div class="warning" style="margin-top:16px">
+            This is a coaching guide, not medical nutrition therapy. Clients with diabetes, kidney disease, eating-disorder history, pregnancy, GI disease, major allergies, or prescribed diets should be referred to a licensed clinician or registered dietitian.
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="targets" role="tabpanel">
+      <div class="grid">
+        <div class="panel span-6">
+          <h2>Goal-Based Targets</h2>
+          <table>
+            <thead><tr><th>Goal</th><th>Daily focus</th><th>Macro emphasis</th></tr></thead>
+            <tbody>
+              <tr><td>Weight loss / recomposition</td><td>Small calorie deficit, high protein, fiber, consistent meals.</td><td>Protein 1.6-2.2 g/kg; carbs adjusted to training; fat usually 20-35% calories.</td></tr>
+              <tr><td>Strength / power</td><td>Performance and recovery, avoid aggressive deficits.</td><td>Protein 1.6-2.2 g/kg; carbs moderate-high around sessions.</td></tr>
+              <tr><td>Hypertrophy</td><td>Progressive training, protein distribution, small surplus if mass gain is desired.</td><td>Protein 1.6-2.2 g/kg; carbs 3-7 g/kg depending volume.</td></tr>
+              <tr><td>Endurance</td><td>Carbohydrate availability, sodium and fluid planning, GI practice.</td><td>Carbs 5-10 g/kg depending duration; protein 1.2-1.8 g/kg.</td></tr>
+              <tr><td>Maintenance</td><td>Stable energy, food quality, sustainable routine.</td><td>Protein 1.2-1.8 g/kg; carbs/fats by preference and training.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="panel span-6">
+          <h2>Plate Templates</h2>
+          <table>
+            <thead><tr><th>Day type</th><th>Plate build</th></tr></thead>
+            <tbody>
+              <tr><td>Heavy lifting / intervals</td><td>1-2 palms protein, 1-2 fists vegetables, 1-2 cupped hands carbs, 1 thumb fat.</td></tr>
+              <tr><td>Long endurance</td><td>Protein at each meal, carb-forward meals before and after, lower-fat pre-session if GI sensitive.</td></tr>
+              <tr><td>Rest / light day</td><td>Protein and plants stay high; reduce starch portions if weight loss is the goal.</td></tr>
+              <tr><td>Keto day</td><td>Protein, low-carb vegetables, fats, electrolytes; avoid forcing high-fat meals if calories exceed target.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="panel span-12">
+          <h2>Diet Guideline Guardrails</h2>
+          <ul>
+            <li><strong>Keto:</strong> Keep net carbs commonly below 20-50 g/day; emphasize sodium, magnesium, potassium-rich foods, and fiber from low-carb vegetables.</li>
+            <li><strong>Vegan:</strong> Build each day around legumes, tofu/tempeh, seitan if gluten is tolerated, soy milk, pea/rice protein, nuts/seeds, and B12-fortified foods or supplementation referral.</li>
+            <li><strong>Vegetarian:</strong> Use eggs/dairy only if tolerated and preferred; otherwise follow vegan protein structure.</li>
+            <li><strong>Gluten-free:</strong> Avoid wheat, barley, rye, and cross-contact risk; use rice, potatoes, corn, oats labeled gluten-free, quinoa, beans, fruit.</li>
+            <li><strong>Dairy-free:</strong> Use fortified soy/pea milk, lactose-free only if intolerance rather than allergy, tofu, fish, poultry, legumes, or protein powders matched to restrictions.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="meals" role="tabpanel">
+      <div class="panel">
+        <h2>Meals & Allergy-Aware Substitutes</h2>
+        <p class="hint">Meal cards hide when they conflict with the selected diet style or allergy list. Substitutions are shown for common restrictions.</p>
+      </div>
+      <div class="grid" id="mealGrid"></div>
+    </section>
+
+    <section id="timing" role="tabpanel">
+      <div class="grid">
+        <div class="panel span-6">
+          <h2>Pre-Workout Fueling</h2>
+          <table>
+            <thead><tr><th>Time before</th><th>Best fit</th></tr></thead>
+            <tbody>
+              <tr><td>3-4 hours</td><td>Full meal with lean protein, carb source, vegetables, moderate fat.</td></tr>
+              <tr><td>1-2 hours</td><td>Smaller carb + protein meal; keep fat and fiber moderate if the client gets GI distress.</td></tr>
+              <tr><td>15-45 minutes</td><td>Easy carbs if needed: banana, applesauce, sports drink, rice cake, dates, or low-fiber bar.</td></tr>
+              <tr><td>Keto clients</td><td>Use protein + electrolytes; consider targeted carbs only if compatible with their plan and performance needs.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="panel span-6">
+          <h2>Post-Workout Recovery</h2>
+          <table>
+            <thead><tr><th>Window</th><th>Best fit</th></tr></thead>
+            <tbody>
+              <tr><td>Within 0-2 hours</td><td>Protein feeding plus carbs, especially if training again within 24 hours.</td></tr>
+              <tr><td>Protein</td><td>20-40 g high-quality protein, or roughly 0.25-0.4 g/kg per feeding.</td></tr>
+              <tr><td>Carbs</td><td>Prioritize carbs after hard lifting, intervals, long endurance, or two-a-day training.</td></tr>
+              <tr><td>Fluids</td><td>Replace sweat losses; if body weight is measured, drink about 1.25-1.5 L per kg lost over the next few hours.</td></tr>
+            </tbody>
+          </table>
+        </div>
+        <div class="panel span-12">
+          <h2>During Training</h2>
+          <ul>
+            <li>Under 60 minutes: water is usually enough unless heat, heavy sweating, or low pre-workout intake changes the situation.</li>
+            <li>60-150 minutes: consider 30-60 g carbohydrate per hour for endurance or high-output sessions.</li>
+            <li>Over 150 minutes: advanced endurance clients may practice 60-90 g carbohydrate per hour from mixed carb sources, with sodium and fluid matched to sweat rate.</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="hydration" role="tabpanel">
+      <div class="grid">
+        <div class="panel span-5">
+          <h2>Hydration Input Tab</h2>
+          <div class="field">
+            <label for="workoutMinutes">Workout duration today</label>
+            <input id="workoutMinutes" type="number" min="0" max="600" value="60">
+            <div class="hint">Minutes.</div>
+          </div>
+          <div class="field">
+            <label for="heat">Heat / sweat level</label>
+            <select id="heat">
+              <option value="low">Low</option>
+              <option value="moderate" selected>Moderate</option>
+              <option value="high">High heat or heavy sweater</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="waterLogged">Water already logged</label>
+            <input id="waterLogged" type="number" min="0" max="300" value="0">
+            <div class="hint">Fluid ounces.</div>
+          </div>
+          <div class="field">
+            <label for="preWeight">Optional pre-workout weight</label>
+            <input id="preWeight" type="number" min="40" max="500" placeholder="lb">
+          </div>
+          <div class="field">
+            <label for="postWeight">Optional post-workout weight</label>
+            <input id="postWeight" type="number" min="40" max="500" placeholder="lb">
+          </div>
+        </div>
+        <div class="panel span-7">
+          <h2>Daily Hydration Goal</h2>
+          <div class="metric"><strong>Baseline fluid target</strong><span class="value" id="baseFluid"></span></div>
+          <div class="metric"><strong>Exercise add-on</strong><span class="value" id="exerciseFluid"></span></div>
+          <div class="metric"><strong>Total daily goal</strong><span class="value" id="totalFluid"></span></div>
+          <div class="metric"><strong>Remaining today</strong><span class="value" id="remainingFluid"></span></div>
+          <div class="metric"><strong>Sweat-loss replacement</strong><span class="value" id="sweatFluid"></span></div>
+          <table>
+            <thead><tr><th>Hydration checkpoint</th><th>Client cue</th></tr></thead>
+            <tbody>
+              <tr><td>Morning</td><td>Start with water and sodium-containing food if training early or sweating heavily.</td></tr>
+              <tr><td>Pre-workout</td><td>Arrive hydrated; pale-yellow urine and stable body weight are useful practical cues.</td></tr>
+              <tr><td>During</td><td>Drink to thirst for short sessions; use planned fluids/electrolytes for long, hot, or high-sweat sessions.</td></tr>
+              <tr><td>Evening</td><td>Avoid chasing a large deficit right before bed; distribute fluids earlier next day.</td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section id="criteria" role="tabpanel">
+      <div class="grid">
+        <div class="panel span-7">
+          <h2>Key Criteria To Add</h2>
+          <ol>
+            <li><strong>Calories or portion method:</strong> Decide whether the program uses calorie targets, hand portions, or both.</li>
+            <li><strong>Body metrics:</strong> Current weight, height, age, sex, body composition estimate, waist, and goal timeline.</li>
+            <li><strong>Training load:</strong> Session type, duration, intensity, weekly volume, sport demands, and step count.</li>
+            <li><strong>Medical screen:</strong> Diabetes, kidney disease, hypertension, GI disorders, pregnancy, eating-disorder history, medications, supplements.</li>
+            <li><strong>Readiness and logistics:</strong> Budget, cooking skill, kitchen access, schedule, meal frequency, grocery access, cultural/religious foods.</li>
+            <li><strong>Adherence score:</strong> Hunger, energy, cravings, sleep, digestion, performance, mood, and weekly compliance.</li>
+            <li><strong>Progress rules:</strong> How often to adjust calories, carbs, hydration, and sodium based on weight trend and performance.</li>
+            <li><strong>Restaurant/travel rules:</strong> Simple ordering templates and emergency allergy instructions.</li>
+            <li><strong>Supplement policy:</strong> Creatine, caffeine, protein powder, electrolytes, vitamin D/B12/iron referrals when appropriate.</li>
+            <li><strong>Escalation criteria:</strong> When the coach refers out to a physician, allergist, or registered dietitian.</li>
+          </ol>
+        </div>
+        <div class="panel span-5">
+          <h2>Source Notes</h2>
+          <ul>
+            <li>FDA food allergy guidance identifies the nine major U.S. allergens and label limitations.</li>
+            <li>National Academies water guidance provides adult adequate intake baselines of about 3.7 L/day for men and 2.7 L/day for women from all beverages and foods.</li>
+            <li>ISSN sports-nutrition position stands support protein distribution, daily protein ranges, and nutrient timing based on training context.</li>
+            <li>Dietary Guidelines emphasize nutrient-dense patterns, food preferences, calorie limits, and limiting added sugar, saturated fat, sodium, and alcohol.</li>
+          </ul>
+          <p class="hint">
+            Sources:
+            <a href="https://www.fda.gov/food/nutrition-food-labeling-and-critical-foods/food-allergies">FDA Food Allergies</a>,
+            <a href="https://www.nationalacademies.org/read/10925/chapter/6">National Academies Water DRI</a>,
+            <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5596471/">ISSN Nutrient Timing</a>,
+            <a href="https://www.dietaryguidelines.gov/">Dietary Guidelines for Americans</a>.
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script>
+    const meals = [
+      {
+        title: "Performance Breakfast Bowl",
+        diet: ["balanced", "vegetarian", "gluten-free"],
+        allergens: ["milk"],
+        tags: ["strength", "hypertrophy", "endurance", "maintenance"],
+        base: "Greek yogurt, berries, oats, chia, honey.",
+        swaps: ["Dairy-free: soy yogurt or pea protein smoothie.", "Gluten-free: certified gluten-free oats.", "Keto: unsweetened yogurt, chia, nuts, small berries."]
+      },
+      {
+        title: "Chicken Rice Training Plate",
+        diet: ["balanced", "gluten-free", "dairy-free"],
+        allergens: [],
+        tags: ["strength", "hypertrophy", "endurance", "loss", "maintenance"],
+        base: "Chicken breast or thigh, rice, roasted vegetables, olive oil, salsa.",
+        swaps: ["Vegan: tofu, tempeh, lentils, or chickpeas.", "Keto: cauliflower rice and avocado.", "Fish allergy safe as written."]
+      },
+      {
+        title: "Salmon Potato Recovery Plate",
+        diet: ["balanced", "pescatarian", "gluten-free", "dairy-free"],
+        allergens: ["fish"],
+        tags: ["endurance", "strength", "hypertrophy", "maintenance"],
+        base: "Salmon, potatoes, greens, citrus vinaigrette.",
+        swaps: ["Fish allergy: chicken, turkey, tofu, or lean beef.", "Vegan: lentil patties or tofu with algae-based omega-3 discussion.", "Keto: swap potato for asparagus or salad."]
+      },
+      {
+        title: "Vegan Power Chili",
+        diet: ["balanced", "vegan", "vegetarian", "gluten-free", "dairy-free"],
+        allergens: [],
+        tags: ["loss", "endurance", "maintenance", "hypertrophy"],
+        base: "Beans, lentils, tomatoes, peppers, corn, spices, avocado.",
+        swaps: ["Keto: turkey or tofu chili with fewer beans and extra low-carb vegetables.", "Soy allergy: avoid tofu topping; use avocado or pumpkin seeds if tolerated.", "Nut allergy safe if seed toppings are verified."]
+      },
+      {
+        title: "Turkey Avocado Lettuce Wraps",
+        diet: ["balanced", "keto", "gluten-free", "dairy-free"],
+        allergens: [],
+        tags: ["loss", "strength", "maintenance"],
+        base: "Turkey, avocado, lettuce cups, cucumber, tomato, mustard.",
+        swaps: ["Vegetarian: egg salad if eggs tolerated or chickpea salad.", "Vegan: hummus-free bean spread if sesame allergy; tofu strips if soy tolerated.", "Endurance: add fruit, rice, or potatoes around training."]
+      },
+      {
+        title: "Tofu Noodle Stir Fry",
+        diet: ["balanced", "vegan", "vegetarian", "dairy-free"],
+        allergens: ["soy", "wheat", "sesame"],
+        tags: ["hypertrophy", "endurance", "maintenance"],
+        base: "Tofu, noodles, vegetables, sesame-ginger sauce.",
+        swaps: ["Soy allergy: chicken, shrimp if shellfish tolerated, or pea-protein crumbles.", "Wheat allergy/gluten-free: rice noodles or rice.", "Sesame allergy: olive oil, garlic, ginger, coconut aminos."]
+      },
+      {
+        title: "Egg & Sweet Potato Hash",
+        diet: ["balanced", "vegetarian", "gluten-free", "dairy-free"],
+        allergens: ["eggs"],
+        tags: ["loss", "strength", "maintenance"],
+        base: "Eggs, sweet potato, peppers, onions, spinach.",
+        swaps: ["Egg allergy: turkey, tofu if soy tolerated, or lentil scramble.", "Keto: swap sweet potato for zucchini and mushrooms.", "Vegan: tofu scramble or chickpea flour scramble."]
+      },
+      {
+        title: "Smoothie Recovery Shake",
+        diet: ["balanced", "vegetarian", "vegan", "gluten-free", "dairy-free"],
+        allergens: ["milk", "soy", "peanuts", "tree nuts"],
+        tags: ["endurance", "hypertrophy", "strength"],
+        base: "Protein powder, banana, berries, spinach, milk or fortified alternative.",
+        swaps: ["Milk allergy: pea protein with oat, rice, or coconut beverage.", "Nut allergy: skip nut butter; use seeds only if tolerated.", "Keto: low-carb protein, unsweetened liquid, spinach, chia, small berries."]
+      }
+    ];
+
+    const ids = ["weight", "sex", "goal", "diet", "training", "allergies", "workoutMinutes", "heat", "waterLogged", "preWeight", "postWeight"];
+
+    function kg() {
+      const lb = Number(document.getElementById("weight").value || 0);
+      return lb / 2.20462;
+    }
+
+    function selectedAllergies() {
+      return document.getElementById("allergies").value.toLowerCase()
+        .split(/[,;\n]/).map(x => x.trim()).filter(Boolean);
+    }
+
+    function allergyHit(meal) {
+      const avoids = selectedAllergies();
+      return meal.allergens.some(a => avoids.some(item => item.includes(a) || a.includes(item)));
+    }
+
+    function macroTargets() {
+      const bodyKg = kg();
+      const goal = document.getElementById("goal").value;
+      const diet = document.getElementById("diet").value;
+      let protein = [1.4, 2.0], carbs = [2, 5], fat = "20-35% calories";
+      if (goal === "loss") { protein = [1.6, 2.2]; carbs = [1, 4]; fat = "20-35% calories"; }
+      if (goal === "strength") { protein = [1.6, 2.2]; carbs = [3, 6]; fat = "20-35% calories"; }
+      if (goal === "hypertrophy") { protein = [1.6, 2.2]; carbs = [3, 7]; fat = "20-35% calories"; }
+      if (goal === "endurance") { protein = [1.2, 1.8]; carbs = [5, 10]; fat = "20-35% calories"; }
+      if (goal === "maintenance") { protein = [1.2, 1.8]; carbs = [2, 5]; fat = "20-35% calories"; }
+      if (diet === "keto") { carbs = null; fat = "Fill remaining calories from fats after protein and vegetables"; }
+      return {
+        protein: `${Math.round(protein[0] * bodyKg)}-${Math.round(protein[1] * bodyKg)} g/day`,
+        carbs: carbs ? `${Math.round(carbs[0] * bodyKg)}-${Math.round(carbs[1] * bodyKg)} g/day` : "20-50 g net/day",
+        fat
+      };
+    }
+
+    function hydrationTargets() {
+      const sex = document.getElementById("sex").value;
+      const weightLb = Number(document.getElementById("weight").value || 0);
+      const minutes = Number(document.getElementById("workoutMinutes").value || 0);
+      const heat = document.getElementById("heat").value;
+      const logged = Number(document.getElementById("waterLogged").value || 0);
+      let baseOz = sex === "male" ? 125 : sex === "female" ? 91 : weightLb * 0.55;
+      const rate = heat === "high" ? 27 : heat === "moderate" ? 20 : 14;
+      const exerciseOz = Math.round((minutes / 60) * rate);
+      const totalOz = Math.round(baseOz + exerciseOz);
+      const pre = Number(document.getElementById("preWeight").value || 0);
+      const post = Number(document.getElementById("postWeight").value || 0);
+      let sweat = "Use if weighed";
+      if (pre && post && pre > post) {
+        const lostLb = pre - post;
+        sweat = `${Math.round(lostLb * 20)}-${Math.round(lostLb * 24)} oz`;
+      }
+      return {
+        baseOz: Math.round(baseOz),
+        exerciseOz,
+        totalOz,
+        remainingOz: Math.max(0, totalOz - logged),
+        sweat
+      };
+    }
+
+    function renderMeals() {
+      const diet = document.getElementById("diet").value;
+      const goal = document.getElementById("goal").value;
+      const grid = document.getElementById("mealGrid");
+      grid.innerHTML = "";
+      meals.forEach(meal => {
+        const dietOk = diet === "balanced" || meal.diet.includes(diet) || meal.swaps.join(" ").toLowerCase().includes(diet);
+        const conflict = allergyHit(meal);
+        const goalOk = meal.tags.includes(goal);
+        const card = document.createElement("article");
+        card.className = `meal span-6${dietOk && goalOk ? "" : " hidden"}`;
+        const status = conflict ? '<span class="status">Needs allergy swap</span>' : '<span class="status">Fits current allergy list</span>';
+        card.innerHTML = `
+          <h3>${meal.title}</h3>
+          ${status}
+          <p>${meal.base}</p>
+          <strong>Substitutes</strong>
+          <ul>${meal.swaps.map(s => `<li>${s}</li>`).join("")}</ul>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function update() {
+      const macros = macroTargets();
+      const fluids = hydrationTargets();
+      document.getElementById("proteinOut").textContent = macros.protein;
+      document.getElementById("carbOut").textContent = macros.carbs;
+      document.getElementById("fatOut").textContent = macros.fat;
+      document.getElementById("hydrationOut").textContent = `${fluids.totalOz} oz/day`;
+      document.getElementById("workoutFluidOut").textContent = `${fluids.exerciseOz} oz`;
+      document.getElementById("baseFluid").textContent = `${fluids.baseOz} oz`;
+      document.getElementById("exerciseFluid").textContent = `${fluids.exerciseOz} oz`;
+      document.getElementById("totalFluid").textContent = `${fluids.totalOz} oz`;
+      document.getElementById("remainingFluid").textContent = `${fluids.remainingOz} oz`;
+      document.getElementById("sweatFluid").textContent = fluids.sweat;
+      const chips = [
+        document.getElementById("goal").selectedOptions[0].text,
+        document.getElementById("diet").selectedOptions[0].text,
+        `${document.getElementById("training").value || 0} training days/week`
+      ].concat(selectedAllergies().map(a => `Avoid: ${a}`));
+      document.getElementById("activeChips").innerHTML = chips.map(c => `<span class="chip">${c}</span>`).join("");
+      renderMeals();
+    }
+
+    document.querySelectorAll(".tab").forEach(button => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll(".tab").forEach(b => b.setAttribute("aria-selected", "false"));
+        document.querySelectorAll("section[role='tabpanel']").forEach(panel => panel.classList.remove("active"));
+        button.setAttribute("aria-selected", "true");
+        document.getElementById(button.dataset.tab).classList.add("active");
+      });
+    });
+
+    ids.forEach(id => document.getElementById(id).addEventListener("input", update));
+    ids.forEach(id => document.getElementById(id).addEventListener("change", update));
+    update();
+  </script>
+</body>
+</html>
