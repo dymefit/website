@@ -6,19 +6,19 @@
   <title>Client Nutrition Meal Plan Guide</title>
   <style>
     :root {
-      --ink: #1f2a2e;
-      --muted: #607077;
-      --line: #d9e0dc;
-      --paper: #fbfcf8;
-      --panel: #ffffff;
-      --green: #2f6b4f;
-      --blue: #315f87;
-      --amber: #9b6424;
-      --red: #9c3f3f;
-      --soft-green: #eaf3ed;
-      --soft-blue: #eaf1f7;
-      --soft-amber: #f6efe4;
-      --shadow: 0 14px 38px rgba(31, 42, 46, 0.09);
+      --ink: #F2EFE8;
+      --muted: #9A958C;
+      --line: #2A2A2E;
+      --paper: #0B0C0E;
+      --panel: #17181C;
+      --green: #D4AF37;
+      --blue: #E6C24A;
+      --amber: #F6D899;
+      --red: #E05B5B;
+      --soft-green: rgba(212, 175, 55, 0.14);
+      --soft-blue: rgba(212, 175, 55, 0.08);
+      --soft-amber: rgba(246, 216, 153, 0.10);
+      --shadow: 0 14px 38px rgba(0, 0, 0, 0.5);
     }
 
     * { box-sizing: border-box; }
@@ -30,8 +30,8 @@
     }
 
     header {
-      background: linear-gradient(110deg, #214939 0%, #315f87 100%);
-      color: white;
+      background: linear-gradient(120deg, #F6E2B0, #D4AF37, #9A6E16 55%, #F6D899);
+      color: #241B07;
       padding: 36px 24px 28px;
     }
 
@@ -58,7 +58,7 @@
 
     .tab {
       border: 1px solid var(--line);
-      background: #fff;
+      background: var(--panel);
       color: var(--ink);
       border-radius: 6px 6px 0 0;
       padding: 10px 14px;
@@ -68,7 +68,7 @@
     }
 
     .tab[aria-selected="true"] {
-      color: white;
+      color: #241B07; font-weight: 800;
       background: var(--green);
       border-color: var(--green);
     }
@@ -102,12 +102,12 @@
     label { display: block; font-weight: 750; margin: 0 0 6px; }
     input, select, textarea {
       width: 100%;
-      border: 1px solid #bdcac4;
+      border: 1px solid #3A3B40;
       border-radius: 6px;
       min-height: 42px;
       padding: 9px 10px;
       color: var(--ink);
-      background: white;
+      background: #0F1013;
       font: inherit;
     }
 
@@ -125,7 +125,7 @@
     .chip {
       border: 1px solid var(--line);
       background: var(--soft-blue);
-      color: #21496a;
+      color: #F6D899;
       border-radius: 999px;
       padding: 6px 10px;
       font-weight: 700;
@@ -134,7 +134,7 @@
 
     .warning {
       border-left: 4px solid var(--red);
-      background: #fff3f1;
+      background: rgba(224, 91, 91, 0.12);
       padding: 12px 14px;
       border-radius: 6px;
     }
@@ -188,14 +188,14 @@
       float: right;
       border: 0;
       background: var(--blue);
-      color: white;
+      color: #241B07;
       border-radius: 6px;
       padding: 10px 12px;
       font-weight: 800;
       cursor: pointer;
     }
 
-    a { color: #245d82; }
+    a { color: #E6C24A; }
     ul, ol { padding-left: 22px; }
     li { margin: 5px 0; }
 
@@ -212,7 +212,7 @@
       section[role="tabpanel"] { display: block !important; page-break-after: always; }
       .panel, .meal { box-shadow: none; }
       header { background: white; color: black; border-bottom: 1px solid #999; }
-      header p { color: #333; }
+      header p { color: #4A3A10; }
     }
   </style>
 </head>
