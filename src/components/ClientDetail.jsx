@@ -86,6 +86,7 @@ export default function ClientDetail({ client, onChanged, onDeleted }) {
         <Field label="Phone" value={client.phone} href={client.phone ? `tel:${client.phone}` : null} />
         <Field label="Start date" value={client.start_date} />
         <Field label="Goal" value={client.goal} />
+        <Field label="TPI screen" value={client.tpi_score ? `${client.tpi_score}${client.tpi_notes ? " — " + client.tpi_notes : ""}` : null} />
       </div>
 
       <div className="detail-notes">

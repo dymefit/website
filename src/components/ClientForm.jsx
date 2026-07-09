@@ -12,6 +12,8 @@ export default function ClientForm({ client, onClose, onSaved }) {
     phone: client?.phone ?? "",
     start_date: client?.start_date ?? "",
     notes: client?.notes ?? "",
+    tpi_score: client?.tpi_score ?? "",
+    tpi_notes: client?.tpi_notes ?? "",
   });
   const [busy, setBusy] = useState(false);
   const set = (k) => (e) => setF({ ...f, [k]: e.target.value });
@@ -29,6 +31,8 @@ export default function ClientForm({ client, onClose, onSaved }) {
         phone: f.phone.trim() || null,
         start_date: f.start_date || null,
         notes: f.notes.trim() || null,
+        tpi_score: f.tpi_score.trim() || null,
+        tpi_notes: f.tpi_notes.trim() || null,
       };
       const saved = editing
         ? await api.updateClient(client.id, payload)
@@ -71,6 +75,16 @@ export default function ClientForm({ client, onClose, onSaved }) {
           <span>Notes</span>
           <textarea rows="3" value={f.notes} onChange={set("notes")} placeholder="Injuries, preferences, history…" />
         </label>
+        <div className="field-row">
+          <label className="field" style={{ maxWidth: 130 }}>
+            <span>TPI screen score</span>
+            <input value={f.tpi_score} onChange={set("tpi_score")} placeholder="e.g. 9/13" />
+          </label>
+          <label className="field">
+            <span>TPI results summary</span>
+            <input value={f.tpi_notes} onChange={set("tpi_notes")} placeholder="e.g. Limited hip IR (lead), poor pelvic tilt — bias hip mobility" />
+          </label>
+        </div>
         <div className="form-actions">
           <button type="button" className="btn secondary" onClick={onClose}>Cancel</button>
           <button type="submit" className="btn" disabled={busy}>{editing ? "Save" : "Add client"}</button>
