@@ -82,6 +82,7 @@ export default function CoachApp({ user, onSignOut }) {
         {view === "programs" && (
           <ProgramView
             client={selectedClient}
+            clients={clients}
             program={selectedProgram}
             onProgramsChanged={() => refreshPrograms(selectedClient?.id)}
             onSelectProgram={setSelectedProgram}

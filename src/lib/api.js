@@ -332,9 +332,18 @@ export async function duplicateDay(day, position) {
   return copy;
 }
 
-// Duplicate a whole program (all days + exercises) for the same client.
-export async function duplicateProgram(program) {
-  const copy = await createProgram(program.client_id, `${program.name} (copy)`, program.weeks);
+// Duplicate a whole program (all days + exercises) — to the same client by
+// default, or to another client (template → real golfer) via targetClientId.
+export async function duplicateProgram(program, targetClientId) {
+  const dest = targetClientId || program.client_id;
+  const suffix = dest === program.client_id ? " (copy)" : "";
+  const copy = await createProgram(dest, {
+    name: `${program.name}${suffix}`,
+    weeks: program.weeks,
+    type: program.type ?? null,
+    level: program.level ?? null,
+    week_notes: program.week_notes ?? {},
+  });
   const days = await listDays(program.id);
   for (const d of days) {
     const newDay = await createDay(copy.id, d.label, d.focus, d.position);

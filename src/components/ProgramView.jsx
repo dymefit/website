@@ -5,7 +5,8 @@ import { projectLoad, isPowerPattern, POWER_MIN_REPS, coeffFor } from "../lib/pr
 import { defaultRestForType } from "../lib/rest";
 import Modal from "./Modal.jsx";
 
-export default function ProgramView({ client, program, onProgramsChanged, onSelectProgram }) {
+export default function ProgramView({ client, clients, program, onProgramsChanged, onSelectProgram }) {
+  const [copyModal, setCopyModal] = useState(false);
   const [days, setDays] = useState([]);
   const [loading, setLoading] = useState(false);
   const [dayModal, setDayModal] = useState(null); // {mode:'add'|'edit', day?}
@@ -141,13 +142,16 @@ export default function ProgramView({ client, program, onProgramsChanged, onSele
     catch (e) { alert(e.message); }
     finally { setBusy(false); }
   }
-  async function dupProgram() {
+  async function dupProgram(targetClientId) {
     setBusy(true);
     try {
-      const copy = await api.duplicateProgram(program);
-      const list = await onProgramsChanged?.();
-      const fresh = (list || []).find((p) => p.id === copy.id) || copy;
-      onSelectProgram?.(fresh);
+      const copy = await api.duplicateProgram(program, targetClientId);
+      if (!targetClientId || targetClientId === program.client_id) {
+        const list = await onProgramsChanged?.();
+        const fresh = (list || []).find((p) => p.id === copy.id) || copy;
+        onSelectProgram?.(fresh);
+      }
+      return copy;
     } catch (e) { alert(e.message); }
     finally { setBusy(false); }
   }
@@ -178,8 +182,8 @@ export default function ProgramView({ client, program, onProgramsChanged, onSele
           <button className="btn secondary" onClick={() => window.print()} title="Print or save as PDF">
             Print
           </button>
-          <button className="btn secondary" onClick={dupProgram} disabled={busy} title="Duplicate this whole program">
-            Duplicate
+          <button className="btn secondary" onClick={() => setCopyModal(true)} disabled={busy} title="Duplicate here or copy to another client">
+            Duplicate / Copy…
           </button>
           <button className="btn" onClick={() => setDayModal({ mode: "add" })}>+ Add Day</button>
         </div>
@@ -285,6 +289,24 @@ export default function ProgramView({ client, program, onProgramsChanged, onSele
         />
       )}
 
+      {copyModal && (
+        <Modal title="Duplicate / copy program" onClose={() => setCopyModal(false)}>
+          <CopyForm
+            program={program}
+            clients={clients || []}
+            busy={busy}
+            onCopy={async (targetId) => {
+              const copy = await dupProgram(targetId);
+              setCopyModal(false);
+              if (copy && targetId && targetId !== program.client_id) {
+                const dest = (clients || []).find((c) => c.id === targetId);
+                alert(`Copied "${program.name}" to ${dest?.name || "client"}.`);
+              }
+            }}
+          />
+        </Modal>
+      )}
+
       {exModal && (
         <ExerciseForm
           dayId={exModal.dayId}
@@ -297,6 +319,34 @@ export default function ProgramView({ client, program, onProgramsChanged, onSele
         />
       )}
     </>
+  );
+}
+
+// Duplicate to the same client, or stamp a template onto another client.
+function CopyForm({ program, clients, busy, onCopy }) {
+  const [target, setTarget] = useState(program.client_id);
+  return (
+    <div className="form">
+      <label className="field">
+        <span>Copy to</span>
+        <select value={target} onChange={(e) => setTarget(e.target.value)}>
+          {clients.map((c) => (
+            <option key={c.id} value={c.id}>
+              {c.name}{c.id === program.client_id ? " (this client)" : ""}
+            </option>
+          ))}
+        </select>
+      </label>
+      <p className="muted-note">
+        Copies all days, exercises, patterns, rest times, and week-by-week
+        progressions. Great for assigning a template to a golfer.
+      </p>
+      <div className="form-actions">
+        <button className="btn" disabled={busy} onClick={() => onCopy(target)}>
+          {busy ? "Copying…" : "Copy program"}
+        </button>
+      </div>
+    </div>
   );
 }
 
