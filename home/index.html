@@ -173,6 +173,15 @@ h1.sheen::after {
 }
 @media (prefers-reduced-motion: reduce){ h1.sheen::after{ animation:none; opacity:0; } }
 </style>
+
+<style>
+/* Mobile nav: keep Member Login + Book visible without overflow */
+@media (max-width: 620px) {
+  .brand > span { display: none; }           /* logo mark stays, wordmark hides */
+  .navlinks { gap: 10px; }
+  .navlinks .btn { padding: 9px 13px; font-size: 13px; white-space: nowrap; }
+}
+</style>
 </head>
 <body>
 
@@ -194,7 +203,7 @@ h1.sheen::after {
     <a href="#packages">Packages</a>
     <a href="#about">Coach</a>
     <a href="#faq">FAQ</a>
-    <a href="/app">Member Login</a><button class="btn btn-p" onclick="openBook()">Book a Session</button>
+    <a href="/app" class="btn btn-g" style="padding:10px 18px;font-size:14px">Member Login</a><button class="btn btn-p" onclick="openBook()">Book a Session</button>
   </div>
 </div></nav>
 
@@ -383,7 +392,7 @@ h1.sheen::after {
       <p style="color:var(--mut);font-size:14px;max-width:300px">A lifetime in motion — because no setback is final. Online performance coaching with Dymond Unutoa, CSCS.</p>
     </div>
     <div><h4>Explore</h4><a href="#specialties">Specialties</a><a href="#packages">Packages</a><a href="#about">Coach</a><a href="#faq">FAQ</a></div>
-    <div><h4>Get started</h4><a href="#" onclick="openBook();return false">Book assessment</a><a href="#packages">Enroll</a><a href="mailto:unutoa31@gmail.com">unutoa31@gmail.com</a></div>
+    <div><h4>Get started</h4><a href="#" onclick="openBook();return false">Book assessment</a><a href="#packages">Enroll</a><a href="/app">Member login</a><a href="mailto:unutoa31@gmail.com">unutoa31@gmail.com</a></div>
   </div>
   <div class="copy"><span>© 2026 Fitness-Elevated · Dymond Unutoa</span><span>Performance · Prevention · Progress</span></div>
 </div></footer>
