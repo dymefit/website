@@ -6,8 +6,17 @@
 -- Deterministic IDs — safe to re-run and safe over v1.
 -- ============================================================
 
-alter table public.clients add column if not exists tpi_score text;
-alter table public.clients add column if not exists tpi_notes text;
+-- Column guards: make this file self-contained no matter which earlier
+-- migrations were run (adds are no-ops when the column already exists).
+alter table public.programs  add column if not exists type         text;
+alter table public.programs  add column if not exists level        text;
+alter table public.programs  add column if not exists week_notes   jsonb not null default '{}'::jsonb;
+alter table public.exercises add column if not exists pattern      text;
+alter table public.exercises add column if not exists equipment    text;
+alter table public.exercises add column if not exists alt          text;
+alter table public.exercises add column if not exists progressions jsonb not null default '{}'::jsonb;
+alter table public.clients   add column if not exists tpi_score    text;
+alter table public.clients   add column if not exists tpi_notes    text;
 
 insert into clients (id, name, goal, notes) values ('280b37a6-9770-5ca2-8eae-b36ddf570366', '🏌️ Golf Templates', 'Program templates', 'Holder for golf program templates — duplicate to a real client, then adjust level/loads.') on conflict (id) do nothing;
 
