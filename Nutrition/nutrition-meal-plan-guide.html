@@ -215,6 +215,10 @@
       header p { color: #D9EFE5; }
     }
   </style>
+
+<style>
+:focus-visible { outline: 2px solid #D4AF37; outline-offset: 2px; border-radius: 4px; }
+</style>
 </head>
 <body>
   <header>
@@ -225,13 +229,13 @@
     </div>
   </header>
 
-  <nav class="tabs wrap" aria-label="Guide tabs">
-    <button class="tab" aria-selected="true" data-tab="intake">Client Intake</button>
-    <button class="tab" aria-selected="false" data-tab="targets">Targets</button>
-    <button class="tab" aria-selected="false" data-tab="meals">Meals & Swaps</button>
-    <button class="tab" aria-selected="false" data-tab="timing">Workout Timing</button>
-    <button class="tab" aria-selected="false" data-tab="hydration">Hydration</button>
-    <button class="tab" aria-selected="false" data-tab="criteria">Missing Criteria</button>
+  <nav class="tabs wrap" role="tablist" aria-label="Guide tabs">
+    <button class="tab" role="tab" aria-selected="true" data-tab="intake">Client Intake</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="targets">Targets</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="meals">Meals & Swaps</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="timing">Workout Timing</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="hydration">Hydration</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="criteria">Missing Criteria</button>
   </nav>
 
   <main class="wrap">
@@ -298,12 +302,12 @@
 
         <div class="panel span-5">
           <h2>Snapshot</h2>
-          <div class="metric"><strong>Protein target</strong><span class="value" id="proteinOut"></span></div>
-          <div class="metric"><strong>Carbohydrate target</strong><span class="value" id="carbOut"></span></div>
-          <div class="metric"><strong>Fat target</strong><span class="value" id="fatOut"></span></div>
-          <div class="metric"><strong>Hydration baseline</strong><span class="value" id="hydrationOut"></span></div>
-          <div class="metric"><strong>Workout fluids</strong><span class="value" id="workoutFluidOut"></span></div>
-          <div class="chips" id="activeChips"></div>
+          <div class="metric"><strong>Protein target</strong><span class="value" id="proteinOut" aria-live="polite"></span></div>
+          <div class="metric"><strong>Carbohydrate target</strong><span class="value" id="carbOut" aria-live="polite"></span></div>
+          <div class="metric"><strong>Fat target</strong><span class="value" id="fatOut" aria-live="polite"></span></div>
+          <div class="metric"><strong>Hydration baseline</strong><span class="value" id="hydrationOut" aria-live="polite"></span></div>
+          <div class="metric"><strong>Workout fluids</strong><span class="value" id="workoutFluidOut" aria-live="polite"></span></div>
+          <div class="chips" id="activeChips" aria-live="polite"></div>
           <div class="warning" style="margin-top:16px">
             This is a coaching guide, not medical nutrition therapy. Clients with diabetes, kidney disease, eating-disorder history, pregnancy, GI disease, major allergies, or prescribed diets should be referred to a licensed clinician or registered dietitian.
           </div>
@@ -429,11 +433,11 @@
         </div>
         <div class="panel span-7">
           <h2>Daily Hydration Goal</h2>
-          <div class="metric"><strong>Baseline fluid target</strong><span class="value" id="baseFluid"></span></div>
-          <div class="metric"><strong>Exercise add-on</strong><span class="value" id="exerciseFluid"></span></div>
-          <div class="metric"><strong>Total daily goal</strong><span class="value" id="totalFluid"></span></div>
-          <div class="metric"><strong>Remaining today</strong><span class="value" id="remainingFluid"></span></div>
-          <div class="metric"><strong>Sweat-loss replacement</strong><span class="value" id="sweatFluid"></span></div>
+          <div class="metric"><strong>Baseline fluid target</strong><span class="value" id="baseFluid" aria-live="polite"></span></div>
+          <div class="metric"><strong>Exercise add-on</strong><span class="value" id="exerciseFluid" aria-live="polite"></span></div>
+          <div class="metric"><strong>Total daily goal</strong><span class="value" id="totalFluid" aria-live="polite"></span></div>
+          <div class="metric"><strong>Remaining today</strong><span class="value" id="remainingFluid" aria-live="polite"></span></div>
+          <div class="metric"><strong>Sweat-loss replacement</strong><span class="value" id="sweatFluid" aria-live="polite"></span></div>
           <table>
             <thead><tr><th>Hydration checkpoint</th><th>Client cue</th></tr></thead>
             <tbody>
