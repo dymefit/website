@@ -221,7 +221,7 @@ function TrainingZones({ client, onSaved }) {
     <section className="zones-card">
       <div className="zones-head">
         <h2 className="portal-subtitle">Heart-rate training zones</h2>
-        <span className={"log-status " + status}>{status === "saved" ? "✓ Saved" : status === "saving" ? "Saving…" : ""}</span>
+        <span className={"log-status " + status} role="status" aria-live="polite">{status === "saved" ? "✓ Saved" : status === "saving" ? "Saving…" : ""}</span>
       </div>
       <p className="muted-note">
         Enter your age and resting heart rate — your zones for cardio and
@@ -329,7 +329,7 @@ function RestTimer({ restStr }) {
 
   if (done) {
     return (
-      <button type="button" className="rest-timer done" onClick={start}>
+      <button type="button" className="rest-timer done" onClick={start} role="status" aria-live="assertive">
         ✅ Rest complete — go!
       </button>
     );
@@ -639,7 +639,7 @@ function ExerciseLogger({ exercise, client, session, existing, library }) {
             </div>
           )}
         </div>
-        <span className={"log-status " + status}>
+        <span className={"log-status " + status} role="status" aria-live="polite">
           {status === "saved" ? "✓ Logged" : status === "saving" ? "Saving…" : ""}
         </span>
       </div>
@@ -657,7 +657,7 @@ function ExerciseLogger({ exercise, client, session, existing, library }) {
               <td><input value={s.rpe} onChange={setField(i, "rpe")} placeholder="—" inputMode="decimal" /></td>
               <td>
                 {sets.length > 1 && (
-                  <button className="tiny" onClick={() => removeSet(i)} title="Remove set">✕</button>
+                  <button className="tiny" onClick={() => removeSet(i)} title="Remove set" aria-label={`Remove set ${i + 1}`}>✕</button>
                 )}
               </td>
             </tr>

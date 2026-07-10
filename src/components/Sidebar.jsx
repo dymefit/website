@@ -63,7 +63,7 @@ export default function Sidebar({
       <div className="panel">
         <div className="panel-head">
           <h2>Clients</h2>
-          <button className="icon-btn" onClick={() => setClientModal(true)} title="Add client">+</button>
+          <button className="icon-btn" onClick={() => setClientModal(true)} title="Add client" aria-label="Add client">+</button>
         </div>
         <ul className="list">
           {clients.length === 0 && <li className="list-empty">No clients yet</li>}
@@ -88,6 +88,7 @@ export default function Sidebar({
             className="icon-btn"
             onClick={() => selectedClient && setProgramModal(true)}
             title={selectedClient ? "Add program" : "Select a client first"}
+            aria-label="Add program"
             disabled={!selectedClient}
           >+</button>
         </div>

@@ -221,8 +221,8 @@ export default function ProgramView({ client, clients, program, onProgramsChange
               </div>
               <div className="row-actions">
                 <span className="day-reorder">
-                  <button className="mini-btn" disabled={di === 0} onClick={() => moveDay(di, -1)} title="Move day up">↑</button>
-                  <button className="mini-btn" disabled={di === days.length - 1} onClick={() => moveDay(di, 1)} title="Move day down">↓</button>
+                  <button className="mini-btn" disabled={di === 0} onClick={() => moveDay(di, -1)} title="Move day up" aria-label={`Move ${d.label} up`}>↑</button>
+                  <button className="mini-btn" disabled={di === days.length - 1} onClick={() => moveDay(di, 1)} title="Move day down" aria-label={`Move ${d.label} down`}>↓</button>
                 </span>
                 <button className="mini-btn" onClick={() => setDayModal({ mode: "edit", day: d })}>Edit</button>
                 <button className="mini-btn" onClick={() => dupDay(d)} disabled={busy}>Duplicate</button>
@@ -246,8 +246,8 @@ export default function ProgramView({ client, clients, program, onProgramsChange
                 {d.exercises.map((ex, i) => (
                   <tr key={ex.id} className={isProgressed(ex) ? "progressed" : ""}>
                     <td className="reorder">
-                      <button className="tiny" disabled={i === 0} onClick={() => moveExercise(d, i, -1)}>▲</button>
-                      <button className="tiny" disabled={i === d.exercises.length - 1} onClick={() => moveExercise(d, i, 1)}>▼</button>
+                      <button className="tiny" disabled={i === 0} onClick={() => moveExercise(d, i, -1)} aria-label={`Move ${ex.name} up`}>▲</button>
+                      <button className="tiny" disabled={i === d.exercises.length - 1} onClick={() => moveExercise(d, i, 1)} aria-label={`Move ${ex.name} down`}>▼</button>
                     </td>
                     <td className="name">
                       {ex.name}
@@ -262,7 +262,7 @@ export default function ProgramView({ client, clients, program, onProgramsChange
                     <td>{eff(ex, "rest")}</td>
                     <td className="row-actions">
                       <button className="mini-btn" onClick={() => setExModal({ dayId: d.id, exercise: ex })}>Edit</button>
-                      <button className="mini-btn danger" onClick={() => deleteExercise(ex)}>✕</button>
+                      <button className="mini-btn danger" onClick={() => deleteExercise(ex)} aria-label={`Delete ${ex.name}`}>✕</button>
                     </td>
                   </tr>
                 ))}

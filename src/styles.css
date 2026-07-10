@@ -166,11 +166,11 @@ table.exercises td.muted-cell { color: var(--muted); }
 .alt-toggle:hover { border-color: var(--accent); }
 .proj-load { color: var(--good, #34d399); font-weight: 600; }
 .proj-pct {
-  margin-left: 5px; font-size: 10px; font-weight: 600; color: var(--accent);
+  margin-left: 5px; font-size: 11px; font-weight: 600; color: var(--accent);
   background: var(--accent-soft); border-radius: 4px; padding: 1px 5px;
 }
 .wk-badge {
-  display: inline-block; margin-left: 8px; font-size: 10px; font-weight: 700;
+  display: inline-block; margin-left: 8px; font-size: 11px; font-weight: 700;
   color: var(--accent); background: var(--accent-soft); border-radius: 4px; padding: 1px 5px;
   vertical-align: middle;
 }
@@ -542,7 +542,7 @@ table.exercises td.name { font-weight: 600; }
 
 /* SWAP picker */
 .swap-badge {
-  font-size: 10px; font-weight: 700; color: var(--accent);
+  font-size: 11px; font-weight: 700; color: var(--accent);
   background: var(--accent-soft); border-radius: 5px; padding: 2px 6px;
   margin-left: 8px; vertical-align: middle; text-transform: uppercase;
 }
@@ -755,3 +755,13 @@ code { background: var(--panel-2); padding: 1px 5px; border-radius: 4px; font-si
 @media (prefers-reduced-motion: reduce) {
   .brand-name, .portal-head .brand { animation: none; background-position: -60% 0, 0 0; }
 }
+
+
+/* ---------- Accessibility ---------- */
+/* Clear gold focus ring for keyboard navigation (mouse clicks unaffected). */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+.modal:focus { outline: none; } /* dialog container itself needs no ring */

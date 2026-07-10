@@ -90,7 +90,7 @@ export default function ExerciseLibrary() {
                     {byCat[cat][pattern][eq].map((it) => (
                       <div className="lib-item" key={it.id}>
                         <span>{it.name}</span>
-                        <button className="tiny" title="Remove" onClick={() => remove(it)}>✕</button>
+                        <button className="tiny" title="Remove" aria-label={`Remove ${it.name}`} onClick={() => remove(it)}>✕</button>
                       </div>
                     ))}
                   </div>

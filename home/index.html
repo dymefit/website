@@ -182,8 +182,16 @@ h1.sheen::after {
   .navlinks .btn { padding: 9px 13px; font-size: 13px; white-space: nowrap; }
 }
 </style>
+
+<style>
+.skip-link{position:absolute;left:-9999px;top:0;background:#D4AF37;color:#241B07;
+  font-weight:700;padding:12px 20px;border-radius:0 0 12px 0;z-index:999}
+.skip-link:focus{left:0}
+:focus-visible{outline:2px solid #D4AF37;outline-offset:2px}
+</style>
 </head>
 <body>
+<a class="skip-link" href="#top">Skip to main content</a>
 
 <!-- NAV -->
 <nav><div class="wrap nav-in">
@@ -249,7 +257,7 @@ h1.sheen::after {
     </div>
   </div>
   <div class="hero-photo">
-    <img src="/hero.jpg" alt="Coach Dymond Unutoa in the gym">
+    <img src="/hero.jpg" alt="Coach Dymond Unutoa seated in his training studio with a mountain view behind him" alt="Coach Dymond Unutoa in the gym">
     <div class="hero-badge"><b>Dymond Unutoa</b><span>CSCS · PTA · LMT · TPI Certified</span></div>
   </div>
 </div></header>
@@ -398,7 +406,7 @@ h1.sheen::after {
 </div></footer>
 
 <!-- BOOKING MODAL -->
-<div class="overlay" id="bookO">
+<div class="overlay" id="bookO" role="dialog" aria-modal="true" aria-label="Book a session">
   <div class="modal">
     <button class="close" onclick="closeAll()">×</button>
     <div id="bookStep1">

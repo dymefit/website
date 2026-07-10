@@ -28,7 +28,7 @@ function buildSeries(logs) {
   }).filter((s) => s.series.length > 0);
 }
 
-function LineChart({ points }) {
+function LineChart({ points, label }) {
   const W = 300, H = 120, pad = 28;
   const ys = points.map((p) => p.y);
   const minY = Math.min(...ys), maxY = Math.max(...ys);
@@ -40,7 +40,7 @@ function LineChart({ points }) {
   const path = points.map((p, i) => `${i ? "L" : "M"}${px(i).toFixed(1)},${py(p.y).toFixed(1)}`).join(" ");
 
   return (
-    <svg viewBox={`0 0 ${W} ${H}`} className="chart-svg" preserveAspectRatio="xMidYMid meet">
+    <svg viewBox={`0 0 ${W} ${H}`} className="chart-svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label={label}>
       {/* y range labels */}
       <text x="4" y={py(maxY) + 4} className="chart-axis">{maxY}</text>
       <text x="4" y={py(minY) + 4} className="chart-axis">{minY}</text>
@@ -79,7 +79,7 @@ export default function ProgressCharts({ logs }) {
                   {delta > 0 ? "▲" : delta < 0 ? "▼" : "•"} {Math.abs(delta) || 0}
                 </span>
               </div>
-              <LineChart points={s.series} />
+              <LineChart points={s.series} label={`${s.name}: top-set weight from ${s.series[0].y} to ${s.series[s.series.length - 1].y} pounds over ${s.series.length} sessions`} />
             </div>
           );
         })}
