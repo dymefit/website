@@ -765,3 +765,11 @@ code { background: var(--panel-2); padding: 1px 5px; border-radius: 4px; font-si
   border-radius: 4px;
 }
 .modal:focus { outline: none; } /* dialog container itself needs no ring */
+
+
+/* Work/interval clock */
+.timers-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.timers-row .rest-timer { margin-top: 0; }
+.rest-timer.work-idle { border-color: var(--accent); }
+.rest-timer.running.work-work { background: rgba(212, 175, 55, 0.18); border-color: var(--accent); color: var(--text); }
+.rest-timer.running.work-off { background: var(--panel-2); }

@@ -4,6 +4,7 @@ import { karvonenZones, estimateMaxHR } from "../lib/zones";
 import { HOTEL_GROUPS, availableAtHotel } from "../lib/hotel";
 import { swapCandidates, effortHint } from "../lib/swap";
 import { parseRest, formatSecs } from "../lib/rest";
+import { parseWork, buildPhases, clockLabel } from "../lib/workclock";
 import Modal from "./Modal.jsx";
 
 // local-time YYYY-MM-DD
@@ -271,6 +272,108 @@ function TrainingZones({ client, onSaved }) {
 // One-tap rest timer, preset to the exercise's prescribed rest. Countdown is
 // timestamp-based (immune to background-tab throttling); finishing beeps,
 // vibrates, and flashes so the client knows to start the next set.
+// Work/interval clock: runs the TIME-based part of a prescription — interval
+// rounds (30s on / 90s off), holds (planks, wall sits), ladders, and steady
+// cardio blocks — with a beep/vibration on every transition.
+function WorkClock({ sets, reps, restStr }) {
+  const spec = parseWork(reps, sets);
+  const [phases, setPhases] = useState(null); // active phase list | null
+  const [idx, setIdx] = useState(0);
+  const [endsAt, setEndsAt] = useState(null);
+  const [left, setLeft] = useState(0);
+  const [done, setDone] = useState(false);
+  const audioRef = { current: null };
+
+  function beep(n = 2) {
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      const ctx = audioRef.current || new Ctx();
+      audioRef.current = ctx;
+      Array.from({ length: n }, (_, i) => i * 0.3).forEach((t) => {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.frequency.value = 880;
+        g.gain.setValueAtTime(0.001, ctx.currentTime + t);
+        g.gain.exponentialRampToValueAtTime(0.4, ctx.currentTime + t + 0.02);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + t + 0.26);
+        o.start(ctx.currentTime + t); o.stop(ctx.currentTime + t + 0.28);
+      });
+    } catch { /* vibration/visual still fire */ }
+    if (navigator.vibrate) navigator.vibrate(n >= 3 ? [250, 100, 250, 100, 400] : [200, 80, 200]);
+  }
+
+  useEffect(() => {
+    if (!phases || endsAt == null) return;
+    const tick = () => {
+      const rem = Math.ceil((endsAt - Date.now()) / 1000);
+      if (rem <= 0) {
+        const next = idx + 1;
+        if (next < phases.length) {
+          beep(2);
+          setIdx(next);
+          setEndsAt(Date.now() + phases[next].secs * 1000);
+        } else {
+          beep(3);
+          setPhases(null);
+          setEndsAt(null);
+          setDone(true);
+          setTimeout(() => setDone(false), 6000);
+        }
+      } else {
+        setLeft(rem);
+      }
+    };
+    tick();
+    const id = setInterval(tick, 250);
+    return () => clearInterval(id);
+  }, [phases, endsAt, idx]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  if (!spec) return null;
+
+  function start() {
+    try {
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      if (!audioRef.current) audioRef.current = new Ctx();
+      if (audioRef.current.state === "suspended") audioRef.current.resume();
+    } catch { /* ignore */ }
+    const p = buildPhases(spec, parseRest(restStr) ?? 0);
+    if (!p.length) return;
+    setDone(false);
+    setIdx(0);
+    setPhases(p);
+    setLeft(p[0].secs);
+    setEndsAt(Date.now() + p[0].secs * 1000);
+  }
+
+  if (done) {
+    return (
+      <button type="button" className="rest-timer done" onClick={start} role="status" aria-live="assertive">
+        ✅ {spec.kind === "interval" ? "Intervals complete!" : "Work complete!"}
+      </button>
+    );
+  }
+  if (phases) {
+    const ph = phases[idx];
+    return (
+      <button
+        type="button"
+        className={"rest-timer running work-" + ph.cue}
+        onClick={() => { setPhases(null); setEndsAt(null); }}
+        aria-live="polite"
+      >
+        {ph.cue === "work" ? "🏃" : "😮‍💨"} {ph.label} · {formatSecs(left)}
+        <span className="rest-cancel"> · tap to cancel</span>
+      </button>
+    );
+  }
+  return (
+    <button type="button" className="rest-timer work-idle" onClick={start}>
+      ▶ {clockLabel(spec)}
+    </button>
+  );
+}
+
 function RestTimer({ restStr }) {
   const preset = parseRest(restStr) ?? 90;
   const [endsAt, setEndsAt] = useState(null); // ms timestamp | null
@@ -665,7 +768,10 @@ function ExerciseLogger({ exercise, client, session, existing, library }) {
         </tbody>
       </table>
 
-      <RestTimer restStr={exercise.rest} />
+      <div className="timers-row">
+        <WorkClock sets={exercise.sets} reps={exercise.reps} restStr={exercise.rest} />
+        <RestTimer restStr={exercise.rest} />
+      </div>
       <div className="log-actions">
         <button className="btn secondary small" onClick={addSet}>+ Set</button>
         <input className="log-note" value={note} onChange={(e) => { setNote(e.target.value); setStatus("idle"); }} placeholder="Note (optional)" />
