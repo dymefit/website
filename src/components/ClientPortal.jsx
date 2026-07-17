@@ -6,6 +6,7 @@ import { swapCandidates, effortHint } from "../lib/swap";
 import { parseRest, formatSecs } from "../lib/rest";
 import { parseWork, buildPhases, clockLabel } from "../lib/workclock";
 import Modal from "./Modal.jsx";
+import BrandMark from "./BrandMark.jsx";
 
 // local-time YYYY-MM-DD
 function ymd(d) {
@@ -61,7 +62,7 @@ export default function ClientPortal({ user, onSignOut }) {
   return (
     <div className="portal">
       <header className="portal-head">
-        <div className="brand"><span className="brand-mark">◆</span> Fitness-Elevated</div>
+        <div className="brand"><BrandMark size={26} /> <span className="brand-name">Fitness-Elevated</span></div>
         <div className="portal-user">
           {client?.name && <span>{client.name}</span>}
           <button className="linklike" onClick={onSignOut}>Sign out</button>

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useAuth } from "../auth.jsx";
+import BrandMark from "./BrandMark.jsx";
 
 export default function Login({ onBack }) {
   const { signIn, signUp } = useAuth();
@@ -36,7 +37,7 @@ export default function Login({ onBack }) {
     <div className="auth-screen">
       <form className="auth-card" onSubmit={handleSubmit}>
         <div className="brand auth-brand">
-          <span className="brand-mark">◆</span>
+          <BrandMark size={30} />
           <span className="brand-name">Fitness-Elevated</span>
         </div>
         <h1 className="auth-title">

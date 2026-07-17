@@ -2,6 +2,7 @@ import { useState } from "react";
 import * as api from "../lib/api";
 import { PROGRAM_TYPES, LEVELS } from "../lib/constants";
 import Modal from "./Modal.jsx";
+import BrandMark from "./BrandMark.jsx";
 import ClientForm from "./ClientForm.jsx";
 
 export default function Sidebar({
@@ -44,7 +45,7 @@ export default function Sidebar({
   return (
     <aside className="sidebar">
       <div className="brand">
-        <span className="brand-mark">◆</span>
+        <BrandMark size={26} />
         <span className="brand-name">Fitness-Elevated</span>
       </div>
 
