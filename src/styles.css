@@ -773,3 +773,57 @@ code { background: var(--panel-2); padding: 1px 5px; border-radius: 4px; font-si
 .rest-timer.work-idle { border-color: var(--accent); }
 .rest-timer.running.work-work { background: rgba(212, 175, 55, 0.18); border-color: var(--accent); color: var(--text); }
 .rest-timer.running.work-off { background: var(--panel-2); }
+
+
+/* ---------- Mobile coach layout: full-screen drawer flow ---------- */
+.mobile-menu-btn { display: none; }
+
+@media (max-width: 768px) {
+  .app { display: block; }
+
+  /* picker mode: sidebar fills the screen */
+  .app .sidebar { display: none; }
+  .app.m-side .sidebar {
+    display: flex;
+    width: 100%;
+    max-width: none;
+    height: 100dvh;
+  }
+
+  /* program mode: content fills the screen, scrolls vertically */
+  .app .content { display: none; }
+  .app.m-main .content {
+    display: block;
+    width: 100%;
+    height: 100dvh;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 18px 14px 90px;
+  }
+
+  /* floating ☰ returns to the picker */
+  .app.m-main .mobile-menu-btn {
+    display: grid;
+    place-items: center;
+    position: fixed;
+    right: 16px;
+    bottom: 18px;
+    z-index: 40;
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    border: none;
+    font-size: 22px;
+    color: #241B07;
+    background: linear-gradient(120deg, #F6E2B0, #D4AF37, #9A6E16 55%, #F6D899);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
+    cursor: pointer;
+  }
+
+  /* wide prescription tables scroll sideways inside their card */
+  .day-card { overflow-x: auto; }
+  .day-card table.exercises { min-width: 560px; }
+
+  /* header stacks so buttons don't crush the title */
+  .content-header { flex-direction: column; align-items: flex-start; gap: 10px; }
+}

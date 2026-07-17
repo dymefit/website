@@ -14,6 +14,9 @@ export default function CoachApp({ user, onSignOut }) {
   const [selectedProgram, setSelectedProgram] = useState(null);
   const [view, setView] = useState("programs"); // "programs" | "calendar" | "client"
   const [error, setError] = useState("");
+  // Mobile: show the sidebar (picker) OR the content full-screen — never
+  // both. Desktop ignores this entirely (media query). Start on the picker.
+  const [mobileSide, setMobileSide] = useState(true);
 
   const refreshClients = useCallback(async () => {
     const data = await api.listClients();
@@ -55,7 +58,7 @@ export default function CoachApp({ user, onSignOut }) {
   }, [selectedClient, refreshPrograms]);
 
   return (
-    <div className="app">
+    <div className={"app " + (mobileSide ? "m-side" : "m-main")}>
       <Sidebar
         user={user}
         onSignOut={onSignOut}
@@ -65,11 +68,21 @@ export default function CoachApp({ user, onSignOut }) {
         selectedProgram={selectedProgram}
         view={view}
         onSelectClient={setSelectedClient}
-        onSelectProgram={(p) => { setSelectedProgram(p); setView("programs"); }}
-        onSetView={setView}
+        onSelectProgram={(p) => { setSelectedProgram(p); setView("programs"); setMobileSide(false); }}
+        onSetView={(v) => { setView(v); setMobileSide(false); }}
         onClientsChanged={refreshClients}
         onProgramsChanged={() => refreshPrograms(selectedClient?.id)}
       />
+
+      {/* Mobile only: bring back the picker to choose another program/view */}
+      <button
+        className="mobile-menu-btn"
+        onClick={() => setMobileSide(true)}
+        aria-label="Open menu to choose a client, program, or view"
+        title="Menu"
+      >
+        ☰
+      </button>
 
       <main className="content">
         {error && <div className="api-error">{error}</div>}
