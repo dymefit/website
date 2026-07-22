@@ -238,6 +238,16 @@ table.exercises tr.progressed td.name { position: relative; }
 .day-reorder { display: inline-flex; gap: 2px; margin-right: 4px; }
 
 /* ---------- Print / PDF ---------- */
+/* Client portal: printing is disabled — a print attempt outputs only the notice. */
+.print-blocked-note { display: none; }
+@media print {
+  .portal > * { display: none !important; }
+  .portal .print-blocked-note {
+    display: block !important;
+    padding: 60px 24px; text-align: center;
+    color: #000; font-size: 15px;
+  }
+}
 @media print {
   .sidebar { display: none !important; }
   .app { display: block; height: auto; overflow: visible; }

@@ -59,8 +59,21 @@ export default function ClientPortal({ user, onSignOut }) {
 
   useEffect(() => { load(); }, [load]);
 
+  // Programs are licensed to the member — block the print shortcut in the portal.
+  useEffect(() => {
+    const blockPrint = (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === "p") e.preventDefault();
+    };
+    window.addEventListener("keydown", blockPrint);
+    return () => window.removeEventListener("keydown", blockPrint);
+  }, []);
+
   return (
     <div className="portal">
+      <div className="print-blocked-note" aria-hidden="true">
+        Printing is disabled. Fitness-Elevated programs are licensed to the
+        individual member — please use the app for your workouts.
+      </div>
       <header className="portal-head">
         <div className="brand"><BrandMark size={26} /> <span className="brand-name">Fitness-Elevated</span></div>
         <div className="portal-user">
