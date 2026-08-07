@@ -10,6 +10,7 @@ const CATEGORY_ORDER = [
   "CORE & ROTATION",
   "EXPLOSIVE / POWER",
   "CONDITIONING",
+  "PREHAB / MOBILITY",
 ];
 const EQUIP_ORDER = [
   "Default", "Barbell", "Dumbbell", "Machine / Cable", "Band", "Bodyweight", "Kettlebell",
