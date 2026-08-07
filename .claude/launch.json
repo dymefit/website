@@ -12,6 +12,12 @@
       "runtimeExecutable": "python3",
       "runtimeArgs": ["-m", "http.server", "5050", "--directory", "Fitness-Elevated/web"],
       "port": 5050
+    },
+    {
+      "name": "nutrition-guide",
+      "runtimeExecutable": "python3",
+      "runtimeArgs": ["-m", "http.server", "5060", "--directory", "Nutrition"],
+      "port": 5060
     }
   ]
 }

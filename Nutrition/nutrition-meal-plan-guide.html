@@ -240,6 +240,7 @@
     <button class="tab" role="tab" aria-selected="true" data-tab="intake">Client Intake</button>
     <button class="tab" role="tab" aria-selected="false" data-tab="targets">Targets</button>
     <button class="tab" role="tab" aria-selected="false" data-tab="meals">Meals & Swaps</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="desserts">Healthy Desserts</button>
     <button class="tab" role="tab" aria-selected="false" data-tab="timing">Workout Timing</button>
     <button class="tab" role="tab" aria-selected="false" data-tab="hydration">Hydration</button>
     <button class="tab" role="tab" aria-selected="false" data-tab="criteria">Missing Criteria</button>
@@ -370,6 +371,14 @@
       <div class="grid" id="mealGrid"></div>
     </section>
 
+    <section id="desserts" role="tabpanel">
+      <div class="panel">
+        <h2>Healthy Desserts & Allergy-Aware Substitutes</h2>
+        <p class="hint">Protein- and fruit-forward desserts with controlled added sugar. Cards hide when they conflict with the selected diet style, and every recipe carries allergy swaps.</p>
+      </div>
+      <div class="grid" id="dessertGrid"></div>
+    </section>
+
     <section id="timing" role="tabpanel">
       <div class="grid">
         <div class="panel span-6">
@@ -497,255 +506,210 @@
 
   <script>
     const meals = [
-      {
-        title: "Performance Breakfast Bowl",
-        diet: ["balanced", "vegetarian", "gluten-free"],
-        allergens: ["milk"],
-        tags: ["strength", "hypertrophy", "endurance", "maintenance"],
-        base: "Greek yogurt, berries, oats, chia, honey.",
-        swaps: ["Dairy-free: soy yogurt or pea protein smoothie.", "Gluten-free: certified gluten-free oats.", "Keto: unsweetened yogurt, chia, nuts, small berries."]
-      },
-      {
-        title: "Chicken Rice Training Plate",
-        diet: ["balanced", "gluten-free", "dairy-free"],
-        allergens: [],
-        tags: ["strength", "hypertrophy", "endurance", "loss", "maintenance"],
-        base: "Chicken breast or thigh, rice, roasted vegetables, olive oil, salsa.",
-        swaps: ["Vegan: tofu, tempeh, lentils, or chickpeas.", "Keto: cauliflower rice and avocado.", "Fish allergy safe as written."]
-      },
-      {
-        title: "Salmon Potato Recovery Plate",
-        diet: ["balanced", "pescatarian", "gluten-free", "dairy-free"],
-        allergens: ["fish"],
-        tags: ["endurance", "strength", "hypertrophy", "maintenance"],
-        base: "Salmon, potatoes, greens, citrus vinaigrette.",
-        swaps: ["Fish allergy: chicken, turkey, tofu, or lean beef.", "Vegan: lentil patties or tofu with algae-based omega-3 discussion.", "Keto: swap potato for asparagus or salad."]
-      },
-      {
-        title: "Vegan Power Chili",
-        diet: ["balanced", "vegan", "vegetarian", "gluten-free", "dairy-free"],
-        allergens: [],
-        tags: ["loss", "endurance", "maintenance", "hypertrophy"],
-        base: "Beans, lentils, tomatoes, peppers, corn, spices, avocado.",
-        swaps: ["Keto: turkey or tofu chili with fewer beans and extra low-carb vegetables.", "Soy allergy: avoid tofu topping; use avocado or pumpkin seeds if tolerated.", "Nut allergy safe if seed toppings are verified."]
-      },
-      {
-        title: "Turkey Avocado Lettuce Wraps",
-        diet: ["balanced", "keto", "gluten-free", "dairy-free"],
-        allergens: [],
-        tags: ["loss", "strength", "maintenance"],
-        base: "Turkey, avocado, lettuce cups, cucumber, tomato, mustard.",
-        swaps: ["Vegetarian: egg salad if eggs tolerated or chickpea salad.", "Vegan: hummus-free bean spread if sesame allergy; tofu strips if soy tolerated.", "Endurance: add fruit, rice, or potatoes around training."]
-      },
-      {
-        title: "Tofu Noodle Stir Fry",
-        diet: ["balanced", "vegan", "vegetarian", "dairy-free"],
-        allergens: ["soy", "wheat", "sesame"],
-        tags: ["hypertrophy", "endurance", "maintenance"],
-        base: "Tofu, noodles, vegetables, sesame-ginger sauce.",
-        swaps: ["Soy allergy: chicken, shrimp if shellfish tolerated, or pea-protein crumbles.", "Wheat allergy/gluten-free: rice noodles or rice.", "Sesame allergy: olive oil, garlic, ginger, coconut aminos."]
-      },
-      {
-        title: "Egg & Sweet Potato Hash",
-        diet: ["balanced", "vegetarian", "gluten-free", "dairy-free"],
-        allergens: ["eggs"],
-        tags: ["loss", "strength", "maintenance"],
-        base: "Eggs, sweet potato, peppers, onions, spinach.",
-        swaps: ["Egg allergy: turkey, tofu if soy tolerated, or lentil scramble.", "Keto: swap sweet potato for zucchini and mushrooms.", "Vegan: tofu scramble or chickpea flour scramble."]
-      },
-      {
-        title: "Smoothie Recovery Shake",
-        diet: ["balanced", "vegetarian", "vegan", "gluten-free", "dairy-free"],
-        allergens: ["milk", "soy", "peanuts", "tree nuts"],
-        tags: ["endurance", "hypertrophy", "strength"],
-        base: "Protein powder, banana, berries, spinach, milk or fortified alternative.",
-        swaps: ["Milk allergy: pea protein with oat, rice, or coconut beverage.", "Nut allergy: skip nut butter; use seeds only if tolerated.", "Keto: low-carb protein, unsweetened liquid, spinach, chia, small berries."]
-      },
-      {
-        title: "Overnight Protein Oats",
-        diet: ["balanced", "vegetarian"],
-        allergens: ["milk"],
-        tags: ["strength", "hypertrophy", "endurance", "maintenance"],
-        base: "Oats soaked in milk with whey or Greek yogurt, chia, banana, cinnamon.",
-        swaps: ["Dairy-free/vegan: soy milk + pea protein.", "Gluten-free: certified GF oats.", "Weight loss: halve the oats, double the berries."]
-      },
-      {
-        title: "Veggie Egg Scramble Plate",
-        diet: ["balanced", "vegetarian", "gluten-free", "keto"],
-        allergens: ["eggs"],
-        tags: ["loss", "maintenance", "strength"],
-        base: "Whole eggs + extra whites scrambled with spinach, peppers, mushrooms; avocado on the side.",
-        swaps: ["Egg allergy/vegan: firm tofu scramble with turmeric.", "Higher carb (training day): add fruit or sourdough toast.", "Keto as written."]
-      },
-      {
-        title: "Tofu Scramble Burrito Bowl",
-        diet: ["vegan", "vegetarian", "dairy-free", "gluten-free"],
-        allergens: ["soy"],
-        tags: ["hypertrophy", "endurance", "maintenance"],
-        base: "Crumbled tofu, black beans, rice, salsa, avocado, greens.",
-        swaps: ["Soy allergy: chickpea scramble.", "Keto: cauliflower rice, extra avocado.", "Weight loss: half rice, extra greens."]
-      },
-      {
-        title: "Cottage Cheese Berry Bowl",
-        diet: ["balanced", "vegetarian", "gluten-free", "keto"],
-        allergens: ["milk"],
-        tags: ["loss", "maintenance", "strength"],
-        base: "High-protein cottage cheese, mixed berries, pumpkin seeds, honey drizzle.",
-        swaps: ["Dairy-free: coconut yogurt + protein powder.", "Keto: skip honey, add nuts.", "Nut/seed-free: omit seeds, add extra berries."]
-      },
-      {
-        title: "Lean Beef Burrito Bowl",
-        diet: ["balanced", "gluten-free", "dairy-free"],
-        allergens: [],
-        tags: ["strength", "hypertrophy", "maintenance"],
-        base: "93% lean ground beef, rice, black beans, pico, lettuce, guacamole.",
-        swaps: ["Vegan: seasoned lentils + walnut crumble.", "Keto: cauliflower rice, no beans, extra guac.", "Weight loss: single palm of beef, half rice."]
-      },
-      {
-        title: "Shrimp Quinoa Bowl",
-        diet: ["balanced", "pescatarian", "gluten-free", "dairy-free"],
-        allergens: ["shellfish"],
-        tags: ["loss", "endurance", "maintenance"],
-        base: "Garlic shrimp, quinoa, roasted zucchini and tomatoes, lemon, olive oil.",
-        swaps: ["Shellfish allergy: chicken breast or white fish.", "Vegan: white beans.", "Lower carb: swap quinoa for shaved cabbage slaw."]
-      },
-      {
-        title: "Turkey Chili + Baked Potato",
-        diet: ["balanced", "gluten-free", "dairy-free"],
-        allergens: [],
-        tags: ["strength", "hypertrophy", "endurance", "loss", "maintenance"],
-        base: "Lean turkey chili with kidney beans over a baked potato; big side salad.",
-        swaps: ["Vegan: three-bean chili.", "Keto: serve over roasted cauliflower.", "Nightshade-sensitive: use sweet potato & no tomato base."]
-      },
-      {
-        title: "Greek Chicken Pita Plate",
-        diet: ["balanced"],
-        allergens: ["wheat", "milk"],
-        tags: ["maintenance", "strength", "hypertrophy"],
-        base: "Grilled chicken, whole-wheat pita, tzatziki, cucumber-tomato salad, olives.",
-        swaps: ["Gluten-free: lettuce cups or GF pita.", "Dairy-free: hummus instead of tzatziki.", "Vegan: falafel + hummus."]
-      },
-      {
-        title: "Baked Cod Mediterranean Plate",
-        diet: ["balanced", "pescatarian", "gluten-free", "dairy-free"],
-        allergens: ["fish"],
-        tags: ["loss", "maintenance", "endurance"],
-        base: "Baked cod, herbed potatoes, green beans, olive tapenade.",
-        swaps: ["Fish allergy: chicken thigh.", "Keto: swap potatoes for roasted broccoli + extra olive oil.", "Vegan: butter beans with the same seasonings."]
-      },
-      {
-        title: "Pork Tenderloin & Apple Plate",
-        diet: ["balanced", "gluten-free", "dairy-free"],
-        allergens: [],
-        tags: ["strength", "maintenance"],
-        base: "Roasted pork tenderloin, saut\u00e9ed apples, mashed sweet potato, Brussels sprouts.",
-        swaps: ["Vegan: maple-glazed tempeh (contains soy).", "Keto: skip sweet potato, extra sprouts with butter or olive oil.", "Weight loss: single palm of pork, half the sweet potato."]
-      },
-      {
-        title: "Lentil Curry Power Bowl",
-        diet: ["vegan", "vegetarian", "dairy-free", "gluten-free"],
-        allergens: [],
-        tags: ["endurance", "hypertrophy", "maintenance", "loss"],
-        base: "Red lentil curry with coconut milk, basmati rice, spinach, cilantro.",
-        swaps: ["Lower fat: light coconut milk.", "Keto: serve over cauliflower rice, add tofu for protein.", "Extra protein: stir in pea-protein or serve with edamame (soy)."]
-      },
-      {
-        title: "Bison Burger Plate",
-        diet: ["balanced", "keto", "gluten-free", "dairy-free"],
-        allergens: [],
-        tags: ["strength", "hypertrophy", "maintenance"],
-        base: "Bison patty over greens with tomato, onion, pickles, avocado; roasted potato wedges.",
-        swaps: ["Budget: 90% lean beef.", "Keto: skip the wedges (as-written otherwise).", "Vegan: black-bean patty."]
-      },
-      {
-        title: "Miso Salmon Soba Bowl",
-        diet: ["pescatarian", "dairy-free"],
-        allergens: ["fish", "soy", "wheat"],
-        tags: ["endurance", "hypertrophy", "maintenance"],
-        base: "Miso-glazed salmon, soba noodles, edamame, bok choy, sesame (omit if allergic).",
-        swaps: ["Gluten-free: 100% buckwheat soba or rice noodles.", "Soy allergy: coconut-aminos glaze, skip edamame.", "Fish allergy: chicken thigh."]
-      },
-      {
-        title: "Chicken Fajita Skillet",
-        diet: ["balanced", "gluten-free", "dairy-free", "keto"],
-        allergens: [],
-        tags: ["loss", "strength", "maintenance"],
-        base: "Sliced chicken, peppers, onions, fajita spices; serve with tortillas or over rice.",
-        swaps: ["Keto/loss: serve over shredded lettuce with guacamole.", "Vegan: portobello strips + black beans.", "Corn-free: flour tortillas (adds wheat) or rice."]
-      },
-      {
-        title: "Pre-Lift Rice Cakes + Whey",
-        diet: ["balanced", "vegetarian", "gluten-free"],
-        allergens: ["milk"],
-        tags: ["strength", "hypertrophy"],
-        base: "60\u201390 min out: rice cakes with honey + a whey shake. Fast carbs, easy gut.",
-        swaps: ["Dairy-free/vegan: pea-rice protein blend.", "Whole-food: banana + turkey slices.", "Sensitive stomach: smaller portion 45 min out."]
-      },
-      {
-        title: "Banana Peanut-Butter Toast",
-        diet: ["balanced", "vegetarian", "vegan", "dairy-free"],
-        allergens: ["peanuts", "wheat"],
-        tags: ["endurance", "strength", "hypertrophy"],
-        base: "90 min pre-session: sourdough toast, peanut butter, banana, pinch of salt.",
-        swaps: ["Peanut allergy: sunflower-seed butter.", "Gluten-free: GF bread or rice cakes.", "Race-morning: white toast digests faster than sourdough."]
-      },
-      {
-        title: "Endurance Oat Smoothie",
-        diet: ["balanced", "vegetarian", "gluten-free"],
-        allergens: ["milk"],
-        tags: ["endurance", "maintenance"],
-        base: "Blended oats, milk, banana, berries, honey, pinch of salt \u2014 2\u20133 h before long sessions.",
-        swaps: ["Vegan: soy milk + maple.", "Lower FODMAP: lactose-free milk, firm banana.", "Add protein: half scoop whey or pea."]
-      },
-      {
-        title: "Recovery Chocolate Milk + Jerky",
-        diet: ["balanced"],
-        allergens: ["milk"],
-        tags: ["strength", "hypertrophy", "endurance"],
-        base: "Post-session on the go: chocolate milk (carb+protein) plus beef jerky.",
-        swaps: ["Dairy-free: chocolate soy milk.", "Lower sugar: half chocolate, half plain milk.", "Vegan: soy milk + roasted edamame (soy)."]
-      },
-      {
-        title: "Greek Yogurt Recovery Parfait",
-        diet: ["balanced", "vegetarian", "gluten-free"],
-        allergens: ["milk"],
-        tags: ["hypertrophy", "strength", "maintenance", "loss"],
-        base: "Greek yogurt layered with granola (GF if needed), berries, honey.",
-        swaps: ["Dairy-free: coconut yogurt + protein powder.", "Nut-free: seed-based granola.", "Keto: skip granola/honey, add chia + nuts."]
-      },
-      {
-        title: "Tuna Rice Recovery Bowl",
-        diet: ["balanced", "pescatarian", "dairy-free"],
-        allergens: ["fish", "soy", "sesame"],
-        tags: ["strength", "hypertrophy", "endurance"],
-        base: "Seasoned rice, canned tuna, cucumber, soy sauce, sesame, seaweed.",
-        swaps: ["Soy allergy: coconut aminos, skip sesame.", "Fish allergy: shredded chicken.", "Gluten-free: tamari instead of soy sauce."]
-      },
-      {
-        title: "Edamame & Hummus Plate",
-        diet: ["vegan", "vegetarian", "dairy-free", "gluten-free"],
-        allergens: ["soy", "sesame"],
-        tags: ["loss", "maintenance", "endurance"],
-        base: "Steamed edamame, hummus, carrot and cucumber sticks.",
-        swaps: ["Soy allergy: extra hummus + pumpkin seeds.", "Sesame allergy: white-bean dip instead of hummus.", "More protein: add a hard-boiled egg (adds eggs)."]
-      },
-      {
-        title: "Trail Mix + Fruit",
-        diet: ["balanced", "vegan", "vegetarian", "dairy-free", "gluten-free", "keto"],
-        allergens: ["tree nuts", "peanuts"],
-        tags: ["endurance", "maintenance"],
-        base: "Almonds, walnuts, peanuts, dark chocolate, plus an apple or orange.",
-        swaps: ["Nut allergy: roasted chickpeas + seeds.", "Keto: nuts only, skip fruit/chocolate.", "Portion tip: pre-bag a single handful."]
-      },
-      {
-        title: "Casein Night Bowl",
-        diet: ["balanced", "vegetarian", "gluten-free", "keto"],
-        allergens: ["milk"],
-        tags: ["hypertrophy", "strength"],
-        base: "Casein or Greek-yogurt pudding with almond butter before bed for overnight recovery.",
-        swaps: ["Dairy-free: soy-protein pudding.", "Nut allergy: sunflower-seed butter.", "Cutting: water-mixed casein, skip the butter."]
-      }
+      {"title": "Performance Breakfast Bowl", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk"], "tags": ["strength", "hypertrophy", "endurance", "maintenance"], "base": "Greek yogurt, berries, oats, chia, honey.", "swaps": ["Dairy-free: soy yogurt or pea protein smoothie.", "Gluten-free: certified gluten-free oats.", "Keto: unsweetened yogurt, chia, nuts, small berries."]},
+      {"title": "Chicken Rice Training Plate", "diet": ["balanced", "gluten-free", "dairy-free"], "allergens": [], "tags": ["strength", "hypertrophy", "endurance", "loss", "maintenance"], "base": "Chicken breast or thigh, rice, roasted vegetables, olive oil, salsa.", "swaps": ["Vegan: tofu, tempeh, lentils, or chickpeas.", "Keto: cauliflower rice and avocado.", "Fish allergy safe as written."]},
+      {"title": "Salmon Potato Recovery Plate", "diet": ["balanced", "pescatarian", "gluten-free", "dairy-free"], "allergens": ["fish"], "tags": ["endurance", "strength", "hypertrophy", "maintenance"], "base": "Salmon, potatoes, greens, citrus vinaigrette.", "swaps": ["Fish allergy: chicken, turkey, tofu, or lean beef.", "Vegan: lentil patties or tofu with algae-based omega-3 discussion.", "Keto: swap potato for asparagus or salad."]},
+      {"title": "Vegan Power Chili", "diet": ["balanced", "vegan", "vegetarian", "gluten-free", "dairy-free"], "allergens": [], "tags": ["loss", "endurance", "maintenance", "hypertrophy"], "base": "Beans, lentils, tomatoes, peppers, corn, spices, avocado.", "swaps": ["Keto: turkey or tofu chili with fewer beans and extra low-carb vegetables.", "Soy allergy: avoid tofu topping; use avocado or pumpkin seeds if tolerated.", "Nut allergy safe if seed toppings are verified."]},
+      {"title": "Turkey Avocado Lettuce Wraps", "diet": ["balanced", "keto", "gluten-free", "dairy-free"], "allergens": [], "tags": ["loss", "strength", "maintenance"], "base": "Turkey, avocado, lettuce cups, cucumber, tomato, mustard.", "swaps": ["Vegetarian: egg salad if eggs tolerated or chickpea salad.", "Vegan: hummus-free bean spread if sesame allergy; tofu strips if soy tolerated.", "Endurance: add fruit, rice, or potatoes around training."]},
+      {"title": "Tofu Noodle Stir Fry", "diet": ["balanced", "vegan", "vegetarian", "dairy-free"], "allergens": ["soy", "wheat", "sesame"], "tags": ["hypertrophy", "endurance", "maintenance"], "base": "Tofu, noodles, vegetables, sesame-ginger sauce.", "swaps": ["Soy allergy: chicken, shrimp if shellfish tolerated, or pea-protein crumbles.", "Wheat allergy/gluten-free: rice noodles or rice.", "Sesame allergy: olive oil, garlic, ginger, coconut aminos."]},
+      {"title": "Egg & Sweet Potato Hash", "diet": ["balanced", "vegetarian", "gluten-free", "dairy-free"], "allergens": ["eggs"], "tags": ["loss", "strength", "maintenance"], "base": "Eggs, sweet potato, peppers, onions, spinach.", "swaps": ["Egg allergy: turkey, tofu if soy tolerated, or lentil scramble.", "Keto: swap sweet potato for zucchini and mushrooms.", "Vegan: tofu scramble or chickpea flour scramble."]},
+      {"title": "Smoothie Recovery Shake", "diet": ["balanced", "vegetarian", "vegan", "gluten-free", "dairy-free"], "allergens": ["milk", "soy", "peanuts", "tree nuts"], "tags": ["endurance", "hypertrophy", "strength"], "base": "Protein powder, banana, berries, spinach, milk or fortified alternative.", "swaps": ["Milk allergy: pea protein with oat, rice, or coconut beverage.", "Nut allergy: skip nut butter; use seeds only if tolerated.", "Keto: low-carb protein, unsweetened liquid, spinach, chia, small berries."]},
+      {"title": "Overnight Protein Oats", "diet": ["balanced", "vegetarian"], "allergens": ["milk"], "tags": ["strength", "hypertrophy", "endurance", "maintenance"], "base": "Oats soaked in milk with whey or Greek yogurt, chia, banana, cinnamon.", "swaps": ["Dairy-free/vegan: soy milk + pea protein.", "Gluten-free: certified GF oats.", "Weight loss: halve the oats, double the berries."]},
+      {"title": "Veggie Egg Scramble Plate", "diet": ["balanced", "vegetarian", "gluten-free", "keto"], "allergens": ["eggs"], "tags": ["loss", "maintenance", "strength"], "base": "Whole eggs + extra whites scrambled with spinach, peppers, mushrooms; avocado on the side.", "swaps": ["Egg allergy/vegan: firm tofu scramble with turmeric.", "Higher carb (training day): add fruit or sourdough toast.", "Keto as written."]},
+      {"title": "Tofu Scramble Burrito Bowl", "diet": ["vegan", "vegetarian", "dairy-free", "gluten-free"], "allergens": ["soy"], "tags": ["hypertrophy", "endurance", "maintenance"], "base": "Crumbled tofu, black beans, rice, salsa, avocado, greens.", "swaps": ["Soy allergy: chickpea scramble.", "Keto: cauliflower rice, extra avocado.", "Weight loss: half rice, extra greens."]},
+      {"title": "Cottage Cheese Berry Bowl", "diet": ["balanced", "vegetarian", "gluten-free", "keto"], "allergens": ["milk"], "tags": ["loss", "maintenance", "strength"], "base": "High-protein cottage cheese, mixed berries, pumpkin seeds, honey drizzle.", "swaps": ["Dairy-free: coconut yogurt + protein powder.", "Keto: skip honey, add nuts.", "Nut/seed-free: omit seeds, add extra berries."]},
+      {"title": "Lean Beef Burrito Bowl", "diet": ["balanced", "gluten-free", "dairy-free"], "allergens": [], "tags": ["strength", "hypertrophy", "maintenance"], "base": "93% lean ground beef, rice, black beans, pico, lettuce, guacamole.", "swaps": ["Vegan: seasoned lentils + walnut crumble.", "Keto: cauliflower rice, no beans, extra guac.", "Weight loss: single palm of beef, half rice."]},
+      {"title": "Shrimp Quinoa Bowl", "diet": ["balanced", "pescatarian", "gluten-free", "dairy-free"], "allergens": ["shellfish"], "tags": ["loss", "endurance", "maintenance"], "base": "Garlic shrimp, quinoa, roasted zucchini and tomatoes, lemon, olive oil.", "swaps": ["Shellfish allergy: chicken breast or white fish.", "Vegan: white beans.", "Lower carb: swap quinoa for shaved cabbage slaw."]},
+      {"title": "Turkey Chili + Baked Potato", "diet": ["balanced", "gluten-free", "dairy-free"], "allergens": [], "tags": ["strength", "hypertrophy", "endurance", "loss", "maintenance"], "base": "Lean turkey chili with kidney beans over a baked potato; big side salad.", "swaps": ["Vegan: three-bean chili.", "Keto: serve over roasted cauliflower.", "Nightshade-sensitive: use sweet potato & no tomato base."]},
+      {"title": "Greek Chicken Pita Plate", "diet": ["balanced"], "allergens": ["wheat", "milk"], "tags": ["maintenance", "strength", "hypertrophy"], "base": "Grilled chicken, whole-wheat pita, tzatziki, cucumber-tomato salad, olives.", "swaps": ["Gluten-free: lettuce cups or GF pita.", "Dairy-free: hummus instead of tzatziki.", "Vegan: falafel + hummus."]},
+      {"title": "Baked Cod Mediterranean Plate", "diet": ["balanced", "pescatarian", "gluten-free", "dairy-free"], "allergens": ["fish"], "tags": ["loss", "maintenance", "endurance"], "base": "Baked cod, herbed potatoes, green beans, olive tapenade.", "swaps": ["Fish allergy: chicken thigh.", "Keto: swap potatoes for roasted broccoli + extra olive oil.", "Vegan: butter beans with the same seasonings."]},
+      {"title": "Pork Tenderloin & Apple Plate", "diet": ["balanced", "gluten-free", "dairy-free"], "allergens": [], "tags": ["strength", "maintenance"], "base": "Roasted pork tenderloin, sautéed apples, mashed sweet potato, Brussels sprouts.", "swaps": ["Vegan: maple-glazed tempeh (contains soy).", "Keto: skip sweet potato, extra sprouts with butter or olive oil.", "Weight loss: single palm of pork, half the sweet potato."]},
+      {"title": "Lentil Curry Power Bowl", "diet": ["vegan", "vegetarian", "dairy-free", "gluten-free"], "allergens": [], "tags": ["endurance", "hypertrophy", "maintenance", "loss"], "base": "Red lentil curry with coconut milk, basmati rice, spinach, cilantro.", "swaps": ["Lower fat: light coconut milk.", "Keto: serve over cauliflower rice, add tofu for protein.", "Extra protein: stir in pea-protein or serve with edamame (soy)."]},
+      {"title": "Bison Burger Plate", "diet": ["balanced", "keto", "gluten-free", "dairy-free"], "allergens": [], "tags": ["strength", "hypertrophy", "maintenance"], "base": "Bison patty over greens with tomato, onion, pickles, avocado; roasted potato wedges.", "swaps": ["Budget: 90% lean beef.", "Keto: skip the wedges (as-written otherwise).", "Vegan: black-bean patty."]},
+      {"title": "Miso Salmon Soba Bowl", "diet": ["pescatarian", "dairy-free"], "allergens": ["fish", "soy", "wheat"], "tags": ["endurance", "hypertrophy", "maintenance"], "base": "Miso-glazed salmon, soba noodles, edamame, bok choy, sesame (omit if allergic).", "swaps": ["Gluten-free: 100% buckwheat soba or rice noodles.", "Soy allergy: coconut-aminos glaze, skip edamame.", "Fish allergy: chicken thigh."]},
+      {"title": "Chicken Fajita Skillet", "diet": ["balanced", "gluten-free", "dairy-free", "keto"], "allergens": [], "tags": ["loss", "strength", "maintenance"], "base": "Sliced chicken, peppers, onions, fajita spices; serve with tortillas or over rice.", "swaps": ["Keto/loss: serve over shredded lettuce with guacamole.", "Vegan: portobello strips + black beans.", "Corn-free: flour tortillas (adds wheat) or rice."]},
+      {"title": "Pre-Lift Rice Cakes + Whey", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk"], "tags": ["strength", "hypertrophy"], "base": "60–90 min out: rice cakes with honey + a whey shake. Fast carbs, easy gut.", "swaps": ["Dairy-free/vegan: pea-rice protein blend.", "Whole-food: banana + turkey slices.", "Sensitive stomach: smaller portion 45 min out."]},
+      {"title": "Banana Peanut-Butter Toast", "diet": ["balanced", "vegetarian", "vegan", "dairy-free"], "allergens": ["peanuts", "wheat"], "tags": ["endurance", "strength", "hypertrophy"], "base": "90 min pre-session: sourdough toast, peanut butter, banana, pinch of salt.", "swaps": ["Peanut allergy: sunflower-seed butter.", "Gluten-free: GF bread or rice cakes.", "Race-morning: white toast digests faster than sourdough."]},
+      {"title": "Endurance Oat Smoothie", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk"], "tags": ["endurance", "maintenance"], "base": "Blended oats, milk, banana, berries, honey, pinch of salt — 2–3 h before long sessions.", "swaps": ["Vegan: soy milk + maple.", "Lower FODMAP: lactose-free milk, firm banana.", "Add protein: half scoop whey or pea."]},
+      {"title": "Recovery Chocolate Milk + Jerky", "diet": ["balanced"], "allergens": ["milk"], "tags": ["strength", "hypertrophy", "endurance"], "base": "Post-session on the go: chocolate milk (carb+protein) plus beef jerky.", "swaps": ["Dairy-free: chocolate soy milk.", "Lower sugar: half chocolate, half plain milk.", "Vegan: soy milk + roasted edamame (soy)."]},
+      {"title": "Greek Yogurt Recovery Parfait", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk"], "tags": ["hypertrophy", "strength", "maintenance", "loss"], "base": "Greek yogurt layered with granola (GF if needed), berries, honey.", "swaps": ["Dairy-free: coconut yogurt + protein powder.", "Nut-free: seed-based granola.", "Keto: skip granola/honey, add chia + nuts."]},
+      {"title": "Tuna Rice Recovery Bowl", "diet": ["balanced", "pescatarian", "dairy-free"], "allergens": ["fish", "soy", "sesame"], "tags": ["strength", "hypertrophy", "endurance"], "base": "Seasoned rice, canned tuna, cucumber, soy sauce, sesame, seaweed.", "swaps": ["Soy allergy: coconut aminos, skip sesame.", "Fish allergy: shredded chicken.", "Gluten-free: tamari instead of soy sauce."]},
+      {"title": "Edamame & Hummus Plate", "diet": ["vegan", "vegetarian", "dairy-free", "gluten-free"], "allergens": ["soy", "sesame"], "tags": ["loss", "maintenance", "endurance"], "base": "Steamed edamame, hummus, carrot and cucumber sticks.", "swaps": ["Soy allergy: extra hummus + pumpkin seeds.", "Sesame allergy: white-bean dip instead of hummus.", "More protein: add a hard-boiled egg (adds eggs)."]},
+      {"title": "Trail Mix + Fruit", "diet": ["balanced", "vegan", "vegetarian", "dairy-free", "gluten-free", "keto"], "allergens": ["tree nuts", "peanuts"], "tags": ["endurance", "maintenance"], "base": "Almonds, walnuts, peanuts, dark chocolate, plus an apple or orange.", "swaps": ["Nut allergy: roasted chickpeas + seeds.", "Keto: nuts only, skip fruit/chocolate.", "Portion tip: pre-bag a single handful."]},
+      {"title": "Casein Night Bowl", "diet": ["balanced", "vegetarian", "gluten-free", "keto"], "allergens": ["milk"], "tags": ["hypertrophy", "strength"], "base": "Casein or Greek-yogurt pudding with almond butter before bed for overnight recovery.", "swaps": ["Dairy-free: soy-protein pudding.", "Nut allergy: sunflower-seed butter.", "Cutting: water-mixed casein, skip the butter."]},
+      {"title": "Spinach Feta Omelet Plate", "diet": ["keto", "vegetarian", "gluten-free"], "allergens": ["eggs", "milk"], "tags": ["loss", "strength", "maintenance"], "base": "Three-egg omelet with spinach, feta, cherry tomatoes, olive oil, and avocado.", "swaps": ["Egg allergy: firm tofu scramble with black salt.", "Dairy-free: skip feta, add nutritional yeast.", "Balanced: add a slice of whole-grain toast."]},
+      {"title": "Smoked Salmon Egg Bites", "diet": ["keto", "pescatarian", "gluten-free"], "allergens": ["eggs", "milk", "fish"], "tags": ["loss", "strength", "maintenance"], "base": "Baked egg bites with smoked salmon, cottage cheese, chives, and bell pepper.", "swaps": ["Egg allergy: chickpea-flour mini frittatas instead.", "Dairy-free: blend eggs with unsweetened coconut cream.", "Fish allergy: swap salmon for diced turkey or ham."]},
+      {"title": "Turkey Sausage Skillet", "diet": ["balanced", "gluten-free", "dairy-free"], "allergens": ["eggs"], "tags": ["strength", "hypertrophy", "endurance"], "base": "Lean turkey sausage, scrambled eggs, potatoes, peppers, and onions in one skillet.", "swaps": ["Egg allergy: double the sausage and add white beans.", "Keto: swap potatoes for cauliflower and zucchini.", "Vegetarian: plant-based sausage and tofu scramble."]},
+      {"title": "Huevos Rancheros Power Plate", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["eggs", "milk"], "tags": ["strength", "hypertrophy", "endurance", "maintenance"], "base": "Corn tortillas, fried eggs, black beans, salsa, queso fresco, and avocado.", "swaps": ["Egg allergy: turmeric tofu scramble instead of eggs.", "Dairy-free: skip queso, add extra avocado.", "Loss: one tortilla, extra beans and salsa."]},
+      {"title": "Avocado Egg Sourdough", "diet": ["balanced", "vegetarian", "dairy-free"], "allergens": ["eggs", "wheat"], "tags": ["loss", "endurance", "maintenance"], "base": "Sourdough toast, smashed avocado, two poached eggs, chili flakes, and lemon.", "swaps": ["Egg allergy: white-bean smash with hemp seeds on top.", "Gluten-free: certified gluten-free bread.", "Hypertrophy: add a third egg or smoked salmon."]},
+      {"title": "Shakshuka with Feta", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["eggs", "milk"], "tags": ["loss", "strength", "maintenance"], "base": "Eggs poached in spiced tomato-pepper sauce with feta and olive oil.", "swaps": ["Egg allergy: simmer white beans in the sauce instead.", "Dairy-free: skip feta, add olives and avocado.", "Endurance: serve with whole-grain pita."]},
+      {"title": "Steak & Egg Power Bowl", "diet": ["balanced", "gluten-free", "dairy-free"], "allergens": ["eggs"], "tags": ["strength", "hypertrophy"], "base": "Sliced sirloin, fried eggs, roasted sweet potatoes, spinach, and chimichurri.", "swaps": ["Egg allergy: extra steak plus half an avocado.", "Keto: swap sweet potatoes for cauliflower rice.", "Loss: 4 oz steak, one egg, double greens."]},
+      {"title": "Ham & Egg Quesadilla", "diet": ["balanced"], "allergens": ["eggs", "milk", "wheat"], "tags": ["strength", "hypertrophy", "maintenance"], "base": "Whole-wheat tortilla, scrambled eggs, lean ham, cheddar, and pico de gallo.", "swaps": ["Egg allergy: extra ham and black beans.", "Dairy-free: plant-based cheese or avocado.", "Gluten-free: corn or almond-flour tortilla.", "Vegetarian: swap ham for black beans."]},
+      {"title": "Cottage Cheese Power Pancakes", "diet": ["balanced", "vegetarian"], "allergens": ["milk", "eggs"], "tags": ["strength", "hypertrophy", "endurance"], "base": "Blended cottage cheese, eggs, and oats cooked as pancakes, topped with berries.", "swaps": ["Dairy-free: silken tofu replaces cottage cheese.", "Egg allergy: flax eggs plus extra oats.", "Gluten-free: certified gluten-free oats."]},
+      {"title": "Tropical Greek Yogurt Bowl", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk"], "tags": ["endurance", "hypertrophy", "maintenance"], "base": "Greek yogurt, mango, pineapple, chia seeds, toasted coconut, and hemp hearts.", "swaps": ["Dairy-free: coconut or soy yogurt.", "Loss: halve the fruit, add extra yogurt.", "Keto: swap tropical fruit for berries and macadamias."]},
+      {"title": "Savory Cottage Cheese Plate", "diet": ["keto", "vegetarian", "gluten-free"], "allergens": ["milk", "sesame"], "tags": ["loss", "maintenance"], "base": "Cottage cheese with cherry tomatoes, cucumber, olive oil, and everything bagel seasoning.", "swaps": ["Dairy-free: firm tofu mashed with lemon and salt.", "Sesame allergy: season with chives, dill, and cracked pepper.", "Balanced: add whole-grain crackers or fruit."]},
+      {"title": "Chocolate Protein Yogurt Cup", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk"], "tags": ["loss", "hypertrophy", "maintenance"], "base": "Greek yogurt whipped with chocolate whey and cocoa, topped with raspberries.", "swaps": ["Dairy-free: soy yogurt with pea protein.", "Vegan: same swap, sweeten with maple.", "Keto: unsweetened yogurt and stevia-sweetened protein."]},
+      {"title": "Berry Cheesecake Yogurt Jar", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk", "tree nuts"], "tags": ["maintenance", "hypertrophy"], "base": "Layered Greek yogurt, cream cheese swirl, mixed berries, and almond-date crumble.", "swaps": ["Dairy-free: coconut yogurt and coconut cream.", "Nut allergy: toasted oat crumble instead of almonds.", "Loss: skip cream cheese, double the berries."]},
+      {"title": "Kefir Muesli Breakfast Cup", "diet": ["balanced", "vegetarian"], "allergens": ["milk", "tree nuts"], "tags": ["endurance", "maintenance"], "base": "Kefir stirred with vanilla whey over oat muesli, walnuts, apple, and cinnamon.", "swaps": ["Dairy-free: soy milk and pea protein.", "Nut allergy: pumpkin and sunflower seeds instead of walnuts.", "Gluten-free: certified gluten-free muesli."]},
+      {"title": "Apple Cinnamon Protein Oatmeal", "diet": ["balanced", "vegetarian"], "allergens": ["milk", "tree nuts"], "tags": ["endurance", "strength", "maintenance"], "base": "Oats simmered with vanilla whey, diced apple, cinnamon, and toasted walnuts.", "swaps": ["Dairy-free: pea or rice protein.", "Nut allergy: pumpkin seeds instead of walnuts.", "Gluten-free: certified gluten-free oats.", "Vegan: pea protein and plant milk."]},
+      {"title": "Savory Miso Oats Bowl", "diet": ["balanced", "vegetarian", "dairy-free"], "allergens": ["eggs", "soy", "sesame"], "tags": ["endurance", "maintenance"], "base": "Savory oats with miso, soft-boiled egg, scallions, sesame seeds, and spinach.", "swaps": ["Egg allergy: crispy tofu cubes on top.", "Soy allergy: chickpea miso or a pinch of salt.", "Sesame allergy: skip seeds, finish with olive oil.", "Vegan: pan-seared tofu instead of egg."]},
+      {"title": "Quinoa Berry Porridge", "diet": ["balanced", "vegan", "vegetarian", "dairy-free", "gluten-free"], "allergens": ["tree nuts"], "tags": ["endurance", "hypertrophy", "maintenance"], "base": "Quinoa cooked in almond milk with berries, almond butter, hemp seeds, maple.", "swaps": ["Nut allergy: oat milk and sunflower-seed butter.", "Higher protein: stir in a scoop of pea protein.", "Keto: swap quinoa for hemp-chia porridge."]},
+      {"title": "Banana Protein Baked Oats", "diet": ["balanced", "vegetarian"], "allergens": ["eggs", "milk"], "tags": ["strength", "hypertrophy", "endurance"], "base": "Oats blended with banana, eggs, whey, and cinnamon, baked until fluffy.", "swaps": ["Egg allergy: flax eggs.", "Dairy-free: plant protein and almond milk.", "Gluten-free: certified gluten-free oats."]},
+      {"title": "Peanut Butter Overnight Oats", "diet": ["balanced", "vegetarian"], "allergens": ["milk", "peanuts"], "tags": ["endurance", "hypertrophy", "strength"], "base": "Oats soaked in milk with peanut butter, vanilla whey, chia, and banana.", "swaps": ["Peanut allergy: sunflower-seed butter.", "Dairy-free: soy milk and pea protein.", "Gluten-free: certified gluten-free oats.", "Loss: halve the nut butter, skip banana."]},
+      {"title": "Green Machine Smoothie", "diet": ["balanced", "vegan", "vegetarian", "dairy-free", "gluten-free"], "allergens": ["tree nuts"], "tags": ["loss", "endurance", "maintenance"], "base": "Spinach, banana, pineapple, pea protein, and almond butter blended with coconut water.", "swaps": ["Nut allergy: sunflower-seed butter or hemp seeds.", "Keto: swap fruit for avocado and a few berries.", "Higher calorie: add oats and extra nut butter."]},
+      {"title": "Mocha Muscle Shake", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk"], "tags": ["strength", "hypertrophy", "endurance"], "base": "Cold-brew coffee, chocolate whey, banana, milk, and ice blended until creamy.", "swaps": ["Dairy-free: pea protein and oat milk.", "Vegan: pea protein, soy milk, and cocoa.", "Keto: skip banana, add almond butter and MCT oil."]},
+      {"title": "Blueberry Almond Smoothie", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk", "tree nuts"], "tags": ["loss", "endurance", "maintenance"], "base": "Blueberries, Greek yogurt, almond milk, vanilla whey, and flaxseed blended smooth.", "swaps": ["Dairy-free: coconut yogurt and pea protein.", "Nut allergy: use oat milk instead of almond milk.", "Keto: halve the berries, add avocado."]},
+      {"title": "Mango Ginger Recovery Smoothie", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk"], "tags": ["endurance", "maintenance"], "base": "Mango, fresh ginger, Greek yogurt, turmeric, honey, and coconut water blended.", "swaps": ["Dairy-free: soy yogurt or pea protein.", "Vegan: soy yogurt and maple instead of honey.", "Loss: half the mango, extra yogurt."]},
+      {"title": "Chocolate Peanut Power Shake", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk", "peanuts"], "tags": ["strength", "hypertrophy"], "base": "Chocolate whey, peanut butter, banana, milk, and ice blended thick.", "swaps": ["Peanut allergy: almond or sunflower-seed butter.", "Dairy-free: pea protein and soy milk.", "Keto: skip banana, use unsweetened almond milk."]},
+      {"title": "Tempeh Breakfast Hash", "diet": ["balanced", "vegan", "vegetarian", "dairy-free", "gluten-free"], "allergens": ["soy"], "tags": ["strength", "endurance", "maintenance"], "base": "Crumbled tempeh, roasted potatoes, peppers, kale, smoked paprika, and olive oil.", "swaps": ["Soy allergy: chickpeas or white beans instead of tempeh.", "Keto: swap potatoes for radishes and mushrooms.", "Non-vegan boost: top with fried eggs."]},
+      {"title": "Keto Chia Berry Pudding", "diet": ["keto", "vegetarian", "gluten-free"], "allergens": ["milk", "tree nuts"], "tags": ["loss", "maintenance"], "base": "Chia soaked in coconut milk with vanilla whey, raspberries, and sliced almonds.", "swaps": ["Dairy-free: pea protein instead of whey.", "Nut allergy: oat milk base and pumpkin seeds.", "Vegan: pea protein and maple to taste."]},
+      {"title": "Lox & Avocado Plate", "diet": ["keto", "pescatarian", "gluten-free", "dairy-free"], "allergens": ["fish"], "tags": ["loss", "strength", "maintenance"], "base": "Smoked salmon, avocado, cucumber ribbons, capers, red onion, and olive oil.", "swaps": ["Fish allergy: sliced turkey or hard-boiled eggs.", "Balanced: add a toasted whole-grain bagel.", "Hypertrophy: add two soft-boiled eggs."]},
+      {"title": "Cinnamon Protein Waffles", "diet": ["balanced", "vegetarian"], "allergens": ["eggs", "milk", "wheat"], "tags": ["strength", "hypertrophy", "endurance"], "base": "Whole-wheat waffles blended with whey, eggs, Greek yogurt, cinnamon, and berries.", "swaps": ["Egg allergy: flax eggs.", "Dairy-free: plant protein and soy yogurt.", "Gluten-free: buckwheat or gluten-free flour blend."]},
+      {"title": "Black Bean Tofu Tacos", "diet": ["balanced", "vegan", "vegetarian", "dairy-free", "gluten-free"], "allergens": ["soy"], "tags": ["endurance", "hypertrophy", "maintenance"], "base": "Corn tortillas with turmeric tofu scramble, black beans, salsa, and avocado.", "swaps": ["Soy allergy: chickpea-flour scramble instead of tofu.", "Egg option: scrambled eggs replace tofu.", "Keto: lettuce cups instead of tortillas, skip beans."]},
+      {"title": "Protein French Toast", "diet": ["balanced", "vegetarian"], "allergens": ["eggs", "milk", "wheat"], "tags": ["strength", "hypertrophy", "maintenance"], "base": "Whole-grain bread soaked in eggs, whey, and cinnamon, griddled, berry-topped.", "swaps": ["Egg allergy: banana-flax batter.", "Dairy-free: plant protein and almond milk.", "Gluten-free: certified gluten-free bread."]},
+      {"title": "Teriyaki Chicken Rice Bowl", "diet": ["balanced", "gluten-free", "dairy-free"], "allergens": ["soy"], "tags": ["strength", "hypertrophy", "endurance", "maintenance"], "base": "Seared chicken thighs, jasmine rice, steamed broccoli, carrots, gluten-free tamari teriyaki glaze.", "swaps": ["Soy: coconut aminos glaze instead of tamari.", "Vegan: crispy tofu or tempeh cubes.", "Keto: cauliflower rice and sliced avocado."]},
+      {"title": "Lemon Herb Chicken Quinoa", "diet": ["balanced", "gluten-free", "dairy-free"], "allergens": [], "tags": ["loss", "endurance", "maintenance"], "base": "Grilled lemon-herb chicken breast, fluffy quinoa, roasted zucchini and peppers, olive oil drizzle.", "swaps": ["Vegan: seasoned chickpeas or grilled tofu.", "Keto: cauliflower rice and half an avocado.", "Top-nine allergen free as written."]},
+      {"title": "Chicken Tikka Rice Bowl", "diet": ["balanced", "gluten-free"], "allergens": ["milk"], "tags": ["hypertrophy", "strength", "maintenance"], "base": "Yogurt-marinated tikka chicken, basmati rice, charred peppers, onions, cucumber raita.", "swaps": ["Milk: coconut-yogurt marinade and raita.", "Vegan: tandoori-spiced cauliflower and chickpeas.", "Keto: cauliflower rice with cucumber salad."]},
+      {"title": "Thai Basil Chicken Bowl", "diet": ["balanced", "gluten-free", "dairy-free"], "allergens": ["soy"], "tags": ["loss", "endurance", "maintenance"], "base": "Ground chicken stir-fried with basil, green beans, chilies, tamari, over jasmine rice.", "swaps": ["Soy: coconut aminos in the sauce.", "Vegan: crumbled firm tofu.", "Keto: cauliflower rice and extra green beans."]},
+      {"title": "BBQ Chicken Sweet Potato Plate", "diet": ["balanced", "gluten-free", "dairy-free"], "allergens": [], "tags": ["strength", "hypertrophy", "maintenance"], "base": "Shredded BBQ chicken breast, roasted sweet potato, crunchy slaw, pickled onions.", "swaps": ["Vegan: BBQ jackfruit or tempeh.", "Keto: roasted radishes instead of sweet potato, extra slaw.", "Loss phase: choose a no-sugar-added BBQ sauce."]},
+      {"title": "Chicken Pesto Pasta Bowl", "diet": ["balanced"], "allergens": ["wheat", "milk", "tree nuts"], "tags": ["hypertrophy", "endurance"], "base": "Grilled chicken, whole-wheat penne, basil-pine-nut pesto, parmesan, cherry tomatoes, spinach.", "swaps": ["Wheat: chickpea or brown-rice pasta.", "Milk: dairy-free pesto with nutritional yeast.", "Tree nuts: pumpkin-seed pesto.", "Vegan: white beans in place of chicken."]},
+      {"title": "Turkey Meatball Marinara Plate", "diet": ["balanced"], "allergens": ["wheat", "eggs"], "tags": ["hypertrophy", "strength", "maintenance"], "base": "Lean turkey meatballs, whole-wheat spaghetti, marinara, sauteed spinach, olive oil.", "swaps": ["Wheat: gluten-free pasta and oat crumbs.", "Eggs: flax egg binder.", "Vegan: lentil meatballs.", "Keto: zucchini noodles instead of spaghetti."]},
+      {"title": "Turkey Taco Rice Skillet", "diet": ["balanced", "gluten-free", "dairy-free"], "allergens": [], "tags": ["loss", "hypertrophy", "maintenance"], "base": "One-pan taco-spiced ground turkey, rice, black beans, peppers, salsa, avocado.", "swaps": ["Vegan: lentil crumbles instead of turkey.", "Keto: cauliflower rice, skip beans, extra avocado.", "Add cheese only if dairy is tolerated."]},
+      {"title": "Ginger Chicken Stir-Fry", "diet": ["balanced", "gluten-free", "dairy-free"], "allergens": ["soy"], "tags": ["loss", "endurance", "maintenance"], "base": "Chicken breast strips, snap peas, bok choy, ginger-tamari sauce, steamed rice.", "swaps": ["Soy: coconut aminos sauce.", "Vegan: tofu or mushroom mix.", "Keto: cauliflower rice and extra bok choy."]},
+      {"title": "Chicken Shawarma Bowl", "diet": ["balanced", "gluten-free", "dairy-free"], "allergens": [], "tags": ["loss", "hypertrophy", "maintenance"], "base": "Shawarma-spiced chicken thighs, turmeric rice, cucumber-tomato salad, pickles, garlic sauce.", "swaps": ["Vegan: crispy spiced chickpeas.", "Keto: cauliflower-rice tabbouleh instead of rice.", "Sesame-free as written; add tahini only if tolerated."]},
+      {"title": "Turkey Burger Power Plate", "diet": ["balanced", "dairy-free"], "allergens": ["wheat"], "tags": ["strength", "hypertrophy", "maintenance"], "base": "Grilled turkey burger on a whole-grain bun, baked potato wedges, side salad.", "swaps": ["Wheat: gluten-free bun or lettuce wrap.", "Vegan: black-bean patty.", "Keto: lettuce bun and roasted broccoli instead of wedges."]},
+      {"title": "Chipotle Chicken Quinoa Bowl", "diet": ["balanced", "gluten-free", "dairy-free"], "allergens": [], "tags": ["loss", "endurance", "maintenance"], "base": "Chipotle-rubbed chicken, quinoa, fajita peppers, corn, guacamole, lime.", "swaps": ["Vegan: pinto beans and extra fajita vegetables.", "Keto: cauliflower rice, skip corn, double guacamole.", "Top-nine allergen free as written."]},
+      {"title": "Steak Chimichurri Potato Plate", "diet": ["balanced", "gluten-free", "dairy-free"], "allergens": [], "tags": ["strength", "hypertrophy", "maintenance"], "base": "Grilled sirloin, crispy roasted potatoes, asparagus, herby chimichurri sauce.", "swaps": ["Vegan: grilled portobello caps with white beans.", "Keto: cauliflower mash instead of potatoes.", "Loss phase: flank or eye of round for a leaner cut."]},
+      {"title": "Korean Beef Rice Bowl", "diet": ["balanced", "gluten-free", "dairy-free"], "allergens": ["soy", "sesame"], "tags": ["strength", "hypertrophy", "endurance"], "base": "Lean ground beef in gluten-free gochujang-tamari sauce, rice, spinach, carrots, sesame seeds.", "swaps": ["Soy: coconut aminos sauce.", "Sesame: skip seeds, finish with olive oil.", "Vegan: seasoned tofu crumbles.", "Keto: cauliflower rice and extra spinach."]},
+      {"title": "Beef & Broccoli Stir-Fry", "diet": ["balanced", "gluten-free", "dairy-free"], "allergens": ["soy"], "tags": ["strength", "loss", "maintenance"], "base": "Flank steak strips, broccoli, garlic-ginger tamari sauce, steamed white rice.", "swaps": ["Soy: coconut aminos sauce.", "Vegan: king oyster mushrooms or tofu.", "Keto: cauliflower rice and double broccoli."]},
+      {"title": "Bison Meatloaf & Mash", "diet": ["balanced", "dairy-free"], "allergens": ["wheat", "eggs"], "tags": ["strength", "hypertrophy", "maintenance"], "base": "Lean bison meatloaf, olive-oil mashed potatoes, green beans, tomato glaze.", "swaps": ["Wheat: certified gluten-free oats as binder.", "Eggs: flax egg binder.", "Vegan: lentil-mushroom loaf.", "Keto: cauliflower mash instead of potatoes."]},
+      {"title": "Beef Kofta Couscous Plate", "diet": ["balanced", "dairy-free"], "allergens": ["wheat"], "tags": ["hypertrophy", "endurance", "maintenance"], "base": "Spiced beef kofta skewers, couscous, cucumber-tomato salad, fresh mint, lemon.", "swaps": ["Wheat: quinoa instead of couscous.", "Vegan: falafel skewers.", "Keto: cauliflower tabbouleh instead of couscous."]},
+      {"title": "Bison Chili Rice Bowl", "diet": ["balanced", "gluten-free", "dairy-free"], "allergens": [], "tags": ["loss", "strength", "maintenance"], "base": "Hearty bison chili with kidney beans and peppers served over steamed rice.", "swaps": ["Vegan: three-bean chili with extra lentils.", "Keto: serve over cauliflower rice, lighten the beans.", "Endurance days: add an extra scoop of rice."]},
+      {"title": "Carne Asada Street Plate", "diet": ["balanced", "gluten-free", "dairy-free"], "allergens": [], "tags": ["strength", "hypertrophy", "loss"], "base": "Citrus-marinated grilled steak, warm corn tortillas, charred peppers, onions, pico de gallo.", "swaps": ["Vegan: grilled portobello and black beans.", "Keto: lettuce wraps instead of tortillas.", "Endurance days: add cilantro-lime rice."]},
+      {"title": "Lean Beef Stroganoff Bowl", "diet": ["balanced"], "allergens": ["milk", "wheat"], "tags": ["hypertrophy", "maintenance"], "base": "Lean beef strips, mushrooms, Greek-yogurt stroganoff sauce, whole-wheat pasta, parsley.", "swaps": ["Milk: coconut cream with lemon instead of yogurt.", "Wheat: gluten-free pasta.", "Vegan: double mushrooms with white beans.", "Keto: zucchini noodles instead of pasta."]},
+      {"title": "Pork Chop Harvest Plate", "diet": ["balanced", "gluten-free", "dairy-free"], "allergens": [], "tags": ["strength", "hypertrophy", "maintenance"], "base": "Grilled boneless pork chop, roasted sweet potato, Brussels sprouts, crisp apple slaw.", "swaps": ["Vegan: maple-glazed tempeh.", "Keto: cauliflower mash instead of sweet potato.", "Top-nine allergen free as written."]},
+      {"title": "Cuban Mojo Pork Bowl", "diet": ["balanced", "gluten-free", "dairy-free"], "allergens": [], "tags": ["endurance", "hypertrophy", "maintenance"], "base": "Citrus-garlic mojo pork tenderloin, rice, black beans, sauteed peppers, lime.", "swaps": ["Vegan: mojo-marinated tofu with extra black beans.", "Keto: cauliflower rice, skip beans, add avocado.", "Loss phase: trim portions of rice, double the peppers."]},
+      {"title": "Pork Stir-Fry Noodle Bowl", "diet": ["balanced", "gluten-free", "dairy-free"], "allergens": ["soy"], "tags": ["loss", "endurance", "maintenance"], "base": "Pork tenderloin strips, rice noodles, snap peas, peppers, ginger-tamari sauce.", "swaps": ["Soy: coconut aminos sauce.", "Vegan: tofu strips.", "Keto: shirataki noodles and extra snap peas."]},
+      {"title": "Carnitas Taco Plate", "diet": ["balanced", "gluten-free", "dairy-free"], "allergens": [], "tags": ["loss", "hypertrophy", "maintenance"], "base": "Oven-crisped lean carnitas, corn tortillas, cabbage slaw, pico de gallo, lime.", "swaps": ["Vegan: mushroom-jackfruit carnitas.", "Keto: lettuce shells and extra guacamole.", "Loss phase: use pork tenderloin instead of shoulder."]},
+      {"title": "Honey Garlic Pork Rice Plate", "diet": ["balanced", "gluten-free", "dairy-free"], "allergens": ["soy"], "tags": ["strength", "endurance", "maintenance"], "base": "Honey-garlic glazed pork tenderloin, steamed rice, roasted green beans, scallions.", "swaps": ["Soy: coconut aminos in the glaze.", "Vegan: maple-garlic tofu.", "Keto: cauliflower rice and a sugar-free glaze."]},
+      {"title": "Lamb Gyro Rice Bowl", "diet": ["balanced", "gluten-free"], "allergens": ["milk"], "tags": ["hypertrophy", "strength", "maintenance"], "base": "Seasoned ground lamb, rice, tzatziki, cucumber-tomato salad, red onion, oregano.", "swaps": ["Milk: coconut-yogurt tzatziki.", "Vegan: baked falafel instead of lamb.", "Keto: cauliflower rice and extra salad."]},
+      {"title": "Lamb Kofta Skillet", "diet": ["balanced", "gluten-free", "dairy-free"], "allergens": [], "tags": ["loss", "hypertrophy", "maintenance"], "base": "One-pan lamb kofta simmered with spiced tomatoes, chickpeas, spinach, over quinoa.", "swaps": ["Vegan: extra chickpeas and mushrooms instead of lamb.", "Keto: serve over sauteed greens, skip quinoa.", "Loss phase: lean ground lamb or swap half for turkey."]},
+      {"title": "Sheet-Pan Sausage & Veggies", "diet": ["balanced", "gluten-free", "dairy-free"], "allergens": [], "tags": ["loss", "endurance", "maintenance"], "base": "Chicken sausage, baby potatoes, peppers, red onion, broccoli, roasted with olive oil.", "swaps": ["Vegan: plant-based sausage or seasoned tempeh.", "Keto: zucchini and mushrooms instead of potatoes.", "Check labels: choose a gluten-free, dairy-free sausage."]},
+      {"title": "Lean Cheeseburger Skillet", "diet": ["balanced"], "allergens": ["milk", "wheat"], "tags": ["hypertrophy", "strength"], "base": "Extra-lean ground beef, whole-wheat elbows, cheddar, diced tomatoes, pickles, mustard.", "swaps": ["Milk: dairy-free cheddar shreds.", "Wheat: chickpea pasta.", "Vegan: lentil crumbles and plant-based cheese.", "Keto: cauliflower florets instead of pasta."]},
+      {"title": "Sheet-Pan Greek Meatball Plate", "diet": ["balanced", "gluten-free", "dairy-free"], "allergens": ["eggs"], "tags": ["loss", "strength", "maintenance"], "base": "Beef-turkey blend meatballs, roasted potatoes, peppers, olives, lemon, oregano.", "swaps": ["Eggs: flax egg binder.", "Vegan: white-bean meatballs.", "Keto: zucchini instead of potatoes, extra olive oil."]},
+      {"title": "Garlic Shrimp Zoodles", "diet": ["keto", "pescatarian", "gluten-free", "dairy-free"], "allergens": ["shellfish"], "tags": ["loss", "maintenance"], "base": "Garlic shrimp sauteed in olive oil over zucchini noodles with tomatoes and basil.", "swaps": ["Shellfish allergy: chicken breast, white fish, or tofu.", "Higher carb: serve over whole-wheat spaghetti on endurance days.", "Higher protein: add extra shrimp or a side of edamame."]},
+      {"title": "Blackened Tilapia Tacos", "diet": ["balanced", "pescatarian", "gluten-free", "dairy-free"], "allergens": ["fish"], "tags": ["loss", "hypertrophy", "maintenance"], "base": "Blackened tilapia in corn tortillas with cabbage slaw and avocado-lime sauce.", "swaps": ["Fish allergy: blackened chicken or crispy tofu.", "Keto: serve in lettuce cups instead of tortillas.", "Higher protein: add black beans or an extra fillet."]},
+      {"title": "Halibut Citrus Quinoa Plate", "diet": ["balanced", "pescatarian", "gluten-free", "dairy-free"], "allergens": ["fish"], "tags": ["strength", "endurance", "maintenance"], "base": "Pan-seared halibut over lemon quinoa with roasted asparagus and herb dressing.", "swaps": ["Fish allergy: chicken thighs or white beans.", "Keto: swap quinoa for cauliflower rice.", "Budget: substitute cod or tilapia for halibut."]},
+      {"title": "Scallop Pea Risotto", "diet": ["balanced", "pescatarian", "gluten-free"], "allergens": ["shellfish", "milk"], "tags": ["strength", "hypertrophy", "maintenance"], "base": "Seared scallops over parmesan pea risotto with lemon and fresh chives.", "swaps": ["Shellfish allergy: seared chicken or firm white fish.", "Dairy allergy: use olive oil and nutritional yeast instead of parmesan.", "Loss phase: lighten the risotto portion and add extra scallops."]},
+      {"title": "Teriyaki Salmon Rice Bowl", "diet": ["balanced", "pescatarian", "gluten-free", "dairy-free"], "allergens": ["fish", "soy"], "tags": ["hypertrophy", "endurance", "strength"], "base": "Tamari-teriyaki glazed salmon over rice with steamed broccoli and pickled cucumber.", "swaps": ["Fish allergy: teriyaki chicken or tempeh.", "Soy allergy: coconut aminos glaze.", "Keto: swap rice for cauliflower rice."]},
+      {"title": "Cod Coconut Curry", "diet": ["balanced", "pescatarian", "gluten-free", "dairy-free"], "allergens": ["fish"], "tags": ["endurance", "maintenance", "loss"], "base": "Cod simmered in coconut curry sauce with spinach, served over jasmine rice.", "swaps": ["Fish allergy: chickpeas or chicken breast.", "Keto: serve over cauliflower rice.", "Higher protein: add shrimp or extra cod."]},
+      {"title": "Seared Tuna Nicoise", "diet": ["balanced", "pescatarian", "gluten-free", "dairy-free"], "allergens": ["fish", "eggs"], "tags": ["loss", "maintenance", "strength"], "base": "Seared tuna, boiled eggs, baby potatoes, green beans, olives, Dijon vinaigrette.", "swaps": ["Fish allergy: grilled chicken or white beans.", "Egg allergy: omit eggs and add extra tuna or chickpeas.", "Keto: swap potatoes for extra greens and avocado."]},
+      {"title": "Shrimp Veggie Fried Rice", "diet": ["balanced", "pescatarian", "gluten-free", "dairy-free"], "allergens": ["shellfish", "eggs", "soy"], "tags": ["hypertrophy", "endurance"], "base": "Shrimp fried rice with egg, peas, carrots, scallions, and tamari.", "swaps": ["Shellfish allergy: diced chicken or edamame.", "Egg allergy: omit egg and add extra shrimp or tofu.", "Soy allergy: season with coconut aminos.", "Loss phase: use half rice, half cauliflower rice."]},
+      {"title": "Mediterranean Sardine Pasta", "diet": ["balanced", "pescatarian", "dairy-free"], "allergens": ["fish", "wheat"], "tags": ["endurance", "maintenance", "strength"], "base": "Whole-wheat pasta with sardines, garlic, tomatoes, capers, olives, and parsley.", "swaps": ["Fish allergy: white beans or grilled chicken.", "Gluten allergy: use chickpea or brown rice pasta.", "Higher protein: add a second tin of sardines."]},
+      {"title": "Chili Lime Shrimp Fajitas", "diet": ["balanced", "pescatarian", "gluten-free", "dairy-free"], "allergens": ["shellfish"], "tags": ["loss", "hypertrophy", "maintenance"], "base": "Chili-lime shrimp with charred peppers and onions in warm corn tortillas.", "swaps": ["Shellfish allergy: chicken strips or portobello with black beans.", "Keto: serve fajita-style over salad without tortillas.", "Endurance: add cilantro-lime rice on the side."]},
+      {"title": "Miso Glazed Cod Bowl", "diet": ["balanced", "pescatarian", "gluten-free", "dairy-free"], "allergens": ["fish", "soy"], "tags": ["strength", "maintenance", "loss"], "base": "Miso-glazed cod over brown rice with bok choy and shredded carrots.", "swaps": ["Fish allergy: miso-glazed chicken or roasted eggplant with tofu.", "Soy allergy: use chickpea miso or a maple-ginger glaze.", "Keto: swap rice for sauteed greens."]},
+      {"title": "Pesto Salmon Penne", "diet": ["balanced", "pescatarian"], "allergens": ["fish", "wheat", "milk", "tree nuts"], "tags": ["hypertrophy", "endurance"], "base": "Baked salmon tossed with penne, basil-walnut pesto, and blistered cherry tomatoes.", "swaps": ["Fish allergy: grilled chicken or white beans.", "Tree nut allergy: make pesto with sunflower seeds.", "Gluten allergy: gluten-free penne.", "Dairy allergy: skip parmesan and use nutritional yeast."]},
+      {"title": "Halibut Sheet Pan Supper", "diet": ["balanced", "pescatarian", "gluten-free", "dairy-free"], "allergens": ["fish"], "tags": ["loss", "strength", "maintenance"], "base": "Sheet-pan halibut with baby potatoes, green beans, lemon, and olive oil.", "swaps": ["Fish allergy: chicken breast or tempeh.", "Keto: swap potatoes for zucchini and mushrooms.", "Budget: use cod or frozen white fish."]},
+      {"title": "Ahi Poke Bowl", "diet": ["balanced", "pescatarian", "gluten-free", "dairy-free"], "allergens": ["fish", "soy", "sesame"], "tags": ["hypertrophy", "loss", "maintenance"], "base": "Ahi tuna cubes over sushi rice with edamame, cucumber, avocado, tamari-sesame dressing.", "swaps": ["Fish allergy: marinated tofu poke.", "Soy allergy: coconut aminos dressing and omit edamame.", "Sesame allergy: skip sesame seeds and dress with olive oil.", "Keto: build over greens instead of rice."]},
+      {"title": "Sardine Greek Salad Plate", "diet": ["keto", "pescatarian", "gluten-free"], "allergens": ["fish", "milk"], "tags": ["loss", "maintenance"], "base": "Sardines over cucumber, tomato, olives, red onion, and feta with oregano vinaigrette.", "swaps": ["Fish allergy: grilled chicken or chickpeas.", "Dairy allergy: omit feta and add avocado.", "Endurance: add warm pita and extra vegetables."]},
+      {"title": "Chickpea Tikka Masala", "diet": ["balanced", "vegan", "vegetarian", "pescatarian", "gluten-free", "dairy-free"], "allergens": [], "tags": ["endurance", "hypertrophy", "maintenance"], "base": "Chickpeas simmered in coconut tikka sauce with spinach over basmati rice.", "swaps": ["Higher protein: stir in pan-seared tofu or extra chickpeas.", "Keto: serve over cauliflower rice.", "Milder: reduce the garam masala and chili."]},
+      {"title": "Tempeh Peanut Stir-Fry", "diet": ["balanced", "vegan", "vegetarian", "pescatarian", "gluten-free", "dairy-free"], "allergens": ["soy", "peanuts"], "tags": ["hypertrophy", "strength", "endurance"], "base": "Crispy tempeh with broccoli, peppers, and snap peas in peanut-lime sauce.", "swaps": ["Soy allergy: use chickpeas and coconut aminos.", "Peanut allergy: sunflower seed butter sauce.", "Endurance: serve over rice noodles."]},
+      {"title": "Black Bean Sweet Potato Chili", "diet": ["balanced", "vegan", "vegetarian", "pescatarian", "gluten-free", "dairy-free"], "allergens": [], "tags": ["endurance", "loss", "maintenance"], "base": "Smoky chili with black beans, sweet potato, tomatoes, and warming spices.", "swaps": ["Higher protein: add lentils or textured soy protein.", "Loss phase: top with Greek yogurt for extra protein.", "Strength: serve over rice with extra beans."]},
+      {"title": "Seitan Fajita Bowl", "diet": ["balanced", "vegan", "vegetarian", "pescatarian", "dairy-free"], "allergens": ["wheat"], "tags": ["strength", "hypertrophy"], "base": "Sliced seitan with charred peppers, onions, rice, black beans, and salsa.", "swaps": ["Gluten allergy: swap seitan for tofu or extra black beans.", "Keto: skip rice and beans; add guacamole over cauliflower rice.", "Higher protein: double the seitan portion."]},
+      {"title": "Lentil Bolognese Spaghetti", "diet": ["balanced", "vegan", "vegetarian", "pescatarian", "dairy-free"], "allergens": ["wheat"], "tags": ["endurance", "hypertrophy", "maintenance"], "base": "Hearty lentil-mushroom bolognese over whole-wheat spaghetti with fresh basil.", "swaps": ["Gluten allergy: brown rice or lentil pasta.", "Higher protein: use red lentil pasta and add hemp seeds.", "Keto: serve over zucchini noodles."]},
+      {"title": "Lentil Stuffed Peppers", "diet": ["balanced", "vegan", "vegetarian", "pescatarian", "gluten-free", "dairy-free"], "allergens": [], "tags": ["loss", "maintenance", "strength"], "base": "Bell peppers stuffed with lentils, quinoa, tomatoes, and herbs, baked until tender.", "swaps": ["Higher protein: mix in crumbled tempeh.", "Vegetarian: top with melted mozzarella.", "Keto: swap quinoa for riced cauliflower and add olives."]},
+      {"title": "Thai Red Curry Tofu", "diet": ["balanced", "vegan", "vegetarian", "pescatarian", "gluten-free", "dairy-free"], "allergens": ["soy"], "tags": ["maintenance", "endurance", "hypertrophy"], "base": "Tofu and mixed vegetables in coconut red curry, served over jasmine rice.", "swaps": ["Soy allergy: chickpeas or extra vegetables with cashews.", "Keto: cauliflower rice with extra coconut cream.", "Higher protein: use extra-firm tofu and add edamame."]},
+      {"title": "Edamame Soba Bowl", "diet": ["balanced", "vegan", "vegetarian", "pescatarian", "dairy-free"], "allergens": ["soy", "wheat", "sesame"], "tags": ["endurance", "loss", "maintenance"], "base": "Chilled soba noodles with edamame, cucumber, carrots, and sesame-ginger dressing.", "swaps": ["Soy allergy: swap edamame for chickpeas and use coconut aminos.", "Gluten allergy: 100% buckwheat soba or rice noodles.", "Sesame allergy: olive oil and ginger dressing.", "Higher protein: add baked tofu."]},
+      {"title": "White Bean Kale Pasta", "diet": ["balanced", "vegan", "vegetarian", "pescatarian", "dairy-free"], "allergens": ["wheat"], "tags": ["endurance", "maintenance"], "base": "Orecchiette with white beans, garlicky kale, chili flakes, and lemon olive oil.", "swaps": ["Gluten allergy: chickpea pasta.", "Higher protein: protein-enriched pasta and extra beans.", "Vegetarian: finish with shaved parmesan."]},
+      {"title": "Tempeh Taco Skillet", "diet": ["balanced", "vegan", "vegetarian", "pescatarian", "gluten-free", "dairy-free"], "allergens": ["soy"], "tags": ["hypertrophy", "loss", "strength"], "base": "Crumbled tempeh skillet with corn, black beans, peppers, and taco spices.", "swaps": ["Soy allergy: use lentils or mushroom-walnut crumbles.", "Keto: skip corn and beans; serve in lettuce cups with avocado.", "Endurance: pile into corn tortillas with rice."]},
+      {"title": "Chana Masala Plate", "diet": ["balanced", "vegan", "vegetarian", "pescatarian", "gluten-free", "dairy-free"], "allergens": [], "tags": ["endurance", "maintenance", "hypertrophy"], "base": "Spiced chickpea chana masala with tomatoes and onions over basmati rice.", "swaps": ["Higher protein: add pan-fried tofu cubes.", "Keto: serve over cauliflower rice with coconut oil.", "Loss phase: halve the rice and double the vegetables."]},
+      {"title": "Sesame Ginger Tofu Bowl", "diet": ["balanced", "vegan", "vegetarian", "pescatarian", "gluten-free", "dairy-free"], "allergens": ["soy", "sesame"], "tags": ["strength", "hypertrophy", "maintenance"], "base": "Baked sesame-ginger tofu over brown rice with roasted broccoli and carrots.", "swaps": ["Soy allergy: chickpeas with a coconut aminos glaze.", "Sesame allergy: swap sesame oil for avocado oil and skip the seeds.", "Keto: cauliflower rice base with extra tofu."]},
+      {"title": "Seitan Mushroom Stroganoff", "diet": ["balanced", "vegan", "vegetarian", "pescatarian", "dairy-free"], "allergens": ["wheat", "tree nuts"], "tags": ["strength", "hypertrophy"], "base": "Seared seitan and mushrooms in creamy cashew sauce over wide pasta noodles.", "swaps": ["Gluten allergy: use tofu instead of seitan with gluten-free noodles.", "Tree nut allergy: coconut cream or oat-based sauce.", "Higher protein: stir white beans into the sauce."]},
+      {"title": "Smoky Three Bean Chili", "diet": ["balanced", "vegan", "vegetarian", "pescatarian", "gluten-free", "dairy-free"], "allergens": [], "tags": ["endurance", "strength", "maintenance"], "base": "Kidney, pinto, and black beans in smoky chipotle-tomato chili with peppers.", "swaps": ["Higher protein: stir in crumbled tempeh.", "Loss phase: bulk with zucchini and mushrooms.", "Endurance: serve over a baked potato or rice."]},
+      {"title": "Mediterranean Lentil Bowl", "diet": ["balanced", "vegetarian", "pescatarian", "gluten-free"], "allergens": ["milk"], "tags": ["loss", "maintenance", "endurance"], "base": "Warm lentils with cucumber, tomato, olives, feta, and lemon-herb dressing.", "swaps": ["Dairy allergy: omit feta and add a tahini drizzle.", "Vegan: swap feta for avocado.", "Higher protein: add grilled halloumi or a boiled egg."]},
+      {"title": "Chicken Quinoa Power Bowl", "diet": ["balanced", "gluten-free", "dairy-free"], "allergens": [], "tags": ["strength", "hypertrophy", "maintenance"], "base": "Grilled chicken, quinoa, roasted peppers, spinach, olive oil and lemon.", "swaps": ["Vegan: baked tofu or tempeh instead of chicken.", "Loss: halve the quinoa, double the vegetables.", "Keto: replace quinoa with cauliflower rice."]},
+      {"title": "Salmon Avocado Salad", "diet": ["balanced", "keto", "pescatarian", "gluten-free", "dairy-free"], "allergens": ["fish"], "tags": ["loss", "maintenance"], "base": "Seared salmon over greens with avocado, cucumber, and olive oil vinaigrette.", "swaps": ["No fish: grilled chicken or baked tempeh.", "Endurance: add a scoop of cooked quinoa or rice.", "Budget: canned salmon works fine."]},
+      {"title": "Turkey Hummus Wrap", "diet": ["balanced", "dairy-free"], "allergens": ["wheat", "sesame"], "tags": ["loss", "strength", "maintenance"], "base": "Whole-wheat wrap with sliced turkey, hummus, spinach, tomato, and cucumber.", "swaps": ["Gluten-free: corn tortilla or lettuce wrap.", "No sesame: mashed white beans or guacamole instead of hummus.", "Hypertrophy: double the turkey and add avocado."]},
+      {"title": "Lentil Veggie Soup", "diet": ["balanced", "vegan", "vegetarian", "gluten-free", "dairy-free"], "allergens": [], "tags": ["loss", "endurance", "maintenance"], "base": "Red lentils simmered with carrots, celery, tomatoes, and cumin broth.", "swaps": ["Strength: stir in shredded chicken or extra lentils.", "Keto: swap lentils for cauliflower and add olive oil.", "Time-saver: use frozen chopped mirepoix."]},
+      {"title": "Shrimp Zoodle Stir-Fry", "diet": ["keto", "pescatarian", "gluten-free", "dairy-free"], "allergens": ["shellfish", "soy", "sesame"], "tags": ["loss", "maintenance"], "base": "Shrimp and zucchini noodles stir-fried with garlic, tamari, and sesame oil.", "swaps": ["No shellfish: chicken strips or firm tofu.", "No soy: coconut aminos instead of tamari.", "No sesame: finish with avocado or olive oil.", "Endurance: serve over jasmine rice."]},
+      {"title": "Steak Burrito Bowl", "diet": ["balanced", "gluten-free"], "allergens": ["milk"], "tags": ["strength", "hypertrophy"], "base": "Sliced steak, rice, black beans, salsa, shredded cheese, and Greek yogurt.", "swaps": ["Dairy-free: skip cheese and yogurt, add guacamole.", "Loss: half the rice, extra lettuce and salsa.", "Vegetarian: seasoned tofu and extra beans instead of steak."]},
+      {"title": "Mediterranean Chickpea Salad", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk"], "tags": ["loss", "endurance", "maintenance"], "base": "Chickpeas, cucumber, tomato, olives, feta, and red-wine vinaigrette.", "swaps": ["Dairy-free/vegan: omit feta, add extra olives and hemp seeds.", "Strength: add grilled chicken or canned tuna.", "Keto: swap chickpeas for diced avocado."]},
+      {"title": "Egg Fried Cauli-Rice", "diet": ["keto", "vegetarian", "gluten-free", "dairy-free"], "allergens": ["eggs", "soy"], "tags": ["loss", "maintenance"], "base": "Cauliflower rice scrambled with eggs, peas, scallions, and tamari.", "swaps": ["Egg-free: crumbled firm tofu with turmeric.", "No soy: coconut aminos instead of tamari.", "Strength: add diced chicken or shrimp."]},
+      {"title": "Chicken Caesar Pita", "diet": ["balanced"], "allergens": ["wheat", "milk", "eggs"], "tags": ["strength", "maintenance"], "base": "Grilled chicken, romaine, parmesan, and Caesar dressing in a pita.", "swaps": ["Gluten-free: serve as a salad or in a GF wrap.", "Dairy-free: skip parmesan, use a dairy-free dressing.", "Egg-free: olive-oil vinaigrette instead of Caesar.", "Loss: light dressing, extra romaine."]},
+      {"title": "Tofu Peanut Noodle Bowl", "diet": ["vegan", "vegetarian", "dairy-free"], "allergens": ["soy", "peanuts", "wheat"], "tags": ["hypertrophy", "endurance"], "base": "Baked tofu and wheat noodles tossed in peanut-lime sauce with slaw.", "swaps": ["No soy: grilled chicken and coconut aminos.", "No peanuts: sunflower-seed butter sauce.", "Gluten-free: rice noodles.", "Loss: half the noodles, double the slaw."]},
+      {"title": "White Bean Tuna Salad", "diet": ["balanced", "pescatarian", "gluten-free", "dairy-free"], "allergens": ["fish"], "tags": ["loss", "strength", "maintenance"], "base": "Canned tuna, white beans, red onion, parsley, lemon, and olive oil.", "swaps": ["No fish: chickpeas or shredded chicken instead of tuna.", "Endurance: serve over rice or with bread.", "Keto: swap beans for chopped celery and avocado."]},
+      {"title": "Fifteen-Minute Turkey Chili", "diet": ["balanced", "gluten-free", "dairy-free"], "allergens": [], "tags": ["strength", "loss", "maintenance"], "base": "Ground turkey, kidney beans, tomatoes, and chili spices simmered fast.", "swaps": ["Vegan: lentils or plant crumbles instead of turkey.", "Keto: skip beans, add zucchini and extra turkey.", "Endurance: serve over rice or a baked potato."]},
+      {"title": "Pre-Ride Bagel + Honey", "diet": ["balanced", "vegetarian", "dairy-free"], "allergens": ["wheat"], "tags": ["endurance", "strength"], "base": "Plain bagel with honey and sliced banana, eaten 60-90 minutes pre-session.", "swaps": ["Gluten-free: GF bagel or rice cakes.", "Vegan: maple syrup instead of honey.", "Closer to start: half portion, skip the banana."]},
+      {"title": "Tart Cherry Recovery Smoothie", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk"], "tags": ["endurance", "hypertrophy"], "base": "Tart cherry juice, whey protein, banana, and Greek yogurt blended cold.", "swaps": ["Dairy-free: pea protein and coconut yogurt.", "Loss: water base and skip the banana.", "Strength: blend in oats for extra carbs."]},
+      {"title": "Post-Lift Chicken Rice Cup", "diet": ["balanced", "gluten-free", "dairy-free"], "allergens": [], "tags": ["strength", "hypertrophy"], "base": "Microwave rice cup topped with rotisserie chicken and fresh salsa.", "swaps": ["Vegetarian: black beans and corn instead of chicken.", "Loss: half the rice, extra chicken.", "Endurance: add extra rice and a fruit cup."]},
+      {"title": "Pre-Session Fruit + Jerky", "diet": ["balanced", "gluten-free", "dairy-free"], "allergens": ["soy"], "tags": ["loss", "strength"], "base": "Beef jerky with an apple or grapes, 45-60 minutes before training.", "swaps": ["No soy: soy-free jerky or turkey sticks.", "Vegetarian: small protein shake instead of jerky.", "Long sessions: add a granola bar."]},
+      {"title": "Maple Peanut Energy Balls", "diet": ["balanced", "vegan", "vegetarian", "dairy-free"], "allergens": ["peanuts"], "tags": ["endurance", "maintenance"], "base": "Oats, peanut butter, maple syrup, and chia rolled into balls.", "swaps": ["No peanuts: sunflower-seed or almond butter.", "Gluten-free: certified GF oats.", "Higher protein: add a scoop of plant protein."]},
+      {"title": "Berry Recovery Yogurt Cup", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk"], "tags": ["hypertrophy", "loss"], "base": "Greek yogurt with mixed berries, honey, and a whey scoop stirred in.", "swaps": ["Dairy-free: coconut yogurt with pea protein.", "Endurance: add granola and banana.", "Loss: skip honey, use extra berries."]},
+      {"title": "Pre-Lift Turkey Toast", "diet": ["balanced", "dairy-free"], "allergens": ["wheat"], "tags": ["strength", "hypertrophy"], "base": "Sourdough toast with sliced turkey and a thin spread of jam.", "swaps": ["Gluten-free: GF bread or rice cakes.", "Vegetarian: cottage cheese instead of turkey (adds dairy).", "Bigger session: double the toast and jam."]},
+      {"title": "Mocha Recovery Shake", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk"], "tags": ["strength", "hypertrophy", "endurance"], "base": "Chocolate whey, cold-brew coffee, milk, and a frozen banana blended.", "swaps": ["Dairy-free: pea protein and oat milk.", "Evening lift: use decaf coffee.", "Loss: water instead of milk."]},
+      {"title": "Egg White Power Bowl", "diet": ["balanced", "vegetarian", "gluten-free", "dairy-free"], "allergens": ["eggs"], "tags": ["loss", "strength"], "base": "Scrambled egg whites over rice with spinach, salsa, and avocado.", "swaps": ["Egg-free: crumbled tofu with turmeric (adds soy).", "Hypertrophy: whole eggs and extra rice.", "Keto: skip rice, add extra avocado."]},
+      {"title": "Pineapple Cottage Cheese Bowl", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk"], "tags": ["hypertrophy", "maintenance"], "base": "Cottage cheese topped with pineapple chunks and a sprinkle of cinnamon.", "swaps": ["Dairy-free: soy yogurt with plant protein stirred in.", "Keto: swap pineapple for raspberries.", "Loss: low-fat cottage cheese with berries."]},
+      {"title": "Overnight Casein Oats", "diet": ["balanced", "vegetarian"], "allergens": ["milk"], "tags": ["hypertrophy", "strength", "maintenance"], "base": "Oats soaked overnight with casein protein, milk, and chia seeds.", "swaps": ["Dairy-free: plant protein with soy or oat milk.", "Gluten-free: certified GF oats.", "Loss: water base and half the oats."]},
+      {"title": "Deviled Egg Snack Plate", "diet": ["keto", "vegetarian", "gluten-free", "dairy-free"], "allergens": ["eggs"], "tags": ["loss", "maintenance"], "base": "Two deviled eggs with cucumber slices, olives, and cherry tomatoes.", "swaps": ["Egg-free: hummus with the same veggie plate (adds sesame).", "Strength: add a cheese stick (adds dairy).", "Loss: mash yolks with Greek yogurt instead of mayo (adds dairy)."]},
+      {"title": "Frozen Yogurt Protein Bark", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk", "tree nuts"], "tags": ["hypertrophy", "maintenance"], "base": "Greek yogurt mixed with whey, frozen with berries and chopped almonds.", "swaps": ["Dairy-free: coconut yogurt and plant protein.", "No tree nuts: pumpkin or sunflower seeds.", "Loss: skip nuts, use extra berries."]},
+      {"title": "Smoked Salmon Cucumber Bites", "diet": ["keto", "pescatarian", "gluten-free"], "allergens": ["fish", "milk"], "tags": ["loss", "maintenance"], "base": "Cucumber rounds topped with cream cheese, smoked salmon, and dill.", "swaps": ["No fish: sliced turkey breast instead of salmon.", "Dairy-free: mashed avocado instead of cream cheese.", "Strength: serve on rice crackers for extra carbs."]},
+      {"title": "Smoky Roasted Chickpea Crunch", "diet": ["balanced", "vegan", "vegetarian", "gluten-free", "dairy-free"], "allergens": [], "tags": ["loss", "endurance", "maintenance"], "base": "Chickpeas roasted crisp with smoked paprika, garlic, and olive oil.", "swaps": ["Keto: roasted almonds instead of chickpeas (adds tree nuts).", "Higher protein: pair with a protein shake.", "Low sodium: season with herbs only."]},
+      {"title": "PB Protein Celery Boats", "diet": ["keto", "vegetarian", "gluten-free"], "allergens": ["peanuts", "milk"], "tags": ["loss", "maintenance"], "base": "Celery sticks filled with peanut butter blended with vanilla whey.", "swaps": ["No peanuts: almond or sunflower-seed butter.", "Dairy-free: pea protein instead of whey.", "Hypertrophy: top with raisins for extra carbs."]},
+      {"title": "Vanilla Casein Pudding", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk"], "tags": ["hypertrophy", "strength", "maintenance"], "base": "Casein protein whisked thick with milk, topped with cinnamon and berries.", "swaps": ["Dairy-free: soy protein with soy milk, chilled to thicken.", "Keto: splash of heavy cream, skip berries.", "Endurance day: stir in granola (adds wheat)."]}
     ];
+
+    const desserts = [
+      {"title": "Black Bean Brownies", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["eggs"], "tags": ["loss", "maintenance", "hypertrophy"], "base": "Black beans, cocoa powder, eggs, oat flour, and maple syrup baked fudgy.", "swaps": ["Egg allergy: flax eggs.", "Lower sugar: swap maple for mashed dates.", "Extra protein: fold in chocolate whey."]},
+      {"title": "Protein Fudge Brownies", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk", "eggs", "tree nuts"], "tags": ["hypertrophy", "strength", "maintenance"], "base": "Almond flour, chocolate whey, eggs, Greek yogurt, cocoa, touch of honey.", "swaps": ["Dairy-free: plant protein and coconut yogurt.", "Egg allergy: flax egg.", "Nut allergy: oat flour.", "Keto: sweeten with monk fruit."]},
+      {"title": "Oatmeal Raisin Protein Cookies", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk", "eggs"], "tags": ["endurance", "maintenance", "hypertrophy"], "base": "Rolled oats, vanilla whey, egg, mashed banana, raisins, and cinnamon.", "swaps": ["Dairy-free: pea protein.", "Egg allergy: flax egg.", "Lower sugar: halve the raisins, add walnuts."]},
+      {"title": "Cinnamon Baked Apples", "diet": ["balanced", "vegan", "vegetarian", "gluten-free", "dairy-free"], "allergens": ["tree nuts"], "tags": ["loss", "maintenance"], "base": "Whole apples stuffed with oats, walnuts, cinnamon, and a little maple.", "swaps": ["Nut allergy: pumpkin seeds.", "Lower sugar: skip maple, add extra cinnamon.", "Extra protein: top with Greek yogurt."]},
+      {"title": "Blueberry Protein Muffins", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk", "eggs"], "tags": ["hypertrophy", "endurance", "maintenance"], "base": "Oat flour, vanilla whey, eggs, Greek yogurt, and fresh blueberries.", "swaps": ["Dairy-free: plant protein and coconut yogurt.", "Egg allergy: flax eggs.", "Lower sugar: rely on berries only, no honey."]},
+      {"title": "Chocolate Chip Banana Bread", "diet": ["balanced", "vegetarian"], "allergens": ["wheat", "eggs", "milk"], "tags": ["endurance", "maintenance", "strength"], "base": "Whole-wheat flour, ripe bananas, eggs, Greek yogurt, dark chocolate chips.", "swaps": ["Gluten-free: 1:1 gluten-free flour blend.", "Egg allergy: flax eggs.", "Dairy-free: coconut yogurt and dairy-free chips.", "Lower sugar: 85% dark chocolate, less of it."]},
+      {"title": "Cottage Cheese Cheesecake", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk", "eggs", "tree nuts"], "tags": ["hypertrophy", "loss", "maintenance"], "base": "Blended cottage cheese, eggs, vanilla, honey, pressed almond-flour crust.", "swaps": ["Dairy-free: silken tofu and coconut cream.", "Egg allergy: cornstarch slurry.", "Nut allergy: oat-flour crust.", "Keto: monk fruit instead of honey."]},
+      {"title": "Peanut Butter Oat Cookies", "diet": ["balanced", "vegan", "vegetarian", "gluten-free", "dairy-free"], "allergens": ["peanuts"], "tags": ["strength", "endurance", "maintenance"], "base": "Peanut butter, rolled oats, mashed banana, and a splash of maple.", "swaps": ["Peanut allergy: sunflower-seed butter.", "Lower sugar: skip maple, banana sweetens enough.", "Extra protein: mix in plant protein."]},
+      {"title": "Pumpkin Protein Bars", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk", "eggs"], "tags": ["hypertrophy", "maintenance", "endurance"], "base": "Pumpkin puree, oat flour, vanilla whey, eggs, pumpkin-pie spice.", "swaps": ["Dairy-free: plant protein.", "Egg allergy: flax eggs.", "Lower sugar: unsweetened, add cinnamon and vanilla."]},
+      {"title": "Carrot Cake Oat Squares", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk", "eggs", "tree nuts"], "tags": ["endurance", "maintenance", "loss"], "base": "Grated carrots, oats, eggs, Greek yogurt, walnuts, cinnamon, light maple.", "swaps": ["Dairy-free: coconut yogurt.", "Egg allergy: flax eggs.", "Nut allergy: raisins or pumpkin seeds.", "Lower sugar: skip maple, add extra carrot."]},
+      {"title": "Baked Cinnamon Pears", "diet": ["balanced", "vegan", "vegetarian", "gluten-free", "dairy-free"], "allergens": [], "tags": ["loss", "maintenance"], "base": "Halved pears roasted with cinnamon, vanilla, and a light maple drizzle.", "swaps": ["Lower sugar: skip maple entirely.", "Extra protein: serve over Greek yogurt.", "Add crunch: toasted pumpkin seeds."]},
+      {"title": "Lemon Ricotta Bake", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk", "eggs", "tree nuts"], "tags": ["hypertrophy", "maintenance"], "base": "Ricotta, eggs, lemon zest, almond flour, and a little honey, baked custardy.", "swaps": ["Dairy-free: blended silken tofu.", "Egg allergy: not recommended; try the chia pudding card.", "Nut allergy: oat flour.", "Keto: erythritol instead of honey."]},
+      {"title": "Flourless Almond Chocolate Cake", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["tree nuts", "eggs"], "tags": ["strength", "maintenance"], "base": "Almond flour, eggs, dark chocolate, cocoa, and a small maple pour.", "swaps": ["Nut allergy: sunflower-seed flour.", "Egg allergy: aquafaba, whipped.", "Keto: monk fruit and 90% chocolate."]},
+      {"title": "Banana Nice Cream", "diet": ["balanced", "vegan", "vegetarian", "gluten-free", "dairy-free"], "allergens": [], "tags": ["loss", "endurance", "maintenance"], "base": "Frozen bananas blended with cocoa and vanilla until soft-serve smooth.", "swaps": ["Extra protein: blend in plant protein.", "Lower sugar: use just-ripe bananas.", "Richer: spoon of peanut or almond butter."]},
+      {"title": "Chocolate Protein Ice Cream", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk"], "tags": ["hypertrophy", "strength", "maintenance"], "base": "Greek yogurt, chocolate whey, cocoa, and frozen banana churned creamy.", "swaps": ["Dairy-free: coconut yogurt and pea protein.", "Lower sugar: skip banana, add stevia.", "Keto: heavy-cream base with monk fruit."]},
+      {"title": "Greek Yogurt Berry Bark", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk"], "tags": ["loss", "maintenance", "hypertrophy"], "base": "Greek yogurt spread thin with mixed berries, honey drizzle, dark chocolate shards.", "swaps": ["Dairy-free: coconut yogurt.", "Lower sugar: skip honey, berries carry it.", "Extra protein: stir vanilla whey into yogurt."]},
+      {"title": "Dark Chocolate Frozen Grapes", "diet": ["balanced", "vegan", "vegetarian", "gluten-free", "dairy-free"], "allergens": ["soy"], "tags": ["loss", "maintenance"], "base": "Frozen grapes half-dipped in melted dark chocolate with sea salt.", "swaps": ["Soy allergy: soy-lecithin-free dark chocolate.", "Lower sugar: 85% chocolate or plain frozen grapes.", "Add crunch: roll in crushed pistachios."]},
+      {"title": "Mango Coconut Sorbet", "diet": ["balanced", "vegan", "vegetarian", "gluten-free", "dairy-free"], "allergens": ["tree nuts"], "tags": ["endurance", "loss", "maintenance"], "base": "Frozen mango blended with coconut milk and fresh lime juice.", "swaps": ["Coconut allergy: banana or oat-milk base.", "Lower sugar: add lime zest, cut mango with cucumber.", "Extra protein: blend in unflavored plant protein."]},
+      {"title": "Peanut Butter Fudge Pops", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk", "peanuts"], "tags": ["strength", "hypertrophy", "maintenance"], "base": "Greek yogurt, peanut butter, cocoa, and banana blended, then frozen in molds.", "swaps": ["Dairy-free: coconut yogurt.", "Peanut allergy: sunflower-seed butter.", "Lower sugar: skip banana, add stevia."]},
+      {"title": "Strawberry Cheesecake Pops", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk"], "tags": ["loss", "hypertrophy", "maintenance"], "base": "Blended cottage cheese, strawberries, vanilla, and honey frozen on sticks.", "swaps": ["Dairy-free: silken tofu and coconut cream.", "Lower sugar: skip honey, add extra vanilla.", "Extra protein: add vanilla whey."]},
+      {"title": "Frozen Yogurt Blueberry Bites", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk"], "tags": ["loss", "maintenance"], "base": "Blueberries coated in vanilla Greek yogurt and frozen into poppable bites.", "swaps": ["Dairy-free: coconut or soy yogurt.", "Lower sugar: plain yogurt with cinnamon.", "Bigger batch: swap in halved grapes too."]},
+      {"title": "Watermelon Lime Granita", "diet": ["balanced", "vegan", "vegetarian", "gluten-free", "dairy-free"], "allergens": [], "tags": ["loss", "endurance"], "base": "Blended watermelon and lime frozen, then scraped into icy flakes with mint.", "swaps": ["Lower sugar: already no added sugar.", "Extra flavor: pinch of sea salt.", "Post-workout: pair with a protein shake."]},
+      {"title": "Mocha Protein Pops", "diet": ["balanced", "keto", "vegetarian", "gluten-free"], "allergens": ["milk"], "tags": ["loss", "strength", "maintenance"], "base": "Cold-brew coffee, chocolate whey, cocoa, and stevia frozen into pops.", "swaps": ["Dairy-free: plant protein.", "Caffeine-free: decaf cold brew.", "Creamier: splash of coconut cream."]},
+      {"title": "Cherry Chocolate Nice Cream", "diet": ["balanced", "vegan", "vegetarian", "gluten-free", "dairy-free"], "allergens": [], "tags": ["endurance", "maintenance", "loss"], "base": "Frozen cherries and banana blended with cocoa and vanilla.", "swaps": ["Extra protein: blend in plant protein.", "Lower sugar: more cherries, less banana.", "Recovery boost: tart-cherry concentrate splash."]},
+      {"title": "Matcha Yogurt Bark", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk", "tree nuts"], "tags": ["maintenance", "loss", "hypertrophy"], "base": "Greek yogurt whisked with matcha and honey, topped with pistachios, frozen flat.", "swaps": ["Dairy-free: coconut yogurt.", "Nut allergy: pumpkin seeds or cacao nibs.", "Lower sugar: skip honey, add vanilla."]},
+      {"title": "Coconut Chocolate Chia Pudding", "diet": ["balanced", "vegan", "vegetarian", "gluten-free", "dairy-free"], "allergens": [], "tags": ["loss", "endurance", "maintenance"], "base": "Chia seeds, coconut milk, cocoa powder, maple syrup, and vanilla, chilled overnight.", "swaps": ["Lower sugar: swap maple for monk fruit.", "Extra protein: stir in chocolate plant protein.", "More texture: top with cacao nibs and berries."]},
+      {"title": "Vanilla Protein Chia Pudding", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk"], "tags": ["hypertrophy", "strength", "maintenance"], "base": "Chia seeds soaked in milk with vanilla whey, cinnamon, and sliced banana.", "swaps": ["Dairy-free: almond milk and plant protein.", "Lower sugar: skip banana, top with raspberries.", "Extra fiber: stir in ground flaxseed."]},
+      {"title": "Stuffed Medjool Dates", "diet": ["balanced", "vegan", "vegetarian", "gluten-free", "dairy-free"], "allergens": ["tree nuts"], "tags": ["strength", "endurance", "maintenance"], "base": "Medjool dates stuffed with almond butter, topped with dark chocolate and sea salt.", "swaps": ["Nut allergy: sunflower-seed butter.", "Lower sugar: half-date portions, skip the chocolate.", "Extra protein: mix vanilla protein into the nut butter."]},
+      {"title": "Greek Yogurt Chocolate Mousse", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk"], "tags": ["loss", "hypertrophy", "maintenance"], "base": "Greek yogurt whipped with cocoa powder, honey, and vanilla, chilled until set.", "swaps": ["Dairy-free: coconut or soy yogurt.", "Lower sugar: skip honey, sweeten with stevia.", "Extra protein: fold in chocolate whey."]},
+      {"title": "Avocado Cacao Mousse", "diet": ["balanced", "keto", "vegan", "vegetarian", "gluten-free", "dairy-free"], "allergens": [], "tags": ["loss", "maintenance"], "base": "Ripe avocado blended with cacao powder, coconut milk, vanilla, and monk-fruit sweetener.", "swaps": ["Sweeter: use maple syrup instead of monk fruit.", "Extra protein: blend in chocolate plant protein.", "More texture: top with raspberries and cacao nibs."]},
+      {"title": "Peanut Cocoa Energy Balls", "diet": ["balanced", "vegan", "vegetarian", "gluten-free", "dairy-free"], "allergens": ["peanuts"], "tags": ["endurance", "strength"], "base": "Dates, natural peanut butter, cocoa powder, and chia seeds rolled into balls.", "swaps": ["Peanut allergy: sunflower-seed butter.", "Lower sugar: fewer dates, add vanilla protein.", "Crunch: roll in hemp seeds."]},
+      {"title": "Oat Peanut Butter Bites", "diet": ["balanced", "vegetarian"], "allergens": ["peanuts", "milk"], "tags": ["endurance", "strength", "hypertrophy"], "base": "Rolled oats, peanut butter, honey, ground flax, and mini dark-chocolate chips.", "swaps": ["Peanut allergy: almond or sunflower-seed butter.", "Dairy-free: dairy-free dark chocolate chips.", "Lower sugar: swap honey for mashed banana.", "Gluten-free: certified gluten-free oats."]},
+      {"title": "Berry Ricotta Parfait", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk", "tree nuts"], "tags": ["hypertrophy", "maintenance"], "base": "Ricotta layered with mixed berries, a honey drizzle, and toasted almond slivers.", "swaps": ["Nut allergy: toasted pumpkin seeds.", "Dairy-free: thick coconut yogurt.", "Lower sugar: skip honey, add cinnamon."]},
+      {"title": "No-Bake Cheesecake Cups", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk", "tree nuts"], "tags": ["hypertrophy", "maintenance", "loss"], "base": "Greek yogurt and light cream cheese layered over a pressed date-walnut crust.", "swaps": ["Nut allergy: date and gluten-free oat crumb crust.", "Dairy-free: coconut yogurt and dairy-free cream cheese.", "Lower sugar: sweeten with stevia, top with berries."]},
+      {"title": "Chocolate Cherry Overnight Oats", "diet": ["balanced", "vegetarian"], "allergens": ["milk"], "tags": ["endurance", "hypertrophy"], "base": "Oats soaked in milk with cocoa, dark cherries, and a Greek yogurt swirl.", "swaps": ["Dairy-free: soy milk and coconut yogurt.", "Gluten-free: certified gluten-free oats.", "Extra protein: stir in chocolate whey."]},
+      {"title": "Dark Chocolate Strawberries", "diet": ["balanced", "vegan", "vegetarian", "gluten-free", "dairy-free"], "allergens": ["soy"], "tags": ["loss", "maintenance"], "base": "Fresh strawberries dipped in 70 percent dark chocolate, chilled until the shell sets.", "swaps": ["Soy allergy: lecithin-free dark chocolate.", "Lower sugar: use 85 percent chocolate.", "Extra protein: serve with a Greek yogurt dip."]},
+      {"title": "Mango Coconut Chia Parfait", "diet": ["balanced", "vegan", "vegetarian", "gluten-free", "dairy-free"], "allergens": [], "tags": ["endurance", "loss", "maintenance"], "base": "Chia pudding layered with fresh mango, coconut yogurt, and toasted coconut flakes.", "swaps": ["Lower sugar: unsweetened yogurt with lime zest.", "Extra protein: stir in vanilla plant protein.", "Berry version: swap mango for raspberries."]},
+      {"title": "Tahini Date Bites", "diet": ["balanced", "vegan", "vegetarian", "gluten-free", "dairy-free"], "allergens": ["sesame"], "tags": ["endurance", "strength"], "base": "Dates, tahini, cacao nibs, and sea salt rolled into two-bite balls.", "swaps": ["Sesame allergy: sunflower-seed butter.", "Lower sugar: smaller bites, add hemp seeds.", "Extra protein: roll in vanilla plant protein."]},
+      {"title": "Cashew Berry Cream Cups", "diet": ["balanced", "vegan", "vegetarian", "gluten-free", "dairy-free"], "allergens": ["tree nuts"], "tags": ["maintenance", "endurance"], "base": "Soaked cashews blended with maple and vanilla, layered over crushed mixed berries.", "swaps": ["Nut allergy: silken-tofu cream (contains soy).", "Lower sugar: sweeten with monk fruit.", "Extra protein: blend in vanilla plant protein."]},
+      {"title": "Cottage Cheese Cookie Dough", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk", "peanuts"], "tags": ["hypertrophy", "strength", "loss"], "base": "Blended cottage cheese, vanilla protein, peanut butter, and mini dark-chocolate chips.", "swaps": ["Peanut allergy: sunflower-seed butter.", "Dairy-free: silken tofu and plant protein.", "Lower sugar: swap chips for cacao nibs."]},
+      {"title": "Chickpea Cookie Dough Dip", "diet": ["balanced", "vegan", "vegetarian", "gluten-free", "dairy-free"], "allergens": ["peanuts"], "tags": ["strength", "hypertrophy", "endurance"], "base": "Chickpeas blended with peanut butter, maple, vanilla, and a handful of cacao nibs.", "swaps": ["Peanut allergy: tahini or sunflower-seed butter.", "Lower sugar: halve the maple.", "Extra protein: blend in vanilla plant protein."]},
+      {"title": "Lemon Yogurt Mousse Cups", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk"], "tags": ["loss", "maintenance"], "base": "Greek yogurt whipped with lemon zest, honey, and vanilla, chilled in small cups.", "swaps": ["Dairy-free: coconut yogurt.", "Lower sugar: monk fruit instead of honey.", "Extra protein: fold in vanilla whey."]},
+      {"title": "Chocolate Protein Pudding Cups", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk"], "tags": ["hypertrophy", "strength", "loss"], "base": "Casein protein whisked with milk and cocoa into a thick, chilled pudding.", "swaps": ["Dairy-free: plant protein with almond milk.", "Lower sugar: add a pinch of stevia, not syrup.", "More texture: top with berries and cacao nibs."]},
+      {"title": "Apple Nachos", "diet": ["balanced", "vegan", "vegetarian", "gluten-free", "dairy-free"], "allergens": ["peanuts"], "tags": ["loss", "endurance"], "base": "Crisp apple slices drizzled with warmed peanut butter, dark chocolate, and hemp seeds.", "swaps": ["Peanut allergy: almond or sunflower-seed butter.", "Lower sugar: skip chocolate, dust with cinnamon.", "Extra protein: add a Greek yogurt dip."]},
+      {"title": "Pumpkin Pie Chia Pudding", "diet": ["balanced", "vegan", "vegetarian", "gluten-free", "dairy-free"], "allergens": ["tree nuts"], "tags": ["loss", "endurance", "maintenance"], "base": "Chia seeds, pumpkin puree, almond milk, pumpkin-pie spice, and a little maple.", "swaps": ["Nut allergy: oat or coconut milk.", "Lower sugar: reduce maple, add stevia.", "Extra protein: stir in vanilla plant protein."]},
+      {"title": "Tiramisu Overnight Oats", "diet": ["balanced", "vegetarian"], "allergens": ["milk"], "tags": ["endurance", "hypertrophy"], "base": "Oats soaked in cold-brew coffee and milk, layered with vanilla Greek yogurt and cocoa.", "swaps": ["Dairy-free: soy milk and coconut yogurt.", "Gluten-free: certified gluten-free oats.", "Extra protein: stir in vanilla whey."]},
+      {"title": "Banana Split Yogurt Bowl", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk", "tree nuts"], "tags": ["hypertrophy", "endurance", "maintenance"], "base": "Split banana topped with Greek yogurt, dark chocolate shavings, and crushed walnuts.", "swaps": ["Nut allergy: toasted pumpkin seeds.", "Dairy-free: coconut yogurt.", "Lower sugar: use 85 percent chocolate."]},
+      {"title": "Almond Joy Bites", "diet": ["balanced", "vegan", "vegetarian", "gluten-free", "dairy-free"], "allergens": ["tree nuts"], "tags": ["endurance", "maintenance"], "base": "Shredded coconut, dates, and almonds pressed into bites, coated in dark chocolate.", "swaps": ["Nut allergy: swap almonds for pumpkin seeds.", "Lower sugar: fewer dates, 85 percent chocolate.", "Extra protein: add plant protein to the coconut base."]},
+      {"title": "Key Lime Protein Cups", "diet": ["balanced", "vegetarian", "gluten-free"], "allergens": ["milk"], "tags": ["loss", "hypertrophy"], "base": "Greek yogurt blended with lime juice, zest, vanilla whey, and a touch of honey.", "swaps": ["Dairy-free: coconut yogurt and plant protein.", "Lower sugar: skip honey, add stevia.", "Crunch: top with crushed pistachios (adds tree nuts)."]},
+      {"title": "Chocolate Dessert Hummus", "diet": ["balanced", "vegan", "vegetarian", "gluten-free", "dairy-free"], "allergens": ["sesame"], "tags": ["loss", "endurance", "maintenance"], "base": "Chickpeas blended with cocoa, maple, tahini, and vanilla; serve with strawberries.", "swaps": ["Sesame allergy: sunflower-seed butter.", "Lower sugar: halve the maple.", "Extra protein: blend in chocolate plant protein."]}
+    ]; // DESSERTS_END
 
     const ids = ["weight", "sex", "goal", "diet", "training", "allergies", "workoutMinutes", "heat", "waterLogged", "preWeight", "postWeight"];
 
@@ -831,6 +795,28 @@
       });
     }
 
+    function renderDesserts() {
+      const diet = document.getElementById("diet").value;
+      const grid = document.getElementById("dessertGrid");
+      grid.innerHTML = "";
+      desserts.forEach(item => {
+        // Desserts filter on diet style + allergies only — any goal can fit a smart dessert.
+        const dietOk = diet === "balanced" || item.diet.includes(diet) || item.swaps.join(" ").toLowerCase().includes(diet);
+        const conflict = allergyHit(item);
+        const card = document.createElement("article");
+        card.className = `meal span-6${dietOk ? "" : " hidden"}`;
+        const status = conflict ? '<span class="status">Needs allergy swap</span>' : '<span class="status">Fits current allergy list</span>';
+        card.innerHTML = `
+          <h3>${item.title}</h3>
+          ${status}
+          <p>${item.base}</p>
+          <strong>Substitutes</strong>
+          <ul>${item.swaps.map(s => `<li>${s}</li>`).join("")}</ul>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
     function update() {
       const macros = macroTargets();
       const fluids = hydrationTargets();
@@ -851,6 +837,7 @@
       ].concat(selectedAllergies().map(a => `Avoid: ${a}`));
       document.getElementById("activeChips").innerHTML = chips.map(c => `<span class="chip">${c}</span>`).join("");
       renderMeals();
+      renderDesserts();
     }
 
     document.querySelectorAll(".tab").forEach(button => {
