@@ -39,10 +39,10 @@ body {
   overflow-y: auto;
 }
 
-.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; padding: 0 4px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; padding: 0 4px; flex-shrink: 0; }
 .brand-mark { color: var(--accent); }
 
-.nav { display: flex; flex-direction: column; gap: 6px; }
+.nav { display: flex; flex-direction: column; gap: 6px; flex-shrink: 0; }
 .nav-btn {
   display: flex; align-items: center; gap: 10px;
   width: 100%; text-align: left;
@@ -54,7 +54,8 @@ body {
 .nav-btn.active { background: var(--accent-soft); border-color: var(--accent); }
 .nav-icon { font-size: 16px; }
 
-.panel { display: flex; flex-direction: column; gap: 8px; min-height: 0; }
+/* flex-shrink: 0 so long lists push sections down (sidebar scrolls) instead of overlapping them */
+.panel { display: flex; flex-direction: column; gap: 8px; flex-shrink: 0; }
 .panel-head { display: flex; align-items: center; justify-content: space-between; padding: 0 4px; }
 .panel-head h2 {
   font-size: 11px; letter-spacing: .08em; text-transform: uppercase;
@@ -80,7 +81,7 @@ body {
 .list-empty { padding: 8px 10px; color: var(--muted); font-size: 13px; }
 
 .sidebar-foot {
-  margin-top: auto; padding: 10px 6px 2px; border-top: 1px solid var(--line);
+  margin-top: auto; flex-shrink: 0; padding: 10px 6px 2px; border-top: 1px solid var(--line);
   display: flex; align-items: center; justify-content: space-between; gap: 8px;
 }
 .user-email {
