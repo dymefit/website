@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import * as api from "../lib/api";
 import { PROGRAM_TYPES, LEVELS } from "../lib/constants";
 import Modal from "./Modal.jsx";
@@ -21,6 +21,10 @@ export default function Sidebar({
 }) {
   const [clientModal, setClientModal] = useState(false);
   const [programModal, setProgramModal] = useState(false);
+  // Collapse state for the selected client's program group. Selecting a
+  // client always expands it; the chevron / second click folds it shut.
+  const [collapsed, setCollapsed] = useState(false);
+  useEffect(() => { setCollapsed(false); }, [selectedClient?.id]);
 
   // Coach access to the members-only guide (same authed flow as the portal).
   function openNutritionGuide() {
@@ -60,54 +64,51 @@ export default function Sidebar({
         </button>
       </nav>
 
-      {/* Clients */}
+      {/* Clients & their programs — collapsible tree */}
       <div className="panel">
         <div className="panel-head">
-          <h2>Clients</h2>
+          <h2>Clients &amp; Programs</h2>
           <button className="icon-btn" onClick={() => setClientModal(true)} title="Add client" aria-label="Add client">+</button>
         </div>
         <ul className="list">
           {clients.length === 0 && <li className="list-empty">No clients yet</li>}
-          {clients.map((c) => (
-            <li
-              key={c.id}
-              className={"list-item" + (selectedClient?.id === c.id ? " active" : "")}
-              onClick={() => onSelectClient(c)}
-            >
-              <span>{c.name}</span>
-              <span className="meta">{c.goal || ""}</span>
-            </li>
-          ))}
-        </ul>
-      </div>
-
-      {/* Programs */}
-      <div className="panel">
-        <div className="panel-head">
-          <h2>Programs</h2>
-          <button
-            className="icon-btn"
-            onClick={() => selectedClient && setProgramModal(true)}
-            title={selectedClient ? "Add program" : "Select a client first"}
-            aria-label="Add program"
-            disabled={!selectedClient}
-          >+</button>
-        </div>
-        <ul className="list">
-          {!selectedClient && <li className="list-empty">Select a client</li>}
-          {selectedClient && programs.length === 0 && (
-            <li className="list-empty">No programs yet</li>
-          )}
-          {programs.map((p) => (
-            <li
-              key={p.id}
-              className={"list-item" + (selectedProgram?.id === p.id ? " active" : "")}
-              onClick={() => onSelectProgram(p)}
-            >
-              <span>{p.name}</span>
-              <span className="meta">{p.weeks}w</span>
-            </li>
-          ))}
+          {clients.map((c) => {
+            const isSel = selectedClient?.id === c.id;
+            const isOpen = isSel && !collapsed;
+            return (
+              <li key={c.id} className="tree-group">
+                <button
+                  className={"list-item tree-row" + (isSel ? " active" : "")}
+                  aria-expanded={isOpen}
+                  onClick={() => (isSel ? setCollapsed(!collapsed) : onSelectClient(c))}
+                >
+                  <span className="tree-caret" aria-hidden="true">{isOpen ? "▾" : "▸"}</span>
+                  <span className="tree-name">{c.name}</span>
+                  <span className="meta">{c.goal || ""}</span>
+                </button>
+                {isOpen && (
+                  <ul className="list nested">
+                    {programs.length === 0 && <li className="list-empty">No programs yet</li>}
+                    {programs.map((p) => (
+                      <li
+                        key={p.id}
+                        className={"list-item" + (selectedProgram?.id === p.id ? " active" : "")}
+                        onClick={() => onSelectProgram(p)}
+                      >
+                        <span>{p.name}</span>
+                        <span className="meta">{p.weeks}w</span>
+                      </li>
+                    ))}
+                    <li>
+                      <button className="list-item add-inline" onClick={() => setProgramModal(true)}>
+                        ＋ New program
+                      </button>
+                    </li>
+                  </ul>
+                )}
+              </li>
+            );
+          })}
         </ul>
       </div>
 

@@ -48,6 +48,7 @@ export default function CoachApp({ user, onSignOut }) {
 
   useEffect(() => {
     if (selectedClient) {
+      setPrograms([]); // clear immediately so the tree never shows the previous client's programs
       refreshPrograms(selectedClient.id)
         .then((ps) => setSelectedProgram(ps[0] ?? null))
         .catch((e) => setError(e.message));

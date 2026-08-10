@@ -76,6 +76,25 @@ body {
   padding: 8px 10px; border-radius: 8px; cursor: pointer; transition: background .12s;
 }
 .list-item:hover { background: var(--panel-2); }
+
+/* Collapsible client/program tree */
+.tree-group { display: flex; flex-direction: column; }
+button.tree-row {
+  width: 100%; background: transparent; border: none; color: var(--text);
+  font: inherit; text-align: left; gap: 6px;
+}
+.tree-caret { color: var(--muted); font-size: 10px; flex-shrink: 0; width: 12px; }
+.tree-row.active .tree-caret { color: inherit; }
+.tree-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.list.nested {
+  margin: 2px 0 6px 13px; padding-left: 9px;
+  border-left: 1px solid var(--line);
+}
+.list-item.add-inline {
+  width: 100%; background: transparent; border: 1px dashed var(--line);
+  color: var(--muted); font: inherit; font-size: 13px; text-align: left; cursor: pointer;
+}
+.list-item.add-inline:hover { color: var(--accent); border-color: var(--accent); background: transparent; }
 .list-item.active { background: var(--accent-soft); color: #fff; }
 .list-item .meta { font-size: 11px; color: var(--muted); }
 .list-empty { padding: 8px 10px; color: var(--muted); font-size: 13px; }
