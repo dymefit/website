@@ -5,7 +5,7 @@ import { projectLoad, isPowerPattern, POWER_MIN_REPS, coeffFor } from "../lib/pr
 import { defaultRestForType } from "../lib/rest";
 import Modal from "./Modal.jsx";
 
-export default function ProgramView({ client, clients, program, onProgramsChanged, onSelectProgram }) {
+export default function ProgramView({ client, clients, programs = [], program, onProgramsChanged, onSelectProgram }) {
   const [copyModal, setCopyModal] = useState(false);
   const [days, setDays] = useState([]);
   const [loading, setLoading] = useState(false);
@@ -48,11 +48,34 @@ export default function ProgramView({ client, clients, program, onProgramsChange
   }, [week, weekNotes]);
 
   if (!program) {
+    // A client is selected but no program yet: show every program they have.
+    if (client && programs.length > 0) {
+      return (
+        <>
+          <div className="content-header">
+            <div>
+              <h1>{client.name}</h1>
+              <div className="sub">{programs.length} program{programs.length === 1 ? "" : "s"} — pick one to open</div>
+            </div>
+          </div>
+          <div className="prog-overview">
+            {programs.map((p) => (
+              <button key={p.id} className="prog-card" onClick={() => onSelectProgram(p)}>
+                <span className="prog-card-name">{p.name}</span>
+                <span className="prog-card-meta">
+                  {[p.type, p.level, p.weeks ? `${p.weeks} weeks` : null].filter(Boolean).join(" · ")}
+                </span>
+              </button>
+            ))}
+          </div>
+        </>
+      );
+    }
     return (
       <div className="placeholder">
         <div>
           <div className="big">📋</div>
-          <p>Select a client and program to view it here.</p>
+          <p>{client ? "No programs yet — add one from the sidebar." : "Select a client to see their programs."}</p>
         </div>
       </div>
     );

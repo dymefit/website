@@ -49,9 +49,8 @@ export default function CoachApp({ user, onSignOut }) {
   useEffect(() => {
     if (selectedClient) {
       setPrograms([]); // clear immediately so the tree never shows the previous client's programs
-      refreshPrograms(selectedClient.id)
-        .then((ps) => setSelectedProgram(ps[0] ?? null))
-        .catch((e) => setError(e.message));
+      setSelectedProgram(null); // land on the all-programs overview, not an auto-picked program
+      refreshPrograms(selectedClient.id).catch((e) => setError(e.message));
     } else {
       setPrograms([]);
       setSelectedProgram(null);
@@ -68,7 +67,7 @@ export default function CoachApp({ user, onSignOut }) {
         selectedClient={selectedClient}
         selectedProgram={selectedProgram}
         view={view}
-        onSelectClient={setSelectedClient}
+        onSelectClient={(c) => { setSelectedClient(c); setView("programs"); }}
         onSelectProgram={(p) => { setSelectedProgram(p); setView("programs"); setMobileSide(false); }}
         onSetView={(v) => { setView(v); setMobileSide(false); }}
         onClientsChanged={refreshClients}
@@ -97,6 +96,7 @@ export default function CoachApp({ user, onSignOut }) {
           <ProgramView
             client={selectedClient}
             clients={clients}
+            programs={programs}
             program={selectedProgram}
             onProgramsChanged={() => refreshPrograms(selectedClient?.id)}
             onSelectProgram={setSelectedProgram}
