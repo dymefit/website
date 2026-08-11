@@ -302,6 +302,16 @@ table.exercises tr.progressed td.name { position: relative; }
 .prog-card-name { font-weight: 600; font-size: 15px; }
 .prog-card-meta { font-size: 12px; color: var(--muted); }
 
+/* Exercise demo videos */
+.demo-link { margin-left: 6px; color: var(--accent); }
+.demo-toggle { display: inline-block; }
+.video-embed {
+  margin: 8px 0; width: 100%; max-width: 560px;
+  aspect-ratio: 16 / 9; border-radius: var(--radius); overflow: hidden;
+  border: 1px solid var(--line); background: #000;
+}
+.video-embed iframe { width: 100%; height: 100%; border: 0; display: block; }
+
 /* Program day cards */
 .day-grid { display: flex; flex-direction: column; gap: 18px; }
 .day-card { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; }

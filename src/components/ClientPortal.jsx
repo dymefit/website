@@ -3,6 +3,7 @@ import * as api from "../lib/api";
 import { karvonenZones, estimateMaxHR } from "../lib/zones";
 import { HOTEL_GROUPS, availableAtHotel } from "../lib/hotel";
 import { swapCandidates, effortHint } from "../lib/swap";
+import { searchUrl, embedUrl } from "../lib/video";
 import { parseRest, formatSecs } from "../lib/rest";
 import { parseWork, buildPhases, clockLabel } from "../lib/workclock";
 import Modal from "./Modal.jsx";
@@ -656,6 +657,7 @@ function ExerciseLogger({ exercise, client, session, existing, library }) {
   const [swapped, setSwapped] = useState(null); // {name, equipment} | null
   const [showPicker, setShowPicker] = useState(false);
   const [autoPicked, setAutoPicked] = useState(false);
+  const [showDemo, setShowDemo] = useState(false); // inline video player
 
   // When flagged and substitutes exist, start on the best one automatically.
   useEffect(() => {
@@ -713,6 +715,37 @@ function ExerciseLogger({ exercise, client, session, existing, library }) {
             {swapped && <span className="swap-badge">⇄ swap</span>}
           </h3>
           {prescription && <div className="prescription">{prescription}</div>}
+          {(() => {
+            // Demo video: swapped/alt exercises get a search for what's
+            // actually being done; the coach's pinned link wins otherwise.
+            const shownName = swapped ? swapped.name : useAlt && exercise.alt ? exercise.alt : exercise.name;
+            const pinned = !swapped && !useAlt ? exercise.video_url : null;
+            const embed = pinned ? embedUrl(pinned) : null;
+            return (
+              <>
+                <button
+                  type="button"
+                  className="alt-toggle demo-toggle"
+                  onClick={() => {
+                    if (embed) setShowDemo((v) => !v);
+                    else window.open(pinned || searchUrl(shownName), "_blank", "noopener");
+                  }}
+                >
+                  ▶ {embed ? (showDemo ? "Hide demo" : "Watch demo") : "Watch a demo"}
+                </button>
+                {embed && showDemo && (
+                  <div className="video-embed">
+                    <iframe
+                      src={embed}
+                      title={`Demo: ${shownName}`}
+                      allow="accelerometer; autoplay; encrypted-media; picture-in-picture"
+                      allowFullScreen
+                    />
+                  </div>
+                )}
+              </>
+            );
+          })()}
           {swapped && effortHint(swapped.equipment) && (
             <div className="ex-notes">{effortHint(swapped.equipment)}</div>
           )}

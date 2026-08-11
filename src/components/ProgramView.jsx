@@ -3,6 +3,7 @@ import * as api from "../lib/api";
 import { MOVEMENT_PATTERNS, MACHINES, EQUIPMENT_GROUPS } from "../lib/constants";
 import { projectLoad, isPowerPattern, POWER_MIN_REPS, coeffFor } from "../lib/progression";
 import { defaultRestForType } from "../lib/rest";
+import { searchUrl } from "../lib/video";
 import Modal from "./Modal.jsx";
 
 export default function ProgramView({ client, clients, programs = [], program, onProgramsChanged, onSelectProgram }) {
@@ -274,6 +275,12 @@ export default function ProgramView({ client, clients, programs = [], program, o
                     </td>
                     <td className="name">
                       {ex.name}
+                      <button
+                        className="tiny demo-link"
+                        title={ex.video_url ? "Watch demo video" : "Search a demo video"}
+                        aria-label={`Demo video for ${ex.name}`}
+                        onClick={() => window.open(ex.video_url || searchUrl(ex.name), "_blank", "noopener")}
+                      >▶</button>
                       {ex.equipment && <span className="equip-tag">{ex.equipment}</span>}
                       {isProgressed(ex) && <span className="wk-badge" title={`Adjusted for week ${week}`}>W{week}</span>}
                       {ex.notes && <div className="ex-notes">{ex.notes}</div>}
@@ -431,6 +438,7 @@ function ExerciseForm({ dayId, exercise, weeks, programType, position, onClose, 
     load: exercise?.load ?? "",
     rest: exercise?.rest ?? "",
     notes: exercise?.notes ?? "",
+    video_url: exercise?.video_url ?? "",
   });
   // Library picker state
   const [lib, setLib] = useState([]);
@@ -488,6 +496,8 @@ function ExerciseForm({ dayId, exercise, weeks, programType, position, onClose, 
     setBusy(true);
     try {
       const fields = { ...f, progressions: prog };
+      // Only send video_url when set (keeps saves working before the column migration runs).
+      if (!fields.video_url?.trim()) delete fields.video_url;
       // Every exercise ships with a rest time — default matches the day's goal.
       if (!fields.rest.trim()) fields.rest = defaultRestForType(programType);
       if (exercise) await api.updateExercise(exercise.id, fields);
@@ -581,6 +591,15 @@ function ExerciseForm({ dayId, exercise, weeks, programType, position, onClose, 
         <label className="field">
           <span>Notes</span>
           <input value={f.notes} onChange={set("notes")} placeholder="optional cue / tempo" />
+        </label>
+        <label className="field">
+          <span>Demo video URL (optional)</span>
+          <input
+            type="url"
+            value={f.video_url}
+            onChange={set("video_url")}
+            placeholder="YouTube link — blank = auto search button"
+          />
         </label>
 
         {weeks > 1 && (
