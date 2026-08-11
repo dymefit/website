@@ -14,7 +14,7 @@ const CATEGORY_ORDER = [
   "PREHAB / MOBILITY",
 ];
 const EQUIP_ORDER = [
-  "Default", "Barbell", "Dumbbell", "Machine / Cable", "Band", "Bodyweight", "Kettlebell",
+  "Default", "Barbell", "Dumbbell", "Machine / Cable", "Band", "Bodyweight", "Kettlebell", "Landmine",
 ];
 
 export default function ExerciseLibrary() {

@@ -424,6 +424,7 @@ const LIB_EQUIP_MAP = {
   "Machine / Cable": "Cable column",
   Band: "Bands",
   Bodyweight: "Bodyweight",
+  Landmine: "Landmine",
   Default: "",
 };
 
