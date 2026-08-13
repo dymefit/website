@@ -239,6 +239,7 @@
   <nav class="tabs wrap" role="tablist" aria-label="Guide tabs">
     <button class="tab" role="tab" aria-selected="true" data-tab="intake">Client Intake</button>
     <button class="tab" role="tab" aria-selected="false" data-tab="targets">Targets</button>
+    <button class="tab" role="tab" aria-selected="false" data-tab="portions">Portions</button>
     <button class="tab" role="tab" aria-selected="false" data-tab="meals">Meals & Swaps</button>
     <button class="tab" role="tab" aria-selected="false" data-tab="desserts">Healthy Desserts</button>
     <button class="tab" role="tab" aria-selected="false" data-tab="timing">Workout Timing</button>
@@ -261,6 +262,24 @@
               <label for="weight">Body weight</label>
               <input id="weight" type="number" min="40" max="500" value="180">
               <div class="hint">Enter pounds.</div>
+            </div>
+            <div class="field span-6">
+              <label for="height">Height (inches)</label>
+              <input id="height" type="number" min="48" max="90" placeholder="e.g. 70 = 5'10&quot;">
+              <div class="hint">Used for BMI and calorie estimate.</div>
+            </div>
+            <div class="field span-6">
+              <label for="age">Age</label>
+              <input id="age" type="number" min="10" max="100" placeholder="e.g. 45">
+            </div>
+            <div class="field span-6">
+              <label for="mealsPerDay">Meals per day</label>
+              <select id="mealsPerDay">
+                <option value="3">3 meals</option>
+                <option value="4" selected>4 meals</option>
+                <option value="5">5 meals</option>
+              </select>
+              <div class="hint">Drives the per-meal portion builder.</div>
             </div>
             <div class="field span-6">
               <label for="sex">Hydration baseline</label>
@@ -359,6 +378,44 @@
             <li><strong>Gluten-free:</strong> Avoid wheat, barley, rye, and cross-contact risk; use rice, potatoes, corn, oats labeled gluten-free, quinoa, beans, fruit.</li>
             <li><strong>Dairy-free:</strong> Use fortified soy/pea milk, lactose-free only if intolerance rather than allergy, tofu, fish, poultry, legumes, or protein powders matched to restrictions.</li>
           </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="portions" role="tabpanel">
+      <div class="grid">
+        <div class="panel span-7">
+          <h2>Per-Meal Portion Builder</h2>
+          <p class="hint">Built from the intake tab — weight, height, age, sex baseline, goal, training days, and meals per day. Change an input and every number below recalculates.</p>
+          <table>
+            <tbody>
+              <tr><td>BMI</td><td id="bmiOut" aria-live="polite">Add height on the intake tab</td></tr>
+              <tr><td>Estimated maintenance</td><td id="tdeeOut" aria-live="polite">Add height &amp; age</td></tr>
+              <tr><td>Goal calories</td><td id="goalCalOut" aria-live="polite">—</td></tr>
+            </tbody>
+          </table>
+          <h2 style="margin-top:18px">Each meal, on the plate</h2>
+          <table>
+            <tbody>
+              <tr><td>Calories</td><td id="mealCalOut" aria-live="polite">—</td></tr>
+              <tr><td>Protein</td><td id="mealProteinOut" aria-live="polite">—</td></tr>
+              <tr><td>Carbohydrate</td><td id="mealCarbOut" aria-live="polite">—</td></tr>
+              <tr><td>Fat</td><td id="mealFatOut" aria-live="polite">—</td></tr>
+              <tr><td>Vegetables</td><td>1–2 fists at every meal — non-negotiable, any goal.</td></tr>
+            </tbody>
+          </table>
+          <p class="hint" id="portionNote" aria-live="polite"></p>
+        </div>
+        <div class="panel span-5">
+          <h2>The Hand Method</h2>
+          <p class="hint">No scale needed — your hand scales with your body, so it stays personal.</p>
+          <ul>
+            <li><strong>Palm</strong> = one protein portion (≈ 20–25 g protein): chicken, fish, lean beef, tofu.</li>
+            <li><strong>Cupped hand</strong> = one carb portion (≈ 20–25 g carbs): rice, potato, oats, fruit.</li>
+            <li><strong>Thumb</strong> = one fat portion (≈ 8–10 g fat): oils, nut butter, cheese, avocado.</li>
+            <li><strong>Fist</strong> = one vegetable portion (≈ 1 cup): greens, broccoli, peppers.</li>
+          </ul>
+          <p class="hint">BMI is a screen for body size, not composition — muscular clients read "high" while lean. Use it alongside the mirror, the log, and performance, never alone. Calorie estimates (Mifflin-St Jeor) are starting points: hold each target 2 weeks, watch the scale trend, then adjust ±100–200 kcal.</p>
         </div>
       </div>
     </section>
@@ -711,7 +768,7 @@
       {"title": "Chocolate Dessert Hummus", "diet": ["balanced", "vegan", "vegetarian", "gluten-free", "dairy-free"], "allergens": ["sesame"], "tags": ["loss", "endurance", "maintenance"], "base": "Chickpeas blended with cocoa, maple, tahini, and vanilla; serve with strawberries.", "swaps": ["Sesame allergy: sunflower-seed butter.", "Lower sugar: halve the maple.", "Extra protein: blend in chocolate plant protein."]}
     ]; // DESSERTS_END
 
-    const ids = ["weight", "sex", "goal", "diet", "training", "allergies", "workoutMinutes", "heat", "waterLogged", "preWeight", "postWeight"];
+    const ids = ["weight", "height", "age", "mealsPerDay", "sex", "goal", "diet", "training", "allergies", "workoutMinutes", "heat", "waterLogged", "preWeight", "postWeight"];
 
     function kg() {
       const lb = Number(document.getElementById("weight").value || 0);
@@ -743,6 +800,56 @@
         protein: `${Math.round(protein[0] * bodyKg)}-${Math.round(protein[1] * bodyKg)} g/day`,
         carbs: carbs ? `${Math.round(carbs[0] * bodyKg)}-${Math.round(carbs[1] * bodyKg)} g/day` : "20-50 g net/day",
         fat
+      };
+    }
+
+    // ---- Portion builder: BMI -> TDEE -> goal calories -> per-meal plate ----
+    function portionModel() {
+      const lb = Number(document.getElementById("weight").value || 0);
+      const inches = Number(document.getElementById("height").value || 0);
+      const years = Number(document.getElementById("age").value || 0);
+      const meals = Number(document.getElementById("mealsPerDay").value || 4);
+      const sex = document.getElementById("sex").value;
+      const goal = document.getElementById("goal").value;
+      const diet = document.getElementById("diet").value;
+      const days = Number(document.getElementById("training").value || 0);
+      if (!lb || !inches) return { meals };
+
+      const kgW = lb / 2.20462, cm = inches * 2.54;
+      const bmi = (703 * lb) / (inches * inches);
+      const bmiCat = bmi < 18.5 ? "underweight range" : bmi < 25 ? "healthy range" : bmi < 30 ? "overweight range" : "obese range";
+      if (!years) return { meals, bmi, bmiCat };
+
+      // Mifflin-St Jeor; "custom" hydration baseline averages the two equations.
+      const base = 10 * kgW + 6.25 * cm - 5 * years;
+      const bmr = sex === "male" ? base + 5 : sex === "female" ? base - 161 : base - 78;
+      const activity = days <= 1 ? 1.35 : days <= 3 ? 1.45 : days <= 5 ? 1.55 : 1.7;
+      const tdee = Math.round(bmr * activity);
+
+      const mult = { loss: 0.8, maintenance: 1.0, strength: 1.05, hypertrophy: 1.1, endurance: 1.05 }[goal] ?? 1.0;
+      let goalCal = Math.round(tdee * mult);
+      const floor = sex === "female" ? 1200 : 1500;
+      const floored = goalCal < floor;
+      if (floored) goalCal = floor;
+
+      // Protein from the same g/kg bands as the daily targets (midpoint).
+      const pBand = goal === "endurance" || goal === "maintenance" ? [1.2, 1.8] : [1.6, 2.2];
+      const proteinDay = Math.round(((pBand[0] + pBand[1]) / 2) * kgW);
+      const fatDay = Math.round((goalCal * 0.275) / 9);
+      let carbDay = Math.round((goalCal - proteinDay * 4 - fatDay * 9) / 4);
+      let fatDayFinal = fatDay;
+      if (diet === "keto") { carbDay = 30; fatDayFinal = Math.round((goalCal - proteinDay * 4 - carbDay * 4) / 9); }
+      if (carbDay < 0) carbDay = 0;
+
+      // Hand-method equivalents (palm ~25/20 g protein, cup ~25/20 g carb, thumb ~10/8 g fat).
+      const male = sex !== "female";
+      const half = (x) => Math.max(0.5, Math.round(x * 2) / 2);
+      return {
+        meals, bmi, bmiCat, tdee, goalCal, floored,
+        mealCal: Math.round(goalCal / meals),
+        p: Math.round(proteinDay / meals), palms: half(proteinDay / meals / (male ? 25 : 20)),
+        c: Math.round(carbDay / meals), cups: half(carbDay / meals / (male ? 25 : 20)),
+        f: Math.round(fatDayFinal / meals), thumbs: half(fatDayFinal / meals / (male ? 10 : 8)),
       };
     }
 
@@ -820,6 +927,19 @@
     function update() {
       const macros = macroTargets();
       const fluids = hydrationTargets();
+      // Portion builder outputs
+      const pm = portionModel();
+      const set = (id, txt) => { document.getElementById(id).textContent = txt; };
+      set("bmiOut", pm.bmi ? `${pm.bmi.toFixed(1)} — ${pm.bmiCat}` : "Add height on the intake tab");
+      set("tdeeOut", pm.tdee ? `≈ ${pm.tdee} kcal/day` : "Add height & age on the intake tab");
+      set("goalCalOut", pm.goalCal ? `≈ ${pm.goalCal} kcal/day across ${pm.meals} meals` : "—");
+      set("mealCalOut", pm.mealCal ? `≈ ${pm.mealCal} kcal` : "—");
+      set("mealProteinOut", pm.p ? `${pm.p} g  ·  ${pm.palms} palm${pm.palms === 1 ? "" : "s"}` : "—");
+      set("mealCarbOut", pm.c != null && pm.mealCal ? `${pm.c} g  ·  ${pm.cups} cupped hand${pm.cups === 1 ? "" : "s"}` : "—");
+      set("mealFatOut", pm.f ? `${pm.f} g  ·  ${pm.thumbs} thumb${pm.thumbs === 1 ? "" : "s"}` : "—");
+      set("portionNote", pm.floored
+        ? "Calorie floor applied — the goal deficit dipped below a safe intake, so it was capped. Favor a smaller deficit and more training."
+        : pm.goalCal ? "Hold these portions ~2 weeks, watch the scale trend, then adjust ±100–200 kcal." : "");
       document.getElementById("proteinOut").textContent = macros.protein;
       document.getElementById("carbOut").textContent = macros.carbs;
       document.getElementById("fatOut").textContent = macros.fat;
