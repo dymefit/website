@@ -81,6 +81,13 @@
   .pkg.feat{border-color:var(--teal);box-shadow:0 0 0 1px var(--teal),0 24px 50px rgba(212,175,55,.18)}
   .pkg .flag{position:absolute;top:-13px;left:50%;transform:translateX(-50%);background:linear-gradient(120deg,var(--spring),var(--teal));color:#241B07;font-size:11px;font-weight:800;letter-spacing:1px;padding:5px 14px;border-radius:999px}
   .pkg h3{font-size:21px}
+  .pkg40{margin-top:26px;background:var(--panel);border:1px solid var(--spring);border-radius:18px;padding:34px 30px;position:relative;box-shadow:0 0 0 1px var(--spring),0 24px 50px rgba(212,175,55,.14)}
+  .pkg40 .phases{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;margin:20px 0 22px}
+  @media(max-width:860px){.pkg40 .phases{grid-template-columns:1fr}}
+  .pkg40 .ph{background:var(--bg);border:1px solid var(--line);border-radius:14px;padding:18px}
+  .pkg40 .ph b{display:block;font-size:15px;margin-bottom:6px;color:var(--spring)}
+  .pkg40 .ph p{font-size:13.5px;color:var(--mut);margin:0}
+  .pkg40 .foot{display:flex;align-items:center;gap:18px;flex-wrap:wrap;justify-content:space-between}
   .pkg .price{font-size:42px;font-weight:800;margin:14px 0 2px}
   .pkg .price span{font-size:15px;color:var(--mut);font-weight:600}
   .pkg ul{list-style:none;margin:20px 0 26px;display:flex;flex-direction:column;gap:11px}
@@ -331,6 +338,20 @@ h1.sheen::after {
         <li>Bi-weekly 1:1 check-ins</li>
       </ul>
       <button class="btn btn-g" onclick="openCheckout('Injury-Prevention & Return',169)">Enroll</button>
+    </div>
+  </div>
+  <div class="pkg40">
+    <div class="flag">FOR MEN 40+</div>
+    <h3 style="font-size:24px">Lean Past 40 — Recomposition Coaching</h3>
+    <p style="color:var(--mut);font-size:15px;margin-top:8px;max-width:760px">No metabolic magic. A moderate calorie deficit, progressive strength work, and a deliberate return to maintenance — with your coach on the numbers every week. Every claim on this card is something you can see in your own training log.</p>
+    <div class="phases">
+      <div class="ph"><b>1 · Base Camp — weeks 1–12</b><p>Strength programming matched to your decade (40s, 50s, and 60s tracks) plus calorie &amp; protein targets built from your own numbers. Moderate deficit only — no crash dieting, no “detox.”</p></div>
+      <div class="ph"><b>2 · The Ascent — weeks 13–24</b><p>Loads climb while calories walk back up to maintenance on a schedule. Recomposition instead of rebound — most clients finish eating more than they started because muscle and training raised what their body needs.</p></div>
+      <div class="ph"><b>3 · The Summit — ongoing</b><p>You run it yourself: a maintenance plan, quarterly check-ins, and you keep the app — your programs, logging, progress charts, and the nutrition guide.</p></div>
+    </div>
+    <div class="foot">
+      <div class="price" style="margin:0">$179<span>/mo</span></div>
+      <button class="btn btn-g" onclick="openCheckout('Lean Past 40 — Recomposition',179)">Enroll</button>
     </div>
   </div>
   <p style="text-align:center;color:var(--mut);margin-top:24px;font-size:14px">Not sure which fits? <a href="#" onclick="openBook();return false" style="color:var(--spring);font-weight:700">Book a free assessment</a> and we’ll map it out together.</p>
