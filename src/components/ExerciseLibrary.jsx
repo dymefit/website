@@ -22,6 +22,7 @@ export default function ExerciseLibrary() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [adding, setAdding] = useState(null); // {category, pattern, equipment?}
+  const [equipFilter, setEquipFilter] = useState(""); // "" = all equipment
 
   const refresh = useCallback(async () => {
     setLoading(true);
@@ -47,9 +48,15 @@ export default function ExerciseLibrary() {
     catch (e) { alert(e.message); }
   }
 
+  const equipOptions = [
+    ...EQUIP_ORDER.filter((e) => items.some((i) => i.equipment === e)),
+    ...[...new Set(items.map((i) => i.equipment))].filter((e) => !EQUIP_ORDER.includes(e)).sort(),
+  ];
+  const visible = equipFilter ? items.filter((i) => i.equipment === equipFilter) : items;
+
   // group: category -> pattern -> equipment -> [items]
   const byCat = {};
-  for (const it of items) {
+  for (const it of visible) {
     ((byCat[it.category] ||= {})[it.pattern] ||= {})[it.equipment] ||= [];
     byCat[it.category][it.pattern][it.equipment].push(it);
   }
@@ -67,8 +74,23 @@ export default function ExerciseLibrary() {
             Same pattern = same training effect. Pick by what your client has access to.
           </div>
         </div>
-        <button className="btn" onClick={() => setAdding({})}>+ Add exercise</button>
+        <div className="row-actions">
+          <label className="field lib-filter">
+            <span>Equipment</span>
+            <select value={equipFilter} onChange={(e) => setEquipFilter(e.target.value)} aria-label="Filter library by equipment">
+              <option value="">All equipment</option>
+              {equipOptions.map((eq) => <option key={eq} value={eq}>{eq}</option>)}
+            </select>
+          </label>
+          <button className="btn" onClick={() => setAdding({})}>+ Add exercise</button>
+        </div>
       </div>
+      {equipFilter && (
+        <div className="muted-note">
+          Showing {visible.length} {equipFilter} exercise{visible.length === 1 ? "" : "s"} across their movement patterns.
+          {" "}<button className="linklike" onClick={() => setEquipFilter("")}>Show all</button>
+        </div>
+      )}
 
       {error && <div className="api-error">{error}</div>}
       {loading && <div className="muted-note">Loading…</div>}
