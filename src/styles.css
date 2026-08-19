@@ -885,3 +885,32 @@ code { background: var(--panel-2); padding: 1px 5px; border-radius: 4px; font-si
   /* header stacks so buttons don't crush the title */
   .content-header { flex-direction: column; align-items: flex-start; gap: 10px; }
 }
+
+/* ---------- Enrollment agreement / waiver ---------- */
+.enroll { max-width: 860px; margin: 0 auto; display: flex; flex-direction: column; gap: 18px; }
+.enroll-head { display: flex; gap: 14px; align-items: center; }
+.enroll-head h1 { font-size: 22px; }
+.enroll-head .sub { color: var(--muted); font-size: 13px; }
+.enroll-note { color: var(--muted); font-size: 14px; }
+.enroll-sec { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px; display: flex; flex-direction: column; gap: 12px; }
+.enroll-sec h2 { font-size: 16px; color: var(--accent); letter-spacing: .02em; }
+.enroll-doc { max-height: 420px; overflow-y: auto; gap: 16px; line-height: 1.55; font-size: 14px; }
+.enroll-clause h3 { font-size: 14px; margin-bottom: 6px; }
+.enroll-clause p { margin: 0 0 8px; color: var(--text); }
+.enroll-clause.emphasis { border-left: 3px solid var(--accent); padding-left: 12px; }
+.enroll-clause.emphasis p { font-weight: 500; }
+.enroll-flag { background: rgba(212,175,55,.12); border: 1px solid var(--accent); color: var(--text); border-radius: 8px; padding: 10px 12px; font-size: 13px; }
+.enroll-flag.inline, .hotel-flag.inline { display: inline-block; margin: 0; }
+.parq { list-style: decimal; padding-left: 22px; display: flex; flex-direction: column; gap: 10px; }
+.parq li { display: flex; gap: 14px; align-items: flex-start; justify-content: space-between; }
+.parq-q { flex: 1; font-size: 14px; }
+.parq-a { display: flex; gap: 12px; white-space: nowrap; }
+.parq-a label { display: inline-flex; gap: 5px; align-items: center; cursor: pointer; }
+.parq.compact { font-size: 13px; gap: 4px; }
+.parq.compact li.yes { color: var(--accent); font-weight: 600; }
+.ack { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; line-height: 1.45; cursor: pointer; }
+.ack input { margin-top: 4px; flex-shrink: 0; }
+.sig-input { font-family: "Snell Roundhand", "Brush Script MT", cursive; font-size: 22px; padding: 10px 12px; }
+.sig-meta { font-size: 12px; color: var(--muted); }
+.enroll-record .enroll-detail { margin-top: 10px; display: flex; flex-direction: column; gap: 10px; }
+@media print { .enroll-doc { max-height: none; overflow: visible; } }

@@ -1,7 +1,8 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import * as api from "../lib/api";
 import { karvonenZones } from "../lib/zones";
 import ClientForm from "./ClientForm.jsx";
+import { PARQ } from "../lib/enrollmentText";
 
 function Field({ label, value, href }) {
   return (
@@ -39,6 +40,63 @@ function ZonesBlock({ client }) {
         <p className="detail-value empty">
           Not set — the client enters age + resting HR in their portal.
         </p>
+      )}
+    </div>
+  );
+}
+
+
+function EnrollmentBlock({ client }) {
+  const [rec, setRec] = useState(undefined);
+  const [open, setOpen] = useState(false);
+  useEffect(() => {
+    setRec(undefined); setOpen(false);
+    api.getEnrollmentForEmail(client.email).then(setRec).catch(() => setRec(null));
+  }, [client.id, client.email]);
+
+  if (rec === undefined) return null;
+  if (!rec) {
+    return (
+      <div className="detail-notes" style={{ marginTop: 14 }}>
+        <span className="detail-label">📝 Enrollment agreement &amp; waiver</span>
+        <p className="detail-value empty">Not signed yet — the client is prompted to sign on their first portal login{client.email ? "" : " (add their email first)"}.</p>
+      </div>
+    );
+  }
+  const med = rec.medical || {};
+  const flags = (med.parq || []).filter((x) => x.answer === true);
+  return (
+    <div className="detail-notes enroll-record" style={{ marginTop: 14 }}>
+      <span className="detail-label">📝 Enrollment agreement &amp; waiver</span>
+      <p className="detail-value">
+        ✅ Signed by <strong>{rec.signature_name}</strong> on {new Date(rec.signed_at).toLocaleString()}
+        {rec.is_minor && <> · minor — guardian <strong>{rec.guardian_name}</strong> ({rec.guardian_relationship}) signed as {rec.guardian_signature_name}</>}
+        {" "}· doc v{rec.doc_version}{rec.ip_address ? ` · IP ${rec.ip_address}` : ""}
+      </p>
+      <p className="detail-value">
+        {flags.length
+          ? <span className="enroll-flag inline">⚠ PAR-Q+: {flags.length} "Yes" answer{flags.length > 1 ? "s" : ""} — clearance/adjustment indicated</span>
+          : <span className="hotel-flag ok inline">PAR-Q+: all "No" — cleared to begin</span>}
+      </p>
+      <button type="button" className="linklike" onClick={() => setOpen((v) => !v)}>{open ? "▾ Hide" : "▸ View"} Exhibit A &amp; details</button>
+      {open && (
+        <div className="enroll-detail">
+          <div className="detail-grid">
+            <Field label="Date of birth" value={rec.date_of_birth} />
+            <Field label="Phone" value={rec.participant?.phone} />
+            <Field label="Address" value={rec.participant?.address} />
+            <Field label="Emergency contact" value={rec.participant?.emergency_contact?.name ? `${rec.participant.emergency_contact.name} · ${rec.participant.emergency_contact.phone}${rec.participant.emergency_contact.relationship ? " (" + rec.participant.emergency_contact.relationship + ")" : ""}` : null} />
+          </div>
+          <ol className="parq compact">
+            {(med.parq || PARQ.map((q) => ({ q, answer: null }))).map((x, i) => (
+              <li key={i} className={x.answer ? "yes" : ""}><span className="parq-q">{x.q}</span><span className="parq-a">{x.answer === true ? "YES" : x.answer === false ? "No" : "—"}</span></li>
+            ))}
+          </ol>
+          {Object.entries(med.history || {}).map(([k, v]) => v ? (
+            <div key={k} className="detail-field"><span className="detail-label">{k.replace(/_/g, " ")}</span><span className="detail-value">{v}</span></div>
+          ) : null)}
+          <button type="button" className="btn secondary small" onClick={() => window.print()}>Print record</button>
+        </div>
       )}
     </div>
   );
@@ -95,6 +153,8 @@ export default function ClientDetail({ client, onChanged, onDeleted }) {
           ? <p className="detail-value">{client.notes}</p>
           : <p className="detail-value empty">No notes yet.</p>}
       </div>
+
+      <EnrollmentBlock client={client} />
 
       <ZonesBlock client={client} />
 

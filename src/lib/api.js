@@ -353,3 +353,46 @@ export async function duplicateProgram(program, targetClientId) {
   }
   return copy;
 }
+
+// ---------- Enrollment agreement / waiver (e-signed) ----------
+export async function getMyEnrollment() {
+  const { data, error } = await supabase
+    .from("enrollment_forms")
+    .select("id, full_name, signed_at, doc_version, is_minor")
+    .order("signed_at", { ascending: false })
+    .limit(1);
+  if (error) {
+    // Table not migrated yet → don't gate the portal (nothing could be signed yet).
+    if (/enrollment_forms/.test(error.message)) return { pending_setup: true };
+    throw error;
+  }
+  return data?.[0] ?? null;
+}
+
+export async function getEnrollmentForEmail(email) {
+  if (!email) return null;
+  const { data, error } = await supabase
+    .from("enrollment_forms")
+    .select("*")
+    .ilike("email", email)
+    .order("signed_at", { ascending: false })
+    .limit(1);
+  if (error) {
+    if (/enrollment_forms/.test(error.message)) return null;
+    throw error;
+  }
+  return data?.[0] ?? null;
+}
+
+export async function signEnrollment(payload) {
+  const { data } = await supabase.auth.getSession();
+  const token = data?.session?.access_token;
+  const res = await fetch("/api/sign-enrollment", {
+    method: "POST",
+    headers: { "content-type": "application/json", Authorization: `Bearer ${token}` },
+    body: JSON.stringify(payload),
+  });
+  const body = await res.json().catch(() => ({}));
+  if (!res.ok) throw new Error(body.error || "Could not record signature.");
+  return body;
+}

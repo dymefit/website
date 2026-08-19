@@ -8,6 +8,7 @@ import { parseRest, formatSecs } from "../lib/rest";
 import { parseWork, buildPhases, clockLabel } from "../lib/workclock";
 import Modal from "./Modal.jsx";
 import BrandMark from "./BrandMark.jsx";
+import EnrollmentForm from "./EnrollmentForm.jsx";
 
 // local-time YYYY-MM-DD
 function ymd(d) {
@@ -28,6 +29,7 @@ export default function ClientPortal({ user, onSignOut }) {
   const [error, setError] = useState("");
   const [testMax, setTestMax] = useState(false); // "log a tested max" modal
   const [hotel, setHotel] = useState(false);     // hotel-equipment modal
+  const [enrollment, setEnrollment] = useState(undefined); // undefined=loading, null=none, {}=signed
 
   // Open the members-only guide in a new tab (window opens synchronously so
   // popup blockers allow it; content streams in after the authed fetch).
@@ -45,6 +47,7 @@ export default function ClientPortal({ user, onSignOut }) {
     try {
       const me = await api.getMyClient(user.email);
       setClient(me);
+      setEnrollment(await api.getMyEnrollment());
       if (me) {
         const today = new Date();
         const from = new Date(today); from.setDate(from.getDate() - 30);
@@ -94,7 +97,15 @@ export default function ClientPortal({ user, onSignOut }) {
           </div>
         )}
 
-        {!loading && client && !openSession && (
+        {!loading && client && enrollment === null && (
+          <EnrollmentForm
+            user={user}
+            client={client}
+            onSigned={(r) => setEnrollment({ id: r.id, signed_at: r.signed_at })}
+          />
+        )}
+
+        {!loading && client && enrollment && !openSession && (
           <>
             <div className="portal-actions">
               <button className="btn secondary small" onClick={openNutritionGuide} title="Meal planning, fueling, and hydration guide">
@@ -116,7 +127,7 @@ export default function ClientPortal({ user, onSignOut }) {
           </>
         )}
 
-        {!loading && client && openSession && (
+        {!loading && client && enrollment && openSession && (
           <SessionLogger
             client={client}
             session={openSession}
