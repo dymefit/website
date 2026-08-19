@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useAuth } from "../auth.jsx";
 import BrandMark from "./BrandMark.jsx";
+import { CONTACT_EMAIL } from "../lib/constants";
 
 export default function Login({ onBack }) {
   const { signIn, signUp } = useAuth();
@@ -73,6 +74,7 @@ export default function Login({ onBack }) {
         {onBack && (
           <button type="button" className="linklike auth-back" onClick={onBack}>← Back to home</button>
         )}
+        <p className="auth-contact">Questions? <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a></p>
       </form>
     </div>
   );

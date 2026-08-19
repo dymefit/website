@@ -1,7 +1,7 @@
 // Public front page: full-screen hero + About + Services + closing CTA.
 // Background photo lives at /hero.jpg (in the public/ folder).
 // Copy below is placeholder — easy to swap for real wording.
-import { COACH_EMAIL } from "../auth.jsx";
+import { CONTACT_EMAIL } from "../lib/constants";
 
 const SERVICES = [
   {
@@ -37,7 +37,7 @@ const CERTS = [
 
 export default function Landing({ onEnter }) {
   const inquiry =
-    `mailto:${COACH_EMAIL}` +
+    `mailto:${CONTACT_EMAIL}` +
     `?subject=${encodeURIComponent("Fitness-Elevated coaching inquiry")}` +
     `&body=${encodeURIComponent(
       "Hi! I'm interested in training with Fitness-Elevated.\n\nName:\nGoals:\nExperience:\n"

@@ -914,3 +914,6 @@ code { background: var(--panel-2); padding: 1px 5px; border-radius: 4px; font-si
 .sig-meta { font-size: 12px; color: var(--muted); }
 .enroll-record .enroll-detail { margin-top: 10px; display: flex; flex-direction: column; gap: 10px; }
 @media print { .enroll-doc { max-height: none; overflow: visible; } }
+
+.auth-contact { margin-top: 14px; font-size: 12px; color: var(--muted); text-align: center; }
+.auth-contact a { color: var(--accent); }

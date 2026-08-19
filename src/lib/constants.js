@@ -61,3 +61,6 @@ export const MOVEMENT_PATTERNS = [
   "Locomotion / Cardio",
   "Mobility / Recovery",
 ];
+
+// Public contact address shown to clients (NOT the coach login identity).
+export const CONTACT_EMAIL = "Dymefitofficial@gmail.com";
