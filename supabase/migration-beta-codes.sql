@@ -38,7 +38,7 @@ create policy beta_red_coach on public.beta_redemptions
 -- Validate + redeem in one atomic call. SECURITY DEFINER: runs with
 -- owner privileges so anon needs no table access at all.
 create or replace function public.redeem_beta_code(p_code text, p_name text, p_email text, p_package text)
-returns jsonb language plpgsql security definer set search_path = public as $fn$
+returns jsonb language plpgsql security definer set search_path = public, extensions as $fn$
 declare v_row beta_codes;
 begin
   select * into v_row from beta_codes
