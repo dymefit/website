@@ -476,15 +476,16 @@ h1.sheen::after {
       </div>
       <label>Full name</label><input id="cfn" placeholder="Your name">
       <label>Email</label><input id="cem" type="email" placeholder="you@email.com">
-      <label>Card number</label><input id="ccc" inputmode="numeric" placeholder="4242 4242 4242 4242" maxlength="19" oninput="fmtCard(this)">
-      <div class="row2"><div><label>Expiry</label><input id="cexp" placeholder="MM/YY" maxlength="5" oninput="fmtExp(this)"></div><div><label>CVC</label><input id="ccv" inputmode="numeric" placeholder="123" maxlength="4"></div></div>
-      <button class="btn btn-p" style="width:100%;justify-content:center;margin-top:20px" id="coBtn" onclick="coPay()">Pay <span id="coPayAmt"></span> & Start</button>
-      <p style="text-align:center;color:var(--mut);font-size:12px;margin-top:12px">🔒 Demo checkout — no real payment is processed.</p>
+      <label>Discount / beta code <span style="color:var(--mut);font-weight:400">(optional)</span></label>
+      <input id="cdc" placeholder="FE-BETA-XXXX" autocomplete="off" style="text-transform:uppercase">
+      <div id="cdcErr" style="display:none;color:#f87171;font-size:13px;margin-top:6px">That code isn’t valid or has already been used — check with your coach.</div>
+      <button class="btn btn-p" style="width:100%;justify-content:center;margin-top:20px" id="coBtn" onclick="coSubmit()">Continue</button>
+      <p style="text-align:center;color:var(--mut);font-size:12px;margin-top:12px">🔒 No payment collected online today — beta codes enroll free; otherwise we’ll email you to finish enrollment.</p>
     </div>
     <div id="coDone" style="display:none" class="ok">
       <div class="check">✓</div><h3>Welcome aboard!</h3>
       <p style="color:var(--mut)" id="coSummary"></p>
-      <p style="color:var(--mut);margin-top:10px;font-size:14px">Check your email for portal access and your assessment scheduler.</p>
+      <p style="color:var(--mut);margin-top:10px;font-size:14px">Watch your inbox — confirmation comes from noreply@fitness-elevated.com.</p>
       <button class="btn btn-p" style="margin-top:18px" onclick="closeAll()">Done</button>
     </div>
   </div>
@@ -538,11 +539,24 @@ h1.sheen::after {
     document.getElementById('coPayAmt').textContent='$'+price;}
   function fmtCard(el){let v=el.value.replace(/\D/g,'').slice(0,16);el.value=v.replace(/(.{4})/g,'$1 ').trim();}
   function fmtExp(el){let v=el.value.replace(/\D/g,'').slice(0,4);if(v.length>2)v=v.slice(0,2)+'/'+v.slice(2);el.value=v;}
-  function coPay(){const n=document.getElementById('cfn').value.trim(),e=document.getElementById('cem').value.trim(),c=document.getElementById('ccc').value.replace(/\s/g,'');
-    if(!n||!e||c.length<15){alert('Please complete your details (demo card 4242 4242 4242 4242 works).');return;}
-    const b=document.getElementById('coBtn');b.textContent='Processing…';
-    setTimeout(()=>{document.getElementById('coStep1').style.display='none';document.getElementById('coDone').style.display='';
-      document.getElementById('coSummary').textContent=n+', you’re enrolled in '+coTitle+' at $'+coPrice+'/mo.';},900);}
+  function coSubmit(){
+    const n=document.getElementById('cfn').value.trim(),e=document.getElementById('cem').value.trim(),code=document.getElementById('cdc').value.trim();
+    const err=document.getElementById('cdcErr');err.style.display='none';
+    if(!n||!/.+@.+\..+/.test(e)){alert('Please enter your name and a valid email.');return;}
+    const b=document.getElementById('coBtn');b.disabled=true;b.textContent=code?'Checking code…':'Sending…';
+    fetch('/api/enroll-request',{method:'POST',headers:{'content-type':'application/json'},
+      body:JSON.stringify({name:n,email:e,package:coTitle,code:code})})
+      .then(r=>r.json()).then(out=>{
+        b.disabled=false;b.textContent='Continue';
+        if(code && out.valid===false){err.style.display='block';return;}
+        if(out.error){alert(out.error);return;}
+        document.getElementById('coStep1').style.display='none';document.getElementById('coDone').style.display='';
+        document.getElementById('coSummary').textContent = code
+          ? n+', your beta code is confirmed — '+coTitle+' is free during the beta. Next step: create your account at fitness-elevated.com/app using this same email ('+e+'). Your coach has been notified and will unlock your portal.'
+          : n+', we received your enrollment request for '+coTitle+'. We\u2019ll email you shortly to complete payment and onboarding.';
+      })
+      .catch(()=>{b.disabled=false;b.textContent='Continue';alert('Connection problem — please try again.');});
+  }
 
   function closeAll(){document.querySelectorAll('.overlay').forEach(o=>o.classList.remove('on'));document.body.style.overflow='';}
   document.querySelectorAll('.overlay').forEach(o=>o.addEventListener('click',e=>{if(e.target===o)closeAll();}));
