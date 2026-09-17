@@ -7,5 +7,6 @@ cd "$(dirname "$0")"
 npm run build
 cp home/index.html dist/index.html
 cp home/_headers dist/_headers
+cp home/legal.html dist/legal.html
 cp public/hero.jpg dist/hero.jpg
 netlify deploy --prod --dir=dist --functions=netlify/functions

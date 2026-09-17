@@ -74,7 +74,10 @@ export default function Login({ onBack }) {
         {onBack && (
           <button type="button" className="linklike auth-back" onClick={onBack}>← Back to home</button>
         )}
-        <p className="auth-contact">Questions? <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a></p>
+        <p className="auth-contact">
+          By creating an account you agree to the <a href="/legal.html" target="_blank" rel="noopener">Terms &amp; Privacy Policy</a>.
+          <br />Questions? <a href={`mailto:${CONTACT_EMAIL}`}>{CONTACT_EMAIL}</a>
+        </p>
       </form>
     </div>
   );
