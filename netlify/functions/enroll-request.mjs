@@ -55,6 +55,16 @@ export const handler = async (event) => {
       return json(200, { valid: true, label: out.label });
     }
 
+    if (p.type === "booking") {
+      await emailCoach(
+        `📅 Assessment booking — ${name} · ${esc(p.when || "time not set")}`,
+        `<p><strong>${esc(name)}</strong> (${esc(email)}) booked a free assessment for <strong>${esc(p.when || "?")}</strong>.</p>
+         <p>Goal: ${esc(p.goal || "—")}<br>Notes: ${esc(p.note || "—")}</p>
+         <p>Reply to confirm or reschedule.</p>`
+      );
+      return json(200, { received: true });
+    }
+
     await emailCoach(
       `📥 Enrollment request — ${name} (${pkg || "no package"})`,
       `<p><strong>${esc(name)}</strong> (${esc(email)}) requested enrollment in <strong>${esc(pkg || "unspecified package")}</strong> from the website.</p>
