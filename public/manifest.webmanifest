@@ -1,0 +1,22 @@
+{
+  "name": "Fitness-Elevated",
+  "short_name": "Fitness-Elev",
+  "description": "Your training programs, logging, timers, and nutrition guide.",
+  "start_url": "/app/",
+  "scope": "/app/",
+  "display": "standalone",
+  "background_color": "#0B0C0E",
+  "theme_color": "#0B0C0E",
+  "icons": [
+    {
+      "src": "/app/icons/fe-192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/app/icons/fe-512.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

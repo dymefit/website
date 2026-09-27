@@ -1,7 +1,7 @@
 # Netlify config — Cowork marketing site at "/", React member portal at "/app".
 [build]
   # Build the React app into dist/app, then drop the home page + hero at the root.
-  command = "npm run build && cp home/index.html dist/index.html && cp public/hero.jpg dist/hero.jpg"
+  command = "npm run build && cp home/index.html dist/index.html && cp home/_headers dist/_headers && cp home/legal.html dist/legal.html && cp public/hero.jpg dist/hero.jpg"
   publish = "dist"
   functions = "netlify/functions"
 

@@ -9,6 +9,7 @@ import { parseWork, buildPhases, clockLabel } from "../lib/workclock";
 import Modal from "./Modal.jsx";
 import BrandMark from "./BrandMark.jsx";
 import EnrollmentForm from "./EnrollmentForm.jsx";
+import ProgressCharts from "./ProgressCharts.jsx";
 
 // local-time YYYY-MM-DD
 function ymd(d) {
@@ -30,6 +31,7 @@ export default function ClientPortal({ user, onSignOut }) {
   const [testMax, setTestMax] = useState(false); // "log a tested max" modal
   const [hotel, setHotel] = useState(false);     // hotel-equipment modal
   const [enrollment, setEnrollment] = useState(undefined); // undefined=loading, null=none, {}=signed
+  const [myLogs, setMyLogs] = useState([]);
 
   // Open the members-only guide in a new tab (window opens synchronously so
   // popup blockers allow it; content streams in after the authed fetch).
@@ -53,6 +55,7 @@ export default function ClientPortal({ user, onSignOut }) {
         const from = new Date(today); from.setDate(from.getDate() - 30);
         const to = new Date(today); to.setDate(to.getDate() + 60);
         setSessions(await api.listSessions(me.id, ymd(from), ymd(to)));
+        api.listClientLogs(me.id).then(setMyLogs).catch(() => setMyLogs([]));
       }
     } catch (e) {
       setError(e.message);
@@ -123,6 +126,7 @@ export default function ClientPortal({ user, onSignOut }) {
               </button>
             </div>
             <SessionList sessions={sessions} onOpen={setOpenSession} />
+            <MyProgress logs={myLogs} />
             <TrainingZones client={client} onSaved={(c) => setClient(c)} />
           </>
         )}
@@ -554,6 +558,26 @@ function TestedMaxModal({ client, onClose, onSaved }) {
   );
 }
 
+
+// The client's own progress: quick totals + the same charts the coach sees.
+function MyProgress({ logs }) {
+  if (!logs || logs.length === 0) return null;
+  const days = new Set(logs.map((l) => l.date)).size;
+  const sets = logs.reduce((n, l) => n + (l.sets?.length || 0), 0);
+  const exercises = new Set(logs.map((l) => l.exercises?.name).filter(Boolean)).size;
+  return (
+    <section className="my-progress">
+      <h2 className="portal-h2">Your progress</h2>
+      <div className="stat-row">
+        <div className="stat"><b>{days}</b><span>day{days === 1 ? "" : "s"} logged</span></div>
+        <div className="stat"><b>{sets}</b><span>sets recorded</span></div>
+        <div className="stat"><b>{exercises}</b><span>exercises tracked</span></div>
+      </div>
+      <ProgressCharts logs={logs} />
+    </section>
+  );
+}
+
 function SessionList({ sessions, onOpen }) {
   if (sessions.length === 0) {
     return <div className="empty-block">No sessions scheduled yet. Check back soon.</div>;
@@ -594,6 +618,7 @@ function SessionList({ sessions, onOpen }) {
 
 function SessionLogger({ client, session, onBack }) {
   const [day, setDay] = useState(null);
+  const [finished, setFinished] = useState(null); // {exCount, setCount} once wrapped up
   const [logs, setLogs] = useState({}); // exercise_id -> log row
   const [library, setLibrary] = useState([]); // for hotel-mode swaps
   const [loading, setLoading] = useState(true);
@@ -632,7 +657,16 @@ function SessionLogger({ client, session, onBack }) {
       {error && <div className="api-error">{error}</div>}
       {loading && <p className="muted-note">Loading…</p>}
 
-      {!loading && day && (
+      {!loading && day && finished && (
+        <div className="session-done" role="status">
+          <div className="done-badge">✓</div>
+          <h2>Session complete</h2>
+          <p>{finished.exCount} exercise{finished.exCount === 1 ? "" : "s"} · {finished.setCount} set{finished.setCount === 1 ? "" : "s"} logged. Strong work — recovery starts now.</p>
+          <button className="btn" onClick={onBack}>← Back to workouts</button>
+        </div>
+      )}
+
+      {!loading && day && !finished && (
         <div className="log-list">
           {day.exercises.length === 0 && <p className="muted-note">No exercises in this workout.</p>}
           {day.exercises.map((ex) => (
@@ -645,6 +679,19 @@ function SessionLogger({ client, session, onBack }) {
               library={library}
             />
           ))}
+                  <button
+            type="button"
+            className="btn finish-btn"
+            onClick={async () => {
+              try {
+                const done = await api.listLogsForSession(session.id);
+                setFinished({ exCount: done.length, setCount: done.reduce((n, l) => n + (l.sets?.length || 0), 0) });
+              } catch { setFinished({ exCount: 0, setCount: 0 }); }
+              window.scrollTo({ top: 0, behavior: "smooth" });
+            }}
+          >
+            ✓ Finish session
+          </button>
         </div>
       )}
     </>
