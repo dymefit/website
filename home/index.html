@@ -479,8 +479,8 @@ h1.sheen::after {
       <label>Discount / beta code <span style="color:var(--mut);font-weight:400">(optional)</span></label>
       <input id="cdc" placeholder="FE-BETA-XXXX" autocomplete="off" style="text-transform:uppercase">
       <div id="cdcErr" style="display:none;color:#f87171;font-size:13px;margin-top:6px">That code isn’t valid or has already been used — check with your coach.</div>
-      <button class="btn btn-p" style="width:100%;justify-content:center;margin-top:20px" id="coBtn" onclick="coSubmit()">Continue</button>
-      <p style="text-align:center;color:var(--mut);font-size:12px;margin-top:12px">🔒 No payment collected online today — beta codes enroll free; otherwise we’ll email you to finish enrollment.</p>
+      <button class="btn btn-p" style="width:100%;justify-content:center;margin-top:20px" id="coBtn" onclick="coSubmit()">Continue to checkout</button>
+      <p style="text-align:center;color:var(--mut);font-size:12px;margin-top:12px">🔒 Secure checkout by Stripe — card, Apple Pay, or Google Pay. Have a beta code? Enter it above to enroll free.</p>
     </div>
     <div id="coDone" style="display:none" class="ok">
       <div class="check">✓</div><h3>Welcome aboard!</h3>
@@ -534,6 +534,12 @@ h1.sheen::after {
       .catch(()=>{alert('Connection problem \u2014 please try again.');})
       .finally(()=>{btn.disabled=false;btn.textContent='Confirm booking';});}
 
+  const STRIPE_LINKS={
+    'Youth Athlete Development':'https://buy.stripe.com/aFaeV5eLa9vD1gJde677O03',
+    'Injury-Prevention & Return':'https://buy.stripe.com/7sY3cn1Yo37fbVnde677O04',
+    'Sport Performance':'https://buy.stripe.com/eVq28jeLadLT2kNb5Y77O02',
+    'Lean Past 40 — Recomposition':'https://buy.stripe.com/14AeV5eLa0Z76B3a1U77O01'
+  };
   let coPrice=0,coTitle='';
   function openCheckout(name,price){closeAll();coTitle=name;coPrice=price;
     document.getElementById('checkO').classList.add('on');document.body.style.overflow='hidden';
@@ -543,7 +549,7 @@ h1.sheen::after {
     document.getElementById('coLineP').textContent='$'+price+'/mo';
     document.getElementById('coFirst').textContent='$'+price;
     document.getElementById('coTotal').textContent='$'+price;
-    document.getElementById('coPayAmt').textContent='$'+price;}
+    document.getElementById('cdcErr').style.display='none';}
   function fmtCard(el){let v=el.value.replace(/\D/g,'').slice(0,16);el.value=v.replace(/(.{4})/g,'$1 ').trim();}
   function fmtExp(el){let v=el.value.replace(/\D/g,'').slice(0,4);if(v.length>2)v=v.slice(0,2)+'/'+v.slice(2);el.value=v;}
   function coSubmit(){
@@ -554,15 +560,20 @@ h1.sheen::after {
     fetch('/api/enroll-request',{method:'POST',headers:{'content-type':'application/json'},
       body:JSON.stringify({name:n,email:e,package:coTitle,code:code})})
       .then(r=>r.json()).then(out=>{
-        b.disabled=false;b.textContent='Continue';
+        b.disabled=false;b.textContent='Continue to checkout';
         if(code && out.valid===false){err.style.display='block';return;}
         if(out.error){alert(out.error);return;}
+        if(!code && STRIPE_LINKS[coTitle]){
+          b.textContent='Opening secure checkout\u2026';b.disabled=true;
+          window.location.href=STRIPE_LINKS[coTitle]+'?prefilled_email='+encodeURIComponent(e);
+          return;
+        }
         document.getElementById('coStep1').style.display='none';document.getElementById('coDone').style.display='';
         document.getElementById('coSummary').textContent = code
           ? n+', your beta code is confirmed — '+coTitle+' is free during the beta. Next step: create your account at fitness-elevated.com/app using this same email ('+e+'). Your coach has been notified and will unlock your portal.'
           : n+', we received your enrollment request for '+coTitle+'. We\u2019ll email you shortly to complete payment and onboarding.';
       })
-      .catch(()=>{b.disabled=false;b.textContent='Continue';alert('Connection problem — please try again.');});
+      .catch(()=>{b.disabled=false;b.textContent='Continue to checkout';alert('Connection problem — please try again.');});
   }
 
   function closeAll(){document.querySelectorAll('.overlay').forEach(o=>o.classList.remove('on'));document.body.style.overflow='';}
