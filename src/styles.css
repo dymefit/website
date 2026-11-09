@@ -933,3 +933,11 @@ code { background: var(--panel-2); padding: 1px 5px; border-radius: 4px; font-si
 }
 .session-done h2 { margin-bottom: 8px; }
 .session-done p { color: var(--muted); margin-bottom: 18px; }
+
+/* Day-one welcome (no sessions yet) */
+.welcome-block { background: var(--panel); border: 1px solid var(--accent); border-radius: var(--radius); padding: 22px; }
+.welcome-block h2 { margin-bottom: 8px; }
+.welcome-block p { color: var(--muted); margin-bottom: 12px; }
+.welcome-block .prog-overview { margin: 6px 0 4px; }
+.prog-card.static { cursor: default; }
+.prog-card.static:hover { border-color: var(--line); background: var(--panel); }

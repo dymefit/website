@@ -383,13 +383,13 @@ h1.sheen::after {
   <button class="btn btn-p" onclick="openBook()">Book a Free Assessment →</button>
 </div></section>
 
-<!-- TESTIMONIALS -->
+<!-- RESULTS (founding-member season — real quotes only, when they exist) -->
 <section><div class="wrap">
-  <div class="sec-head"><span class="eyebrow">Results</span><h2>What clients say</h2></div>
-  <div class="quotes">
-    <div class="quote"><div class="stars">★★★★★</div><p>“My son went from constant shin pain to a full season injury-free. The programming actually explains <em>why</em> — we love that.”</p><div class="who">— Parent, youth soccer athlete</div></div>
-    <div class="quote"><div class="stars">★★★★★</div><p>“Added real distance to my drive and my back finally feels stable. Dymond’s TPI work is the real deal.”</p><div class="who">— Club golfer, 12 handicap → 6</div></div>
-    <div class="quote"><div class="stars">★★★★★</div><p>“Came back from a knee setback stronger than before. The return-to-play phases gave me confidence I didn’t have.”</p><div class="who">— Recreational basketball player</div></div>
+  <div class="sec-head"><span class="eyebrow">Results</span><h2>Logged, not quoted</h2></div>
+  <div class="quote" style="max-width:760px">
+    <p>No paid reviews, no borrowed stars. Fitness-Elevated is in its <strong>founding-member season</strong> — a small beta roster is training on the platform right now, and every rep is logged in the app, where progress can’t be embellished.</p>
+    <p style="margin-top:10px">As founding members finish their first blocks, their results will be posted here with real first names and real numbers — the same standard behind every claim on this site. Until then, the free assessment is the honest way to find out if this is for you.</p>
+    <div class="who" style="margin-top:12px">— Dymond Unutoa, CSCS · Founder</div>
   </div>
 </div></section>
 
@@ -432,11 +432,11 @@ h1.sheen::after {
     <button class="close" onclick="closeAll()">×</button>
     <div id="bookStep1">
       <span class="pill">Free 30-min assessment</span>
-      <h3>Book your session</h3>
-      <div class="sub">Pick a day and time — I’ll confirm by email.</div>
+      <h3>Request your assessment</h3>
+      <div class="sub">Pick a day and a preferred time — this is a request, not an instant booking. Coach confirms by email (or offers the closest open slot), usually the same day.</div>
       <label>Select a day</label>
       <div class="days" id="days"></div>
-      <label>Available times</label>
+      <label>Preferred time</label>
       <div class="slots" id="slots"></div>
       <button class="btn btn-p" style="width:100%;justify-content:center;margin-top:22px" onclick="bookNext()">Continue →</button>
     </div>
@@ -493,7 +493,7 @@ h1.sheen::after {
 
 <script>
   let selDay=null, selSlot=null;
-  const slotTimes=['7:00 AM','8:00 AM','9:00 AM','12:00 PM','1:00 PM','4:00 PM','5:00 PM','6:00 PM','7:00 PM'];
+  const slotTimes=['6:00 AM','7:00 AM','11:30 AM','4:00 PM','5:30 PM'];
   function buildDays(){
     const wrap=document.getElementById('days');wrap.innerHTML='';
     const dn=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];

@@ -32,6 +32,7 @@ export default function ClientPortal({ user, onSignOut }) {
   const [hotel, setHotel] = useState(false);     // hotel-equipment modal
   const [enrollment, setEnrollment] = useState(undefined); // undefined=loading, null=none, {}=signed
   const [myLogs, setMyLogs] = useState([]);
+  const [myPrograms, setMyPrograms] = useState([]);
 
   // Open the members-only guide in a new tab (window opens synchronously so
   // popup blockers allow it; content streams in after the authed fetch).
@@ -56,6 +57,7 @@ export default function ClientPortal({ user, onSignOut }) {
         const to = new Date(today); to.setDate(to.getDate() + 60);
         setSessions(await api.listSessions(me.id, ymd(from), ymd(to)));
         api.listClientLogs(me.id).then(setMyLogs).catch(() => setMyLogs([]));
+        api.listPrograms(me.id).then(setMyPrograms).catch(() => setMyPrograms([]));
       }
     } catch (e) {
       setError(e.message);
@@ -125,7 +127,9 @@ export default function ClientPortal({ user, onSignOut }) {
                 ＋ Log a tested max
               </button>
             </div>
-            <SessionList sessions={sessions} onOpen={setOpenSession} />
+            {sessions.length === 0
+              ? <WelcomeBlock programs={myPrograms} />
+              : <SessionList sessions={sessions} onOpen={setOpenSession} />}
             <MyProgress logs={myLogs} />
             <TrainingZones client={client} onSaved={(c) => setClient(c)} />
           </>
@@ -574,6 +578,44 @@ function MyProgress({ logs }) {
         <div className="stat"><b>{exercises}</b><span>exercises tracked</span></div>
       </div>
       <ProgressCharts logs={logs} />
+    </section>
+  );
+}
+
+
+// Day-one experience: a paying member should never see an empty room.
+function WelcomeBlock({ programs }) {
+  return (
+    <section className="welcome-block">
+      <h2>Welcome to Fitness-Elevated</h2>
+      {programs.length > 0 ? (
+        <>
+          <p>
+            Your program is loaded. Coach Dymond is scheduling your first sessions now —
+            they'll appear right here, and you'll get an email the moment the first one is up.
+          </p>
+          <div className="prog-overview">
+            {programs.map((p) => (
+              <div key={p.id} className="prog-card static">
+                <span className="prog-card-name">{p.name}</span>
+                <span className="prog-card-meta">
+                  {[p.type, p.level, p.weeks ? `${p.weeks} weeks` : null].filter(Boolean).join(" · ")}
+                </span>
+              </div>
+            ))}
+          </div>
+          <p className="muted-note">
+            While you wait: set your heart-rate zones below, browse the 🥗 Nutrition Guide,
+            and if you're traveling, tap 🏨 Hotel so your program can adapt.
+          </p>
+        </>
+      ) : (
+        <p>
+          Coach Dymond is building your program right now — you'll get an email as soon as
+          your schedule is live, usually within a day. Meanwhile: set your heart-rate zones
+          below and explore the 🥗 Nutrition Guide — it's all yours already.
+        </p>
+      )}
     </section>
   );
 }

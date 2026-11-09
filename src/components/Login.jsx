@@ -5,7 +5,8 @@ import { CONTACT_EMAIL } from "../lib/constants";
 
 export default function Login({ onBack }) {
   const { signIn, signUp } = useAuth();
-  const [mode, setMode] = useState("signin");
+  const paid = new URLSearchParams(window.location.search).has("welcome");
+  const [mode, setMode] = useState(paid ? "signup" : "signin");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -44,6 +45,13 @@ export default function Login({ onBack }) {
         <h1 className="auth-title">
           {mode === "signin" ? "Sign in" : "Create your account"}
         </h1>
+        {paid && (
+          <div className="auth-info" role="status">
+            🎉 Payment received — welcome to Fitness-Elevated! Create your account below using
+            the <strong>same email you used at checkout</strong>, and your coach will have your
+            program ready.
+          </div>
+        )}
         <p className="auth-sub">Coaches and clients sign in here.</p>
 
         <label className="field">
