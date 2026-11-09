@@ -9,4 +9,6 @@ cp home/index.html dist/index.html
 cp home/_headers dist/_headers
 cp home/legal.html dist/legal.html
 cp public/hero.jpg dist/hero.jpg
+cp home/band-bg.jpg dist/band-bg.jpg
+cp home/coach-about.jpg dist/coach-about.jpg
 netlify deploy --prod --dir=dist --functions=netlify/functions
